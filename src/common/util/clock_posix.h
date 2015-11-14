@@ -6,6 +6,7 @@
 
 #include "common/types.h"
 #include <string>
+#include <ctime>
 #include <boost/date_time/local_time/local_time.hpp>
 
 class CClock
@@ -26,12 +27,6 @@ class CClock
    }
 
 public:
-   enum EResolution {
-      EResolutionSeconds,
-      EResolutionMilliseconds,
-      EResolutionMicroseconds,
-      EResolutionNanoSeconds
-   };
 
    CClock() : iTimestamp(GetCurrentTime())
    {
@@ -61,8 +56,12 @@ public:
 
    static int64_t GetCurrentTicksUs()
    {
-      // ...
-      return 0;
+      timespec time;
+      if (0 == clock_gettime(CLOCK_MONOTONIC, &time)) {
+         return time.tv_sec * 1000000L + time.tv_nsec / 1000;
+      } else {
+         return 0;
+      }
    }
 };
 

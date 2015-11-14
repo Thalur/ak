@@ -13,7 +13,7 @@ const std::vector<std::string> CClock::kWeekDay { "Sunday", "Monday", "Tuesday",
 void CClock::InitPrecisionTimer()
 {
    LARGE_INTEGER data {};
-   sPerformanceCounterAvailable = QueryPerformanceFrequency(&data) != FALSE;
+   sPerformanceCounterAvailable = QueryPerformanceFrequency(&data) != false;
    sTicksPerSecond = data.QuadPart;
    sHighPrecisionInitialized = true;
 }
