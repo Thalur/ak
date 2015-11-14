@@ -32,7 +32,7 @@ public:
 
    // Additional memory file functionality
    TFileData GetBuffer() const { return iBuffer; }
-   std::stringstream CreateStream();
+//   std::stringstream CreateStream();
 
    char operator[] (TSize i) const { if (i < Size()) return iBuffer[i]; return -1; }
 

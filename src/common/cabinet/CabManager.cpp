@@ -78,13 +78,13 @@ TMemoryFilePtr CCabManager::GetFile(TSize aIndex) const
 {
    if (aIndex < iResourceIndex.size()) {
       const TIndexEntry& entry = iResourceIndex[aIndex];
-      LOG_DEBUG("GetFile: %"PRIuS" (%u, %u)", aIndex, entry.first, entry.second);
+      LOG_DEBUG("GetFile: %" PRIuS " (%u, %" PRIuS ")", aIndex, entry.first, entry.second);
       //return iCabinets[entry.first]->ReadFileByIndex(entry.second);
       TCabinetPtr cab = iCabinets[entry.first];
       if (cab) return cab->ReadFileByIndex(entry.second);
       else LOG_ERROR("Invalid cabinet handle");
    }
-   LOG_ERROR("Invalid index %"PRIuS, aIndex);
+   LOG_ERROR("Invalid index %" PRIuS, aIndex);
    return TMemoryFilePtr();
 }
 
@@ -97,6 +97,6 @@ TMemoryFilePtr CCabManager::GetFile(const std::string& aFilePrefix) const
       LOG_DEBUG("Found file %s: %u, %u", aFilePrefix.c_str(), std::get<1>(*it), std::get<2>(*it));
       return iCabinets[std::get<1>(*it)]->ReadFileByIndex(std::get<2>(*it));
    }
-   LOG_ERROR("Invalid prefix %s", aFilePrefix);
+   LOG_ERROR("Invalid prefix %s", aFilePrefix.c_str());
    return TMemoryFilePtr();
 }

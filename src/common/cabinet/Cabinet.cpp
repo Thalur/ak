@@ -121,7 +121,7 @@ bool CCabinet::ReadHeaderV2()
       //LOG_DEBUG("encryptHeaderSize = %u", encryptHeaderSize);
       TUint32 fileSize = GetUnsigned<TUint32>(data, 4, 4);
       if (fileSize != iFileSize) {
-         LOG_WARN("File size mismatch, expected %u, actual %"PRIu64, fileSize, iFileSize);
+         LOG_WARN("File size mismatch, expected %u, actual %" PRIu64, fileSize, iFileSize);
       }
       TUint32 numFiles = GetUnsigned<TUint32>(data, 8, 4);
       if (numFiles >= 16777216) {
@@ -341,9 +341,9 @@ TMemoryFilePtr CCabinet::ReadFileByIndex(TSize aIndex)
          if (ReadFilePart(data, iDataOffset+entry.iFileOffset, size, 2*aIndex+1, entry.iEncrypted, entry.iCompressed))
          {
             return std::make_shared<CMemoryFile>(std::move(data));
-         } else LOG_ERROR("Could not read file %"PRIuS" from cabinet", aIndex);
-      } else LOG_ERROR("File %"PRIuS" is too large to store in memory", aIndex);
-   } else LOG_ERROR("Invalid file index %"PRIuS, aIndex);
+         } else LOG_ERROR("Could not read file %" PRIuS " from cabinet", aIndex);
+      } else LOG_ERROR("File %" PRIuS " is too large to store in memory", aIndex);
+   } else LOG_ERROR("Invalid file index %" PRIuS, aIndex);
    return TMemoryFilePtr();
 }
 

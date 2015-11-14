@@ -55,7 +55,7 @@ inline void WriteLogEntry(std::ostream& aOut, std::string aTimeStamp, std::strin
         << std::endl;
 }
 
-}
+} // namespace
 
 namespace NLogging {
 
@@ -70,12 +70,12 @@ void InitLogFile(std::string aAppName)
       *logFile << "*** " << aAppName << " log file started at " << now.GetDateLong() << std::endl;
       *logFile << "*** " PLATFORM_NAME " system detected as "
                << (sizeof(int*)*8) << " bit (max integral: " 
-               << _INTEGRAL_MAX_BITS << " bit, size_t: " << (sizeof(TSize)*8) << ")" << std::endl;
+               /*<< _INTEGRAL_MAX_BITS*/ << " bit, size_t: " << (sizeof(TSize)*8) << ")" << std::endl;
       loggerInitialized = true;
    }
 }
 
-void LogAppend(TInt32 aLogLevel, std::string aFile, std::string aFunc, int aLine, std::string aMessage, ...)
+void LogAppend(int32_t aLogLevel, std::string aFile, std::string aFunc, int aLine, std::string aMessage, ...)
 {
    if (!loggerInitialized && !uninitializedLoggerUseReported) {
       uninitializedLoggerUseReported = true;
@@ -86,7 +86,8 @@ void LogAppend(TInt32 aLogLevel, std::string aFile, std::string aFunc, int aLine
    char buffer[510];
    va_list args;
    va_start(args, aMessage);
-   vsnprintf_s(buffer, 510, _TRUNCATE, aMessage.c_str(), args);
+   vsnprintf(buffer, 500, aMessage.c_str(), args);
+   //vsnprintf_s(buffer, 510, _TRUNCATE, aMessage.c_str(), args);
    va_end(args);
 
    CClock now;

@@ -68,7 +68,7 @@ bool CMemoryFile::Read(TFileData& aResult, TSize aPosition, TSize aSize)
    return true;
 }
 
-std::stringstream CMemoryFile::CreateStream()
+/*std::stringstream CMemoryFile::CreateStream()
 {
 #ifdef _WIN32 // MSVC does not support replacing the stringstream back buffer
    return std::stringstream(std::string(&iBuffer[0], Size()), std::stringstream::in);
@@ -77,7 +77,7 @@ std::stringstream CMemoryFile::CreateStream()
    stream.rdbuf()->pubsetbuf(&iBuffer[0], Size());
    return stream;
 #endif
-}
+}*/
 
 
 CWriteableMemoryFile::CWriteableMemoryFile(TSize aSize) : CMemoryFile(TFileData(aSize))

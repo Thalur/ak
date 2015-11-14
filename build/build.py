@@ -6,13 +6,13 @@
 # ToDo list:
 #  * add cmake parameters to allow generation (no GUI required)
 #  * add missing build target systems: linux, android, osx, ios
-#  * change "clean" to simply remove bin/cmake/project...
+#  * generalize build configurations by having one config file per target
 #
 import sys
 import os
 import glob
+import shutil
 from subprocess import call
-from shutil import copy2
 
 # For now, all build targets and options are hard-coded in this file
 glob_targets = [ [ "akcab", "    - Cabinet file command line tool" ],
@@ -75,7 +75,7 @@ class cd:
 # Build configuration implementations (per target system)
 #####
 
-def build_win(target, mode, clean):
+def build_win(target, mode):
   try:
     config = "-D_AK_PROJECT=" + target.upper()
     client = "-D_AK_CLIENT=0"
@@ -87,9 +87,23 @@ def build_win(target, mode, clean):
     if res != 0:
       return False
     buildCmd = "cmake --build . --config " + mode.upper()
-    if clean:
-      buildCmd += " --clean-first"
     res = call(buildCmd, shell=True)
+    return res == 0
+  except KeyboardInterrupt: # do not crash on Ctrl+C
+    return False
+
+def build_linux(target, mode):
+  try:
+    config = "-D_AK_PROJECT=" + target.upper()
+    client = "-D_AK_CLIENT=0"
+    target_index = option_contains(glob_targets, target)
+    if glob_target_requires_client[target_index]:
+      client = "-D_AK_CLIENT=1"
+    cmakeCmd = [ 'cmake', '-G', 'Unix Makefiles', config, client, '-D_AK_TARGET=LINUX', "-DCMAKE_BUILD_TYPE="+mode, '../../../../src']
+    res = call(cmakeCmd)
+    if res != 0:
+      return False
+    res = call('make')
     return res == 0
   except KeyboardInterrupt: # do not crash on Ctrl+C
     return False
@@ -102,28 +116,33 @@ def build_nyi(target, mode, clean):
 
 def copy_files(source, target):
   for file in glob.glob(source):
-    copy2(file, target)
-
+    shutil.copy2(file, target)
 
 def run_build(target, system, mode, clean):
   print "\n*** Starting build of " + target + " for " + system + " (" + mode + ")..."
   buildResult = False;
   outputDir = os.path.join("..", "bin", "cmake", target, system)
+  if clean and os.path.exists(outputDir):
+    print "*** Cleaning workspace by removing " + outputDir
+    shutil.rmtree(outputDir)
   if not os.path.exists(outputDir):
     os.makedirs(outputDir)
   with cd(outputDir):
     build_fct = "build_" + system
-    buildResult = globals().get(build_fct, build_nyi)(target, mode, clean)
+    buildResult = globals().get(build_fct, build_nyi)(target, mode)
   if buildResult:
     binDir = os.path.join("..", "bin", target, system, mode)
     if not os.path.exists(binDir):
       os.makedirs(binDir)
     # TODO: generalize for all projects / targets
-    copy_files(outputDir+"/projects/"+target+"/"+mode+"/*.exe", binDir)
-    copy_files(outputDir+"/projects/"+target+"/"+mode+"/*.pdb", binDir)
-    if (target == "animview"):
-      copy2("../lib/freeglut/bin/x64/freeglut.dll", binDir)
-      copy2("../lib/glew-1.12.0/bin/Release/x64/glew32.dll", binDir)
+    if system == "win":
+      copy_files(outputDir+"/projects/"+target+"/"+mode+"/*.exe", binDir)
+      copy_files(outputDir+"/projects/"+target+"/"+mode+"/*.pdb", binDir)
+      if (target == "animview"):
+        shutil.copy2("../lib/freeglut/bin/x64/freeglut.dll", binDir)
+        shutil.copy2("../lib/glew-1.12.0/bin/Release/x64/glew32.dll", binDir)
+    elif system == "linux":
+      shutil.copy2(outputDir+"/projects/"+target+"/AKCab", binDir)
   return buildResult
 
 def get_targets(argv, target_system):

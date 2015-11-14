@@ -1,6 +1,8 @@
 # Build with: build.py (in build dir)
-cmake_minimum_required (VERSION 3.3)
+cmake_minimum_required (VERSION 2.8) # no particular reason for that version
+cmake_policy(SET CMP0003 NEW)
 
+# Self-defined variables from build.py
 if (NOT DEFINED _AK_PROJECT)
   message(FATAL_ERROR "No project definition found")
 elseif (NOT DEFINED _AK_TARGET)
@@ -12,17 +14,37 @@ SET(AK_PROJECT ${_AK_PROJECT})
 SET(AK_TARGET ${_AK_TARGET})
 SET(AK_CLIENT ${_AK_CLIENT})
 
-
+# C++ compiler settings
+if ("${AK_TARGET}" STREQUAL "WIN")
+  add_definitions(-DAK_SYSTEM_WINDOWS)
+elseif ("${AK_TARGET}" STREQUAL "LINUX")
+  add_definitions(-DAK_SYSTEM_LINUX)
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+elseif ("${AK_TARGET}" STREQUAL "ANDROID")
+  add_definitions(-DAK_SYSTEM_ANDROID)
+  message(FATAL_ERROR "Android build is not supported yet")
+elseif ("${AK_TARGET}" STREQUAL "OSX")
+  add_definitions(-DAK_SYSTEM_OSX)
+  message(FATAL_ERROR "OSX build is not supported yet")
+elseif ("${AK_TARGET}" STREQUAL "IOS")
+  add_definitions(-DAK_SYSTEM_IOS)
+  message(FATAL_ERROR "iOS build is not supported yet")
+else()
+  message(FATAL_ERROR "Invalid system specified")
+endif()
+  
+# Global include paths
 include_directories ("./")
+include_directories ("../lib/boost_1_59_0")
 
+# Boost settings
 add_definitions (-DBOOST_ALL_NO_LIB)
 set (Boost_USE_STATIC_LIBS ON)
 set (Boost_USE_MULTITHREADED ON)
 set (Boost_USE_STATIC_RUNTIME OFF)
-
-include_directories ("../lib/boost_1_59_0")
 add_subdirectory (../lib/boost_1_59_0 ${CMAKE_CURRENT_BINARY_DIR}/boost)
 
+# Targets
 add_subdirectory(common)
 add_subdirectory(projects)
 IF ("${AK_CLIENT}" STREQUAL "1")

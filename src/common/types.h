@@ -7,6 +7,7 @@
 #define __STDC_FORMAT_MACROS
 #include <cinttypes>
 #include <cstddef>
+#include <memory> // std::unique_ptr
 
 /*#if defined(_WIN32)
   #include "windows/types_win.h"
@@ -46,6 +47,13 @@ typedef std::size_t TSize;
 #define PRIuS __PRIS_PREFIX "u"
 #define PRIXS __PRIS_PREFIX "X"
 #define PRIoS __PRIS_PREFIX "o"
+
+// C++11 replacement formake_unique
+template<typename T, typename... Ts>
+std::unique_ptr<T> make_unique(Ts&&... params)
+{
+   return std::unique_ptr<T>(new T(std::forward<Ts>(params)...));
+}
 
 
 #endif // AK_TYPES_H_INCLUDED

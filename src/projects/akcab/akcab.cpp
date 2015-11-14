@@ -640,6 +640,7 @@ uint32_t GetRandomNumber()
 
 int main(int argc, char** argv)
 {
+   cout << "AK Cabinet Creation tool v0.1 alpha" << endl;
    std::string cabFileName;
    if (argc >= 2) cabFileName = argv[1];
    if (cabFileName.empty() || (NONE != GetCommandType(cabFileName)) || (EMPTY != GetOptionType(cabFileName))) {
@@ -677,9 +678,9 @@ int main(int argc, char** argv)
          } else {
             TCreateCabPtr destCab;
             if (sourceCab) {
-               destCab = std::make_unique<CCreateCabinet>(sourceCab);
+               destCab = make_unique<CCreateCabinet>(sourceCab);
             } else {
-               destCab = std::make_unique<CCreateCabinet>();
+               destCab = make_unique<CCreateCabinet>();
             }
             destCab->SetDestFile(destFile);
             destCab->SetEncryptionKey(key);

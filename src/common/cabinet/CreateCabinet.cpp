@@ -51,7 +51,7 @@ CCreateCabinet::CCreateCabinet(const TCabinetPtr& aSourceCabinet)
 {
    TSize size = iSourceCabinet->iEntries.size();
    iEntries.reserve(size);
-   LOG_DEBUG("Adding %"PRIuS" cabinet files", size);
+   LOG_DEBUG("Adding %" PRIuS " cabinet files", size);
    for (TSize i = 0; i < size; i++) {
       const CCabinetEntry& entry = iSourceCabinet->iEntries[i];
       iEntries.emplace_back(entry.iFilename, entry.iEncrypted, entry.iCompressed, iSourceCabinet, i);
@@ -180,11 +180,11 @@ bool CCreateCabinet::WriteToDisk()
             content = std::move(memFile->GetBuffer());
             curSize = content.size();
          } else {
-            LOG_ERROR("Could not read file %s from cabinet", entry.iFilename);
+            LOG_ERROR("Could not read file %s from cabinet", entry.iFilename.c_str());
             return false;
          }
       } else if (!entry.iSourceFile->Read(content, 0, curSize)) {
-         LOG_ERROR("Could not read from file %s", entry.iFilename);
+         LOG_ERROR("Could not read from file %s", entry.iFilename.c_str());
          return false;
       }
 
@@ -235,7 +235,7 @@ bool CCreateCabinet::WriteToDisk()
    iFile->Insert(firstHeader, 0);
    iFile->Close();
 
-   LOG_DEBUG("Written cabinet to disk. File size: %"PRIuS", written %"PRIuS, iFile->Size(), 24 + header.size() + currentPosition);
+   LOG_DEBUG("Written cabinet to disk. File size: %" PRIuS ", written %" PRIuS, iFile->Size(), 24 + header.size() + currentPosition);
    return true;
 }
 
@@ -253,7 +253,7 @@ bool CCreateCabinet::DeflateData(TFileData& aData, bool aForceDeflation)
 {
    TSize size = aData.size();
    if (size < 100 && !aForceDeflation) { // Do not compress tiny files
-      LOG_DEBUG("Not deflating %"PRIuS" bytes", size);
+      LOG_DEBUG("Not deflating %" PRIuS " bytes", size);
       return false;
    }
 
@@ -282,12 +282,12 @@ bool CCreateCabinet::DeflateData(TFileData& aData, bool aForceDeflation)
 
    TSize small = strm.total_out;
    if (aForceDeflation || (small+100 < size) && (static_cast<double>(small)/static_cast<double>(size) <= 0.9)) {
-      LOG_DEBUG("Deflated data from %"PRIuS" to %"PRIuS, size, small);
+      LOG_DEBUG("Deflated data from %" PRIuS " to %" PRIuS, size, small);
       deflateBuffer.resize(small+4);
       aData.swap(deflateBuffer);
       return true;
    }
-   LOG_DEBUG("Not deflating for too little gain: from %"PRIuS" to %"PRIuS, size, small);
+   LOG_DEBUG("Not deflating for too little gain: from %" PRIuS " to %" PRIuS, size, small);
    return false;
 }
 

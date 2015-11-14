@@ -4,14 +4,26 @@
 #include "common/util/clock.h"
 #include "boost/date_time/time_zone_base.hpp"
 
-//bool CClock::sTimeZoneInitialized = false;
-//boost::local_time::time_zone_ptr CClock::sTimeZone = boost::local_time::time_zone_ptr();
+#ifdef AK_SYSTEM_WINDOWS
 bool CClock::sHighPrecisionInitialized = false;
 bool CClock::sPerformanceCounterAvailable = false;
-TInt64 CClock::sTicksPerSecond = 0;
+int64_t CClock::sTicksPerSecond = 0;
 const std::vector<std::string> CClock::kWeekDay { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
 
-/*void CClock::InitTimeZone()
+void CClock::InitPrecisionTimer()
+{
+   LARGE_INTEGER data {};
+   sPerformanceCounterAvailable = QueryPerformanceFrequency(&data) != FALSE;
+   sTicksPerSecond = data.QuadPart;
+   sHighPrecisionInitialized = true;
+}
+
+#else // AK_SYSTEM_WINDOWS
+
+bool CClock::sTimeZoneInitialized = false;
+boost::local_time::time_zone_ptr CClock::sTimeZone = boost::local_time::time_zone_ptr();
+
+void CClock::InitTimeZone()
 {
    boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
    boost::posix_time::ptime utc = boost::posix_time::second_clock::universal_time();
@@ -25,14 +37,7 @@ const std::vector<std::string> CClock::kWeekDay { "Sunday", "Monday", "Tuesday",
    boost::local_time::time_zone_ptr zone(new boost::local_time::posix_time_zone(ss.str().c_str()));
    sTimeZone = zone;
    sTimeZoneInitialized = true;
-}*/
-
-#ifdef _WIN32
-void CClock::InitPrecisionTimer()
-{
-   LARGE_INTEGER data {};
-   sPerformanceCounterAvailable = QueryPerformanceFrequency(&data) != FALSE;
-   sTicksPerSecond = data.QuadPart;
-   sHighPrecisionInitialized = true;
 }
-#endif
+
+#endif // AK_SYSTEM_WINDOWS
+

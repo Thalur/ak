@@ -47,7 +47,7 @@ protected:
    bool iCanWrite;
 
 private:
-   static TPosixFilePtr CPosixFile::MakeFile(const std::string& aFilename, std::ios_base::openmode aMode, bool aAllowWrite);
+   static TPosixFilePtr MakeFile(const std::string& aFilename, std::ios_base::openmode aMode, bool aAllowWrite);
    void MoveChunk(TSize aSourcePos, TSize aSize, TSize aDestPos);
 };
 

@@ -17,7 +17,7 @@ inline bool FileExists(const std::string& aFilename)
 
 TPosixFilePtr CPosixFile::MakeFile(const std::string& aFilename, std::ios_base::openmode aMode, bool aAllowWrite)
 {
-   std::unique_ptr<std::fstream> stream = std::make_unique<std::fstream>(aFilename.c_str(), aMode);
+   std::unique_ptr<std::fstream> stream = make_unique<std::fstream>(aFilename.c_str(), aMode);
    if (stream->good()) {
       return TPosixFilePtr(new CPosixFile(aFilename, aMode&(~std::ios_base::trunc), stream, aAllowWrite));
    }
