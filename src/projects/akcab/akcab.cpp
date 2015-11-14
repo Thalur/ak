@@ -678,9 +678,9 @@ int main(int argc, char** argv)
          } else {
             TCreateCabPtr destCab;
             if (sourceCab) {
-               destCab = make_unique<CCreateCabinet>(sourceCab);
+               destCab = ::make_unique<CCreateCabinet>(sourceCab);
             } else {
-               destCab = make_unique<CCreateCabinet>();
+               destCab = ::make_unique<CCreateCabinet>();
             }
             destCab->SetDestFile(destFile);
             destCab->SetEncryptionKey(key);

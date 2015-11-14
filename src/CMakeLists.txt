@@ -15,7 +15,7 @@ SET(AK_TARGET ${_AK_TARGET})
 SET(AK_CLIENT ${_AK_CLIENT})
 
 # C++ compiler settings
-if ("${AK_TARGET}" STREQUAL "WIN")
+if ("${AK_TARGET}" STREQUAL "WIN64")
   add_definitions(-DAK_SYSTEM_WINDOWS)
 elseif ("${AK_TARGET}" STREQUAL "LINUX")
   add_definitions(-DAK_SYSTEM_LINUX)

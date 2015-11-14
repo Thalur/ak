@@ -86,8 +86,11 @@ void LogAppend(int32_t aLogLevel, std::string aFile, std::string aFunc, int aLin
    char buffer[510];
    va_list args;
    va_start(args, aMessage);
+#ifdef AK_SYSTEM_WINDOWS
+   vsnprintf_s(buffer, 500, _TRUNCATE, aMessage.c_str(), args);
+#else
    vsnprintf(buffer, 500, aMessage.c_str(), args);
-   //vsnprintf_s(buffer, 510, _TRUNCATE, aMessage.c_str(), args);
+#endif
    va_end(args);
 
    CClock now;
