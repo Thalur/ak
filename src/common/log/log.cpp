@@ -33,7 +33,7 @@ inline const std::string& GetLevelString(ELogLevel aLogLevel)
       return logInfo;
    case ELogLevel::WARN:
       return logWarn;
-   case ELogLevel::ERROR:
+   case ELogLevel::ERR:
       return logError;
    default:
       return logInvalid;
