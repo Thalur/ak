@@ -7,12 +7,10 @@
 #include "common/util/typeconversions.h"
 #include <algorithm>
 #include <iostream>
-
-//#define ZLIB_WINAPI
 #include "zlib.h"
 
 
-CCabinetEntry::CCabinetEntry(const std::string& aFilename, TUint64 aOffset, TUint64 aSize, bool aCompressed, bool aEncrypted)
+CCabinetEntry::CCabinetEntry(const std::string& aFilename, uint64_t aOffset, uint64_t aSize, bool aCompressed, bool aEncrypted)
  :	iFilename(aFilename), iFileOffset(aOffset), iFileSize(aSize), iCompressed(aCompressed), iEncrypted(aEncrypted)
 {
    // Get file prefix and extension
@@ -29,17 +27,17 @@ CCabinetEntry::CCabinetEntry(const std::string& aFilename, TUint64 aOffset, TUin
 
 namespace {
 
-static const TUint32 kFilePrefix = 0xA9414BB1;
-static const TUint64 kFirstHeaderSize = 24;
-static const TUint8 kEncrypted = 1;
-static const TUint8 kCompressed = 2;
+static const uint32_t kFilePrefix = 0xA9414BB1;
+static const uint64_t kFirstHeaderSize = 24;
+static const uint8_t kEncrypted = 1;
+static const uint8_t kCompressed = 2;
 
 template <typename T>
 inline T GetUnsigned(const TFileData& aData, TSize aPosition, TSize aSize)
 {
    T result = 0;
    for (TSize i = 0; i < aSize; i++) {
-		result += (static_cast<TUint8>(aData[aPosition+i]) << (8*(aSize-i-1)));
+      result += (static_cast<uint8_t>(aData[aPosition+i]) << (8*(aSize-i-1)));
    }
    return result;
 }
@@ -47,7 +45,7 @@ inline T GetUnsigned(const TFileData& aData, TSize aPosition, TSize aSize)
 std::string GetString(const TFileData& aData, TSize aPosition, TSize aMaxSize, TSize& aResultPosition)
 {
    if (2 <= aMaxSize) {
-      TUint16 size = GetUnsigned<TUint16>(aData, aPosition, 2);
+      uint16_t size = GetUnsigned<uint16_t>(aData, aPosition, 2);
       if (size+2 <= aMaxSize) {
          aResultPosition = aPosition + 2 + size;
          if (size > 0) {
@@ -75,13 +73,15 @@ bool CompareEntryForSearch(const CCabinetEntry& e1, const TSearchParam& a2)
 
 }
 
-CCabinet::CCabinet(TFilePtr& aFile, TInt32 aKey)
+CCabinet::CCabinet(TFilePtr& aFile, int32_t aKey)
  : iFile(aFile), iDecryptionKey(aKey), iCabinetVersion(0), iFileSize(aFile->Size())
 {
+   LOG_METHOD();
 }
 
-TCabinetPtr CCabinet::Open(TFilePtr& aFile, TInt32 aKey)
+TCabinetPtr CCabinet::Open(TFilePtr& aFile, int32_t aKey)
 {
+   LOG_METHOD();
    TCabinetPtr cab = std::make_shared<CCabinet>(CCabinet(aFile, aKey));
    aFile->Open();
    if (cab->ReadHeader()) {
@@ -93,12 +93,13 @@ TCabinetPtr CCabinet::Open(TFilePtr& aFile, TInt32 aKey)
 
 bool CCabinet::ReadHeader()
 {
+   LOG_METHOD();
    TFileData data;
    if (iFile->Read(data, 0, 8)) {
-      TUint32 prefix = GetUnsigned<TUint32>(data, 0, 4);
+      uint32_t prefix = GetUnsigned<uint32_t>(data, 0, 4);
       if (prefix == kFilePrefix) {
-         iPatchCycle = GetUnsigned<TUint16>(data, 4, 2);
-         iCabinetVersion = GetUnsigned<TUint16>(data, 6, 2);
+         iPatchCycle = GetUnsigned<uint16_t>(data, 4, 2);
+         iCabinetVersion = GetUnsigned<uint16_t>(data, 6, 2);
          if (iCabinetVersion == 3) {
             return ReadHeaderV3(); // current version
          } else if (iCabinetVersion == 2) {
@@ -111,24 +112,23 @@ bool CCabinet::ReadHeader()
 
 bool CCabinet::ReadHeaderV2()
 {
+   LOG_METHOD();
    if (iPatchCycle != 0) {
       LOG_WARN("Patch cycle is not supported in V2 and is required to be 0 for backwards compatibility");
    }
    TFileData data;
    if (iFile->Read(data, 8, 12)) {
-      TUint32 encryptHeaderSize = GetUnsigned<TUint32>(data, 0, 4);
+      uint32_t encryptHeaderSize = GetUnsigned<uint32_t>(data, 0, 4);
       iEncryption = (encryptHeaderSize != 0 ? ENCRYPT_AKV2 : ENCRYPT_NONE);
-      //LOG_DEBUG("encryptHeaderSize = %u", encryptHeaderSize);
-      TUint32 fileSize = GetUnsigned<TUint32>(data, 4, 4);
+      uint32_t fileSize = GetUnsigned<uint32_t>(data, 4, 4);
       if (fileSize != iFileSize) {
          LOG_WARN("File size mismatch, expected %u, actual %" PRIu64, fileSize, iFileSize);
       }
-      TUint32 numFiles = GetUnsigned<TUint32>(data, 8, 4);
+      uint32_t numFiles = GetUnsigned<uint32_t>(data, 8, 4);
       if (numFiles >= 16777216) {
          numFiles -= 16777216;
          iCompression = COMPRESS_ZIP;
       } else iCompression = COMPRESS_NONE;
-      //LOG_DEBUG("numFiles = %u", numFiles);
 
       iDataOffset = 0;
       if (numFiles == 0) {
@@ -146,16 +146,15 @@ bool CCabinet::ReadHeaderV2()
       {
          iCompression = oldCompression;
          TSize pos = 0;
-         for (TUint32 i = 0; i < numFiles; i++) {
+         for (uint32_t i = 0; i < numFiles; i++) {
             std::string fName = GetString(data, pos, encryptHeaderSize-pos, pos);
             if (fName.empty() || (pos+9 > encryptHeaderSize)) {
                LOG_ERROR("Error reading file header data");
                return false;
             }
-            //LOG_DEBUG("File: %s", fName.c_str());
-            TUint32 offset = GetUnsigned<TUint32>(data, pos, 4);
-            TUint32 size = GetUnsigned<TUint32>(data, pos+4, 4);
-            TUint8 flags = static_cast<TUint8>(data[pos+8]);
+            uint32_t offset = GetUnsigned<uint32_t>(data, pos, 4);
+            uint32_t size = GetUnsigned<uint32_t>(data, pos+4, 4);
+            uint8_t flags = static_cast<uint8_t>(data[pos+8]);
             pos += 9;
             iEntries.push_back(std::move(CCabinetEntry(fName, offset, size,
                (flags&kCompressed) > 0 && IsCompressed(), (flags&kEncrypted) > 0 &&IsEncrypted())));
@@ -173,15 +172,14 @@ bool CCabinet::ReadHeaderV2()
 
 bool CCabinet::ReadHeaderV3()
 {
+   LOG_METHOD();
    TFileData data;
    if (iFile->Read(data, 8, 16)) {
-      TUint32 headerSize = GetUnsigned<TUint32>(data, 0, 4);
+      uint32_t headerSize = GetUnsigned<uint32_t>(data, 0, 4);
       iEncryption = static_cast<TEncryption>(data[4]);
-      TUint64 fileSize = GetUnsigned<TUint64>(data, 5, 6);
+      uint64_t fileSize = GetUnsigned<uint64_t>(data, 5, 6);
       iCompression = static_cast<TCompression>(data[11]);
-      TUint32 numFiles = GetUnsigned<TUint32>(data, 12, 4);
-      //LOG_DEBUG("headerSize=%u, fileSize=%u, numFiles=%u, iEncryption=%u, iCompression=%u",
-      //          headerSize, fileSize, numFiles, (TUint8)iEncryption, (TUint8)iCompression);
+      uint32_t numFiles = GetUnsigned<uint32_t>(data, 12, 4);
       if ((headerSize+kFirstHeaderSize <= fileSize) && (fileSize == iFileSize) &&
           (iEncryption <= ENCRYPT_AKV2) && (iCompression <= COMPRESS_ZIP))
       {
@@ -195,7 +193,7 @@ bool CCabinet::ReadHeaderV3()
             TSize pos = 0;
             std::string lastName;
             bool bSorted = true;
-            for (TUint32 i = 0; i < numFiles; i++) {
+            for (uint32_t i = 0; i < numFiles; i++) {
                std::string fName = GetString(data, pos, dataSize-pos, pos);
                if (fName.empty() || (pos+12 > dataSize)) {
                   LOG_ERROR("Error reading file header data");
@@ -204,9 +202,9 @@ bool CCabinet::ReadHeaderV3()
                if (!lastName.empty() && (lastName >= fName)) {
                   bSorted = false;
                }
-               TUint64 offset = GetUnsigned<TUint64>(data, pos, 6);
-               TUint64 size = GetUnsigned<TUint64>(data, pos+6, 5);
-               TUint8 flags = static_cast<TUint8>(data[pos+11]);
+               uint64_t offset = GetUnsigned<uint64_t>(data, pos, 6);
+               uint64_t size = GetUnsigned<uint64_t>(data, pos+6, 5);
+               uint8_t flags = static_cast<uint8_t>(data[pos+11]);
                pos += 12;
                iEntries.push_back(std::move(CCabinetEntry(fName, offset, size,
                   (flags&kCompressed) > 0 && IsCompressed(), (flags&kEncrypted) > 0 &&IsEncrypted())));
@@ -227,7 +225,7 @@ bool CCabinet::ReadHeaderV3()
    return false;
 }
 
-bool CCabinet::ReadFilePart(TFileData& aResult, TUint64 aOffset, TUint64 aSize, TUint64 aKeyOffset,
+bool CCabinet::ReadFilePart(TFileData& aResult, uint64_t aOffset, uint64_t aSize, uint64_t aKeyOffset,
                             bool aEncrypted, bool aCompressed)
 {
    bool bOK = iFile->Read(aResult, aOffset, aSize);
@@ -236,12 +234,12 @@ bool CCabinet::ReadFilePart(TFileData& aResult, TUint64 aOffset, TUint64 aSize, 
    return bOK;
 }
 
-bool CCabinet::DecryptData(TFileData& aData, TUint64 aKeyOffset)
+bool CCabinet::DecryptData(TFileData& aData, uint64_t aKeyOffset)
 {
    TSize length = aData.size();
    CJavaRandom jr{iDecryptionKey + aKeyOffset};
    for (int i = 0; i < length; i++) {
-      aData[i] = (char)(((TUint32)aData[i] + 512 - jr.nextInt(256)) % 256);
+      aData[i] = (char)(((uint32_t)aData[i] + 512 - jr.nextInt(256)) % 256);
    }
    return true;
 }
@@ -250,8 +248,8 @@ bool CCabinet::InflateData(TFileData& aData)
 {
    TSize size = aData.size();
    if (size < 4) return false;
-   TUint32 originalSize = GetUnsigned<TUint32>(aData, 0, 4);
-   //LOG_DEBUG("Inflating entry from size %"PRIuS" to %u", size, originalSize);
+   uint32_t originalSize = GetUnsigned<uint32_t>(aData, 0, 4);
+   LOG_DEBUG("Inflating entry from size %" PRIuS " to %u", size, originalSize);
 
    TFileData inflateBuffer;
    inflateBuffer.resize(originalSize);
@@ -260,7 +258,7 @@ bool CCabinet::InflateData(TFileData& aData)
    strm.zfree  = Z_NULL;
    strm.opaque = Z_NULL;
    strm.next_in = (unsigned char *)(&aData[4]);
-   strm.avail_in = static_cast<TUint32>(size-4);
+   strm.avail_in = static_cast<uint32_t>(size-4);
    strm.avail_out = originalSize;
    strm.next_out = (unsigned char *)(&inflateBuffer[0]);
    int result = inflateInit2(&strm, -15); // zlib encoding without headers
@@ -283,6 +281,7 @@ bool CCabinet::InflateData(TFileData& aData)
 
 void CCabinet::PrintFileIndex() const
 {
+   LOG_METHOD();
    for (const CCabinetEntry& e: iEntries) {
       char mod = ' ';
       if (e.iCompressed)
@@ -309,6 +308,7 @@ TMemoryFilePtr CCabinet::ReadFileByPrefix(const std::string& aPrefix)
 
 bool CCabinet::GetFileIndex(TSize& outIndex, const std::string& aFilename) const
 {
+   LOG_METHOD();
    auto it = std::lower_bound(iEntries.begin(), iEntries.end(), TSearchParam(aFilename, true), CompareEntryForSearch);
    if (it != iEntries.end()) {
       outIndex = it - iEntries.begin();
@@ -319,6 +319,7 @@ bool CCabinet::GetFileIndex(TSize& outIndex, const std::string& aFilename) const
 
 TMemoryFilePtr CCabinet::ReadFile(const std::string& aName, bool aFullName)
 {
+   LOG_METHOD();
    std::vector<CCabinetEntry>::iterator it = std::lower_bound(iEntries.begin(), iEntries.end(),
       TSearchParam(aName, aFullName), CompareEntryForSearch);
    if (it != iEntries.end()) {
@@ -332,6 +333,7 @@ TMemoryFilePtr CCabinet::ReadFile(const std::string& aName, bool aFullName)
 
 TMemoryFilePtr CCabinet::ReadFileByIndex(TSize aIndex)
 {
+   LOG_METHOD();
    if (aIndex < iEntries.size()) {
       const CCabinetEntry& entry = iEntries[aIndex];
       TSize size = entry.iFileSize;
@@ -349,6 +351,7 @@ TMemoryFilePtr CCabinet::ReadFileByIndex(TSize aIndex)
 
 std::vector<TEntryIndex> CCabinet::GetFileList() const
 {
+   LOG_METHOD();
    const TSize size = iEntries.size();
    std::vector<TEntryIndex> result;
    result.reserve(size);
@@ -360,6 +363,7 @@ std::vector<TEntryIndex> CCabinet::GetFileList() const
 
 std::vector<TEntryIndex> CCabinet::GetFilePrefixList() const
 {
+   LOG_METHOD();
    const TSize size = iEntries.size();
    std::vector<TEntryIndex> result;
    result.reserve(size);

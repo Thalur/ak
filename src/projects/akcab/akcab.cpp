@@ -1,6 +1,7 @@
 /**
  *
  */
+#include "common/log/log.h"
 #include "common/cabinet/CreateCabinet.h"
 #include "common/cabinet/PosixFile.h"
 #include <map>
@@ -20,6 +21,8 @@ using std::endl;
 using TStrings = std::vector<std::string>;
 using TCreateCabPtr = std::unique_ptr<CCreateCabinet>;
 namespace bfs = boost::filesystem;
+
+const std::string appName { "AK Cabinet Creation tool v0.1 alpha" };
 
 const std::string errorString { "ERROR" };
 
@@ -640,7 +643,8 @@ uint32_t GetRandomNumber()
 
 int main(int argc, char** argv)
 {
-   cout << "AK Cabinet Creation tool v0.1 alpha" << endl;
+   NLogging::InitLogFile(appName, ELogLevel::DEBUG, ELogLevel::INFO);
+   cout << appName << endl;
    std::string cabFileName;
    if (argc >= 2) cabFileName = argv[1];
    if (cabFileName.empty() || (NONE != GetCommandType(cabFileName)) || (EMPTY != GetOptionType(cabFileName))) {

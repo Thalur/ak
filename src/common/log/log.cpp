@@ -13,6 +13,8 @@ namespace {
 
 bool loggerInitialized = false;
 bool uninitializedLoggerUseReported = false;
+ELogLevel fileLogLevel = ELogLevel::DEBUG;
+ELogLevel consoleLogLevel = ELogLevel::DEBUG;
 boost::optional<std::ofstream> logFile;
 
 const std::string logDebug("DEBUG");
@@ -21,25 +23,26 @@ const std::string logWarn("WARN ");
 const std::string logError("ERROR");
 const std::string logInvalid("<INVALID>");
 
-inline const std::string& GetLevelString(TInt32 aLogLevel)
+inline const std::string& GetLevelString(ELogLevel aLogLevel)
 {
    switch (aLogLevel)
    {
-   case 0:
+   case ELogLevel::DEBUG:
       return logDebug;
-   case 1:
+   case ELogLevel::INFO:
       return logInfo;
-   case 2:
+   case ELogLevel::WARN:
       return logWarn;
-   case 3:
+   case ELogLevel::ERROR:
       return logError;
    default:
       return logInvalid;
    }
 }
 
-inline void WriteLogEntry(std::ostream& aOut, std::string aTimeStamp, std::string aLogLevel,
-                   std::string aFile, std::string aFunc, int aLine, char* aMessage)
+inline void WriteLogEntry(std::ostream& aOut, const std::string& aTimeStamp,
+                          const std::string& aLogLevel, const std::string& aFile,
+                          const std::string& aFunc, int aLine, const char* const aMessage)
 {
    aOut << aTimeStamp
         << " "
@@ -59,23 +62,27 @@ inline void WriteLogEntry(std::ostream& aOut, std::string aTimeStamp, std::strin
 
 namespace NLogging {
 
-void InitLogFile(std::string aAppName)
+void InitLogFile(const std::string& aAppName, ELogLevel aFileLogLevel, ELogLevel aConsoleLogLevel)
 {
    if (loggerInitialized) {
-      LOG_WARN("Ignoring additional init call.");
+      LOG_WARN("Ignoring repeated init call");
    } else {
-      std::string filename("log.txt");
-      logFile = boost::in_place(filename.c_str(), std::ofstream::out);
-      CClock now;
-      *logFile << "*** " << aAppName << " log file started at " << now.GetDateLong() << std::endl;
-      *logFile << "*** " PLATFORM_NAME " system detected as "
-               << (sizeof(int*)*8) << " bit (max integral: " 
-               /*<< _INTEGRAL_MAX_BITS*/ << " bit, size_t: " << (sizeof(TSize)*8) << ")" << std::endl;
+      fileLogLevel = aFileLogLevel;
+      consoleLogLevel = aConsoleLogLevel;
+      if (fileLogLevel < ELogLevel::NONE) {
+         std::string filename("log.txt");
+         logFile = boost::in_place(filename.c_str(), std::ofstream::out);
+         CClock now;
+         *logFile << "*** " << aAppName << " log file started at " << now.GetDateLong() << std::endl;
+         *logFile << "*** " AK_PLATFORM_NAME " system detected as "
+                  << (sizeof(int*)*8) << " bit" << std::endl;
+      }
       loggerInitialized = true;
    }
 }
 
-void LogAppend(int32_t aLogLevel, std::string aFile, std::string aFunc, int aLine, std::string aMessage, ...)
+void LogAppend(ELogLevel aLogLevel, const std::string& aFile, const std::string& aFunc,
+               int aLine, const std::string& aMessage, ...)
 {
    if (!loggerInitialized && !uninitializedLoggerUseReported) {
       uninitializedLoggerUseReported = true;
@@ -95,10 +102,12 @@ void LogAppend(int32_t aLogLevel, std::string aFile, std::string aFunc, int aLin
 
    CClock now;
    std::string timestamp(now.GetTimeLong());
-   if (loggerInitialized) {
+   if (loggerInitialized && aLogLevel >= fileLogLevel) {
       WriteLogEntry(*logFile, timestamp, GetLevelString(aLogLevel), aFile, aFunc, aLine, buffer);
    }
-   WriteLogEntry(std::cout, timestamp, GetLevelString(aLogLevel), aFile, aFunc, aLine, buffer);
+   if (aLogLevel >= consoleLogLevel) {
+      WriteLogEntry(std::cout, timestamp, GetLevelString(aLogLevel), aFile, aFunc, aLine, buffer);
+   }
 }
 
 } // namespace NLogging

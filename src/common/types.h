@@ -9,21 +9,19 @@
 #include <cstddef>
 #include <memory> // std::unique_ptr
 
-/*#if defined(_WIN32)
-  #include "windows/types_win.h"
-#elif defined(__ANDROID__)
-  #include "android/types_and.h"
-#elif defined(unix)
-  #include "linux/types_lin.h"
-#elif defined(__APPLE__)
-  #if !defined(TARGET_OS_MAC)
-    #include "ios/types_ios.h"
-  #else
-    #include "mac/types_mac.h"
-  #endif
+#if defined(AK_SYSTEM_WINDOWS)
+#define AK_PLATFORM_NAME "Windows"
+#elif defined(AK_SYSTEM_LINUX)
+#define AK_PLATFORM_NAME "Linux"
+#elif defined(AK_SYSTEM_ANDROID)
+#define AK_PLATFORM_NAME "Android"
+#elif defined(AK_SYSTEM_OSX)
+#define AK_PLATFORM_NAME "MacOS"
+#elif defined(AK_SYSTEM_IOS)
+#define AK_PLATFORM_NAME "iOS"
 #else
-  #error Target operating system definition not found.
-#endif*/
+#error Target operating system definition not found.
+#endif
 
 typedef int8_t   TInt8;
 typedef uint8_t  TUint8;

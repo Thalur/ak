@@ -43,13 +43,13 @@ public:
    std::string Prefix() const { return iPrefix; }
 
 protected:
-   CCabinetEntry(const std::string& aFilename, TUint64 aOffset, TUint64 aSize, bool aCompressed, bool aEncrypted);
+   CCabinetEntry(const std::string& aFilename, uint64_t aOffset, uint64_t aSize, bool aCompressed, bool aEncrypted);
 
    std::string iFilename;   // complete file name as stored in the cabinet
    std::string iPrefix;     // file name part: [prefix].[extension]
    std::string iExtension;
-   TUint64 iFileOffset;     // position of the data in the cabinet
-   TUint64 iFileSize;       // file size "on disk"
+   uint64_t iFileOffset;     // position of the data in the cabinet
+   uint64_t iFileSize;       // file size "on disk"
    bool iCompressed;
    bool iEncrypted;
 
@@ -64,16 +64,16 @@ public:
    enum TEncryption { ENCRYPT_NONE = 0, ENCRYPT_AKV2 = 1 };
    enum TCompression { COMPRESS_NONE = 0, COMPRESS_ZIP = 1 };
 
-   static TCabinetPtr Open(TFilePtr& aFile, TInt32 aKey = 0);
+   static TCabinetPtr Open(TFilePtr& aFile, int32_t aKey = 0);
 
    TSize GetNumFiles() const { return iEntries.size(); }
    bool IsEncrypted() const { return iEncryption != ENCRYPT_NONE; }
    TEncryption GetEncryption() const { return iEncryption; }
    bool IsCompressed() const { return iCompression != COMPRESS_NONE; }
    TCompression GetCompression() const { return iCompression; }
-   TUint16 GetPatchCycle() const { return iPatchCycle; }
-   TUint16 GetVersion() const { return iCabinetVersion; }
-   TUint64 GetFileSize() const { return iFileSize; }
+   uint16_t GetPatchCycle() const { return iPatchCycle; }
+   uint16_t GetVersion() const { return iCabinetVersion; }
+   uint64_t GetFileSize() const { return iFileSize; }
 
    void PrintFileIndex() const;
    TMemoryFilePtr ReadFileByName(const std::string& aFilename);
@@ -84,26 +84,26 @@ public:
    std::vector<TEntryIndex> GetFilePrefixList() const;
 
 protected:
-   CCabinet(TFilePtr& aFile, TInt32 aKey);
+   CCabinet(TFilePtr& aFile, int32_t aKey);
 
    bool ReadHeader();
    bool ReadHeaderV2();
    bool ReadHeaderV3();
-   bool ReadFilePart(TFileData& aResult, TUint64 aOffset, TUint64 aSize, TUint64 aKeyOffset,
+   bool ReadFilePart(TFileData& aResult, uint64_t aOffset, uint64_t aSize, uint64_t aKeyOffset,
                      bool aEncrypted, bool aCompressed);
-   bool DecryptData(TFileData& aData, TUint64 aKeyOffset);
+   bool DecryptData(TFileData& aData, uint64_t aKeyOffset);
    bool InflateData(TFileData& aData);
    TMemoryFilePtr ReadFile(const std::string& aName, bool aFullName);
 
    TFilePtr iFile;
-   TInt32 iDecryptionKey;
-   TUint16 iPatchCycle;
-   TUint16 iCabinetVersion; // 0: invalid
-   TUint64 iFileSize;
+   int32_t iDecryptionKey;
+   uint16_t iPatchCycle;
+   uint16_t iCabinetVersion; // 0: invalid
+   uint64_t iFileSize;
    TEncryption iEncryption;
    TCompression iCompression;
    std::vector<CCabinetEntry> iEntries;
-   TUint64 iDataOffset;
+   uint64_t iDataOffset;
 
    friend class CCreateCabinet;
 };
