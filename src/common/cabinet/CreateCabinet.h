@@ -34,13 +34,13 @@ public:
    bool WriteToDisk(const TWriteableFilePtr& aFile) { SetDestFile(aFile); return WriteToDisk(); }
 
    TSize GetNumFiles() const { return iEntries.size(); }
-   TInt32 GetEncryptionKey() const { return iEncryptionKey; }
+   int32_t GetEncryptionKey() const { return iEncryptionKey; }
    bool IsEncrypted() const { return iEncryption != CCabinet::ENCRYPT_NONE; }
    CCabinet::TEncryption GetEncryption() const { return iEncryption; }
    bool IsCompressed() const { return iCompression != CCabinet::COMPRESS_NONE; }
    CCabinet::TCompression GetCompression() const { return iCompression; }
-   TUint16 GetCabinetVersion() const { return iCabinetVersion; }
-   TUint16 GetPatchCycle() const { return iPatchCycle; }
+   uint16_t GetCabinetVersion() const { return iCabinetVersion; }
+   uint16_t GetPatchCycle() const { return iPatchCycle; }
 
    void PrintFileIndex() const;
 
@@ -69,7 +69,7 @@ public:
    };
 
 private:
-   std::vector<TCreatedEntry>::iterator FindEntryByName(const std::string aFilename);
+   std::vector<TCreatedEntry>::iterator FindEntryByName(const std::string& aFilename);
    bool EncryptData(TFileData& aData, uint64_t aKeyOffset);
    bool DeflateData(TFileData& aData, bool aForceDeflation=false);
 

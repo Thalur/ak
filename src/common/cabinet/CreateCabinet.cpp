@@ -41,7 +41,7 @@ CCreateCabinet::CCreateCabinet()
  : iCreatedFromCabinet(false), iEncryptionKey(0), iPatchCycle(0), iCabinetVersion(3)
  , iEncryption(CCabinet::ENCRYPT_NONE), iCompression(CCabinet::COMPRESS_NONE)
 {
-   LOG_DEBUG("Default constructor");
+   LOG_METHOD();
 }
 
 CCreateCabinet::CCreateCabinet(const TCabinetPtr& aSourceCabinet)
@@ -58,8 +58,9 @@ CCreateCabinet::CCreateCabinet(const TCabinetPtr& aSourceCabinet)
    }
 }
 
-std::vector<CCreateCabinet::TCreatedEntry>::iterator CCreateCabinet::FindEntryByName(const std::string aFilename)
+std::vector<CCreateCabinet::TCreatedEntry>::iterator CCreateCabinet::FindEntryByName(const std::string& aFilename)
 {
+   LOG_METHOD();
    std::vector<TCreatedEntry>::iterator it = iEntries.begin();
    const std::vector<TCreatedEntry>::iterator itEnd = iEntries.end();
    while (it != itEnd) {
@@ -73,11 +74,13 @@ std::vector<CCreateCabinet::TCreatedEntry>::iterator CCreateCabinet::FindEntryBy
 
 void CCreateCabinet::Clear()
 {
+   LOG_METHOD();
    iEntries.clear();
 }
 
 bool CCreateCabinet::RemoveFile(TSize aIndex)
 {
+   LOG_METHOD();
    if (aIndex < iEntries.size()) {
       iEntries.erase(iEntries.begin() + aIndex);
       return true;
@@ -87,6 +90,7 @@ bool CCreateCabinet::RemoveFile(TSize aIndex)
 
 bool CCreateCabinet::RemoveFile(const std::string& aFilename)
 {
+   LOG_METHOD();
    std::vector<TCreatedEntry>::iterator it = FindEntryByName(aFilename);
    if (it != iEntries.end()) {
       iEntries.erase(it);
@@ -109,6 +113,7 @@ bool CCreateCabinet::AddFile(const std::string& aFilename, const TFilePtr& aSour
 bool CCreateCabinet::AddFile(const std::string& aFilename, const TCabinetPtr& aSourceCabinet, TSize aSourceIndex)
 {
    if (FindEntryByName(aFilename) == iEntries.end()) {
+      LOG_DEBUG("Adding cabinet file %s", aFilename.c_str());
       const CCabinetEntry& entry = aSourceCabinet->iEntries[aSourceIndex];
       iEntries.emplace_back(aFilename, entry.iEncrypted, entry.iCompressed, aSourceCabinet, aSourceIndex);
       return true;
@@ -120,6 +125,7 @@ bool CCreateCabinet::AddFile(const std::string& aFilename, const TCabinetPtr& aS
 bool CCreateCabinet::AddFile(const std::string& aFilename, const TCabinetPtr& aSourceCabinet, TSize aSourceIndex, bool aEncrypted, bool aCompressed)
 {
    if (FindEntryByName(aFilename) == iEntries.end()) {
+      LOG_DEBUG("Adding cabinet file %s", aFilename.c_str());
       iEntries.emplace_back(aFilename, aEncrypted, aEncrypted, aSourceCabinet, aSourceIndex);
       return true;
    }
@@ -131,6 +137,7 @@ bool CCreateCabinet::RenameFile(const std::string& aOriginalFilename, const std:
 {
    auto it = FindEntryByName(aOriginalFilename);
    if (it != iEntries.end()) {
+      LOG_DEBUG("Renaming file %s to %s", aOriginalFilename.c_str(), aNewFilename.c_str());
       it->iFilename = aNewFilename;
       return true;
    }
@@ -142,6 +149,7 @@ bool CCreateCabinet::SetFileProperties(const std::string& aFilename, bool aEncry
 {
    auto it = FindEntryByName(aFilename);
    if (it != iEntries.end()) {
+      LOG_DEBUG("Setting properties for file %s", aFilename.c_str());
       it->iEncrypted = aEncrypt;
       it->iCompressed = aCompress;
       return true;
@@ -152,6 +160,7 @@ bool CCreateCabinet::SetFileProperties(const std::string& aFilename, bool aEncry
 
 bool CCreateCabinet::WriteToDisk()
 {
+   LOG_METHOD();
    if (!iFile) {
       LOG_ERROR("Output file needs to be set first");
       return false;
@@ -166,6 +175,7 @@ bool CCreateCabinet::WriteToDisk()
    iFile->Clear();
 
    // Write the header to memory and the files to disk
+   LOG_DEBUG("Writing content part to disk");
    TSize currentPosition = 0;
    uint64_t i = 0;
    for (TCreatedEntry& entry : iEntries) {
@@ -214,6 +224,7 @@ bool CCreateCabinet::WriteToDisk()
    }
 
    // Then put the header before the files
+   LOG_DEBUG("Writing cabinet header section");
    if (iCompression != CCabinet::COMPRESS_NONE) {
       DeflateData(header, true); // Force deflation as we have no flag for that in the file
    }
@@ -241,6 +252,7 @@ bool CCreateCabinet::WriteToDisk()
 
 bool CCreateCabinet::EncryptData(TFileData& aData, uint64_t aKeyOffset)
 {
+   LOG_METHOD();
    TSize length = aData.size();
    CJavaRandom jr{iEncryptionKey + aKeyOffset};
    for (TSize i = 0; i < length; i++) {
@@ -251,6 +263,7 @@ bool CCreateCabinet::EncryptData(TFileData& aData, uint64_t aKeyOffset)
 
 bool CCreateCabinet::DeflateData(TFileData& aData, bool aForceDeflation)
 {
+   LOG_METHOD();
    TSize size = aData.size();
    if (size < 100 && !aForceDeflation) { // Do not compress tiny files
       LOG_DEBUG("Not deflating %" PRIuS " bytes", size);
@@ -293,6 +306,7 @@ bool CCreateCabinet::DeflateData(TFileData& aData, bool aForceDeflation)
 
 void CCreateCabinet::PrintFileIndex() const
 {
+   LOG_METHOD();
    for (const TCreatedEntry& e: iEntries) {
       char mod = ' ';
       if (e.iCompressed)
@@ -304,3 +318,4 @@ void CCreateCabinet::PrintFileIndex() const
    std::cout << "========================" << std::endl;
    std::cout << iEntries.size() << " files" << (IsCompressed()? ", compressed" : "") << (IsEncrypted()? ", encrypted" : "") << ", V" << iCabinetVersion << "." << std::endl;
 }
+

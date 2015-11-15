@@ -23,6 +23,7 @@ bool CmpFileNameIndex(const CCabManager::TFileEntry& aFirst, const std::string& 
 
 bool CCabManager::Init(std::vector<TCabinetPtr> aCabinets, const TIndexData& aIndexValues, TSize aMaxIndex)
 {
+   LOG_METHOD();
    iCabinets.swap(aCabinets);
    TSize size = iCabinets.size();
    if (size == 0) {
@@ -33,7 +34,7 @@ bool CCabManager::Init(std::vector<TCabinetPtr> aCabinets, const TIndexData& aIn
    }
 
    // Create the file prefix index
-   for (TUint8 i = static_cast<TUint8>(size); i > 0; i--) {
+   for (uint8_t i = static_cast<uint8_t>(size); i > 0; i--) {
       MergeIntoFileList(i-1, iCabinets[i-1]->GetFilePrefixList());
    }
 
@@ -44,12 +45,12 @@ bool CCabManager::Init(std::vector<TCabinetPtr> aCabinets, const TIndexData& aIn
          resourceEntry.second, CmpFileNameIndex);
       if (it != iFileIndex.end()) {
          iResourceIndex[resourceEntry.first] = TIndexEntry(std::get<1>(*it), std::get<2>(*it));
-      } else LOG_ERROR("File not found in cabinet index: %s", resourceEntry.first);
+      } else LOG_ERROR("File not found in cabinet index: %s", resourceEntry.second.c_str());
    }
    return true;
 }
 
-void CCabManager::MergeIntoFileList(TUint8 aCabinetIndex, const std::vector<TEntryIndex>& aEntries)
+void CCabManager::MergeIntoFileList(uint8_t aCabinetIndex, const std::vector<TEntryIndex>& aEntries)
 {
    auto itIndex = iFileIndex.begin();
    auto itData = aEntries.begin();
@@ -68,7 +69,7 @@ void CCabManager::MergeIntoFileList(TUint8 aCabinetIndex, const std::vector<TEnt
          }
          itData++;
       } else {
-         //LOG_DEBUG("Ignoring file entry %s because file is already indexed", std::get<0>(*itIndex).c_str());
+         LOG_DEBUG("Ignoring file entry %s because file is already indexed", std::get<0>(*itIndex).c_str());
          itData++;
       }
    }
@@ -79,10 +80,12 @@ TMemoryFilePtr CCabManager::GetFile(TSize aIndex) const
    if (aIndex < iResourceIndex.size()) {
       const TIndexEntry& entry = iResourceIndex[aIndex];
       LOG_DEBUG("GetFile: %" PRIuS " (%u, %" PRIuS ")", aIndex, entry.first, entry.second);
-      //return iCabinets[entry.first]->ReadFileByIndex(entry.second);
       TCabinetPtr cab = iCabinets[entry.first];
-      if (cab) return cab->ReadFileByIndex(entry.second);
-      else LOG_ERROR("Invalid cabinet handle");
+      if (cab) {
+         return cab->ReadFileByIndex(entry.second);
+      } else {
+         LOG_ERROR("Invalid cabinet handle");
+      }
    }
    LOG_ERROR("Invalid index %" PRIuS, aIndex);
    return TMemoryFilePtr();
@@ -100,3 +103,4 @@ TMemoryFilePtr CCabManager::GetFile(const std::string& aFilePrefix) const
    LOG_ERROR("Invalid prefix %s", aFilePrefix.c_str());
    return TMemoryFilePtr();
 }
+

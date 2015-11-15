@@ -16,6 +16,8 @@ typedef std::shared_ptr<CMemoryFile> TMemoryFilePtr;
 class CMemoryFile : virtual public CFile
 {
 public:
+   typedef std::unique_ptr<std::stringstream> TStringStreamPtr;
+
    CMemoryFile(const TFileData& aData);
    CMemoryFile(TFileData&& aData);
    CMemoryFile(CMemoryFile&& aSrc);
@@ -32,7 +34,7 @@ public:
 
    // Additional memory file functionality
    TFileData GetBuffer() const { return iBuffer; }
-//   std::stringstream CreateStream();
+   TStringStreamPtr CreateStream();
 
    char operator[] (TSize i) const { if (i < Size()) return iBuffer[i]; return -1; }
 

@@ -151,15 +151,17 @@ def get_targets(argv, target_system):
     for arg in argv:
       if option_contains(glob_targets, arg.lower()) >= 0:
         targets.append(arg.lower())
+      elif arg.lower() == "all":
+        print "Running ALL build configurations for " + target_system
+        targets = []
+        system_index = option_contains(glob_systems, target_system)
+        i = 0
+        for target in glob_targets:
+          if glob_target_supports_system[i][system_index]:
+            targets.append(target[0])
+        return targets
       else:
         print "Unknown target specified: " + arg
-  else:
-    print "Running ALL build configurations for " + target_system
-    system_index = option_contains(glob_systems, target_system)
-    i = 0
-    for target in glob_targets:
-      if glob_target_supports_system[i][system_index]:
-        targets.append(target[0])
   return targets
 
 def get_clean(argv):
@@ -220,4 +222,7 @@ def main(argv):
   return 0
 
 if __name__ == "__main__":
+  dir = os.path.dirname(os.path.realpath(sys.argv[0]))
+  with cd(dir):
     exit(main(sys.argv[1:]))
+

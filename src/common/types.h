@@ -23,14 +23,6 @@
 #error Target operating system definition not found.
 #endif
 
-typedef int8_t   TInt8;
-typedef uint8_t  TUint8;
-typedef int16_t  TInt16;
-typedef uint16_t TUint16;
-typedef int32_t  TInt32;
-typedef uint32_t TUint32;
-typedef int64_t  TInt64;
-typedef uint64_t TUint64;
 typedef std::size_t TSize;
 
 // (GOOGLE) printf macros for size_t, in the style of inttypes.h

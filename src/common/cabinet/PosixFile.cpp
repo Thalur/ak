@@ -9,6 +9,7 @@ namespace {
 
 inline bool FileExists(const std::string& aFilename)
 {
+   LOG_METHOD();
    std::ifstream f(aFilename.c_str());
    return f.good();
 }
@@ -17,6 +18,7 @@ inline bool FileExists(const std::string& aFilename)
 
 TPosixFilePtr CPosixFile::MakeFile(const std::string& aFilename, std::ios_base::openmode aMode, bool aAllowWrite)
 {
+   LOG_METHOD();
    std::unique_ptr<std::fstream> stream = make_unique<std::fstream>(aFilename.c_str(), aMode);
    if (stream->good()) {
       return TPosixFilePtr(new CPosixFile(aFilename, aMode&(~std::ios_base::trunc), stream, aAllowWrite));
@@ -26,6 +28,7 @@ TPosixFilePtr CPosixFile::MakeFile(const std::string& aFilename, std::ios_base::
 
 TPosixFilePtr CPosixFile::OpenExistingFile(const std::string& aFilename, bool aAllowWrite)
 {
+   LOG_METHOD();
    if (FileExists(aFilename)) {
       std::ios_base::openmode mode = std::ios_base::in | std::ios_base::binary;
       if (aAllowWrite) {
@@ -38,6 +41,7 @@ TPosixFilePtr CPosixFile::OpenExistingFile(const std::string& aFilename, bool aA
 
 TPosixFilePtr CPosixFile::CreateEmptyFile(const std::string& aFilename, bool aOverwrite)
 {
+   LOG_METHOD();
    if (aOverwrite || !FileExists(aFilename)) {
       std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out | std::ios_base::binary | std::ios_base::trunc;
       return MakeFile(aFilename, mode, true);
@@ -47,6 +51,7 @@ TPosixFilePtr CPosixFile::CreateEmptyFile(const std::string& aFilename, bool aOv
 
 TPosixFilePtr CPosixFile::OpenOrCreate(const std::string& aFilename)
 {
+   LOG_METHOD();
    std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out | std::ios_base::binary;
    if (!FileExists(aFilename)) {
       mode |= std::ios_base::trunc;
@@ -58,13 +63,13 @@ CPosixFile::CPosixFile(CPosixFile&& aSrc)
  : iFilename(std::move(aSrc.iFilename)), iMode(aSrc.iMode), iStream(std::move(aSrc.iStream))
  , iSize(aSrc.iSize), iCanWrite(aSrc.iCanWrite)
 {
-   LOG_DEBUG("Move constructor");
+   LOG_METHOD();
 }
 
 CPosixFile::CPosixFile(const std::string& aFilename, std::ios_base::openmode aMode, TFStreamPtr& aStream, bool aCanWrite)
  : iFilename(aFilename), iMode(aMode), iStream(std::move(aStream)), iSize(0), iCanWrite(aCanWrite) 
 {
-   LOG_DEBUG("Protected constructor");
+   LOG_METHOD();
    if (Open()) {
       std::streampos fsize = iStream->tellg();
       iStream->seekg(0, std::ios::end);
@@ -75,6 +80,7 @@ CPosixFile::CPosixFile(const std::string& aFilename, std::ios_base::openmode aMo
 
 bool CPosixFile::Open()
 {
+   LOG_METHOD();
    if (!IsOpen()) {
       iStream->open(iFilename, iMode);
       return !iStream->fail();
@@ -84,16 +90,19 @@ bool CPosixFile::Open()
 
 bool CPosixFile::IsOpen() const
 {
+   LOG_METHOD();
    return iStream->is_open();
 }
 
 void CPosixFile::Close()
 {
+   LOG_METHOD();
    iStream->close();
 }
 
 bool CPosixFile::Read(TFileData& aResult, TSize aPosition, TSize aSize)
 {
+   LOG_METHOD();
    aResult.clear();
    bool wasOpen = IsOpen();
    if (!wasOpen) {
@@ -119,6 +128,7 @@ bool CPosixFile::Read(TFileData& aResult, TSize aPosition, TSize aSize)
 
 bool CPosixFile::Insert(const TFileData& aData, TSize aFileOffset, TSize aDataOffset, TSize aDataSize)
 {
+   LOG_METHOD();
    if (iCanWrite && CheckOffsets(aFileOffset, aDataOffset, aDataSize, aData.size())) {
       bool wasOpen = IsOpen();
       if (!wasOpen) {
@@ -149,6 +159,7 @@ bool CPosixFile::Insert(const TFileData& aData, TSize aFileOffset, TSize aDataOf
 
 bool CPosixFile::Overwrite(const TFileData& aData, TSize aFileOffset, TSize aDataOffset, TSize aDataSize)
 {
+   LOG_METHOD();
    if (iCanWrite && CheckOffsets(aFileOffset, aDataOffset, aDataSize, aData.size())) {
       bool wasOpen = IsOpen();
       if (!wasOpen) {
@@ -172,6 +183,7 @@ bool CPosixFile::Overwrite(const TFileData& aData, TSize aFileOffset, TSize aDat
 
 bool CPosixFile::Clear()
 {
+   LOG_METHOD();
    if (iCanWrite) {
       bool wasOpen = IsOpen();
       if (wasOpen) {
@@ -190,7 +202,9 @@ bool CPosixFile::Clear()
 
 void CPosixFile::MoveChunk(TSize aSourcePos, TSize aSize, TSize aDestPos)
 {
+   LOG_METHOD();
    TFileData data;
    Read(data, aSourcePos, aSize);
    Overwrite(data, aDestPos, 0, aSize);
 }
+

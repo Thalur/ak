@@ -13,9 +13,9 @@ class CCabManager
 {
 public:
    // Index for 1. iCabinets, 2. file number in cabinet
-   typedef std::pair<TUint8, TSize> TIndexEntry;
+   typedef std::pair<uint8_t, TSize> TIndexEntry;
    // Filename cannot be const ref when using insert()
-   typedef std::tuple<std::string, TUint8, TSize> TFileEntry;
+   typedef std::tuple<std::string, uint8_t, TSize> TFileEntry;
 
    bool Init(std::vector<TCabinetPtr> aCabinets, const TIndexData& aIndexValues, TSize aMaxIndex);
 
@@ -23,7 +23,7 @@ public:
    TMemoryFilePtr GetFile(const std::string& aFilePrefix) const;
 
 private:
-   void MergeIntoFileList(TUint8 aCabinetIndex, const std::vector<TEntryIndex>& aEntries);
+   void MergeIntoFileList(uint8_t aCabinetIndex, const std::vector<TEntryIndex>& aEntries);
 
    std::vector<TCabinetPtr> iCabinets;
    std::vector<TIndexEntry> iResourceIndex;

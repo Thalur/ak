@@ -9,32 +9,33 @@
 CMemoryFile::CMemoryFile(const TFileData& aData)
  : iBuffer(aData)
 {
-   LOG_DEBUG("TFileData constructor.");
+   LOG_METHOD();
 }
 
 // Construct a memory file with given data, moving the backing data vector
 CMemoryFile::CMemoryFile(TFileData&& aData)
- : iBuffer(aData) // move construction
+ : iBuffer(std::move(aData)) // move construction
 {
-   //LOG_DEBUG("TFileData move constructor.");
+   LOG_METHOD();
 }
 
 // Move constructor: move the data but create a new stream
 CMemoryFile::CMemoryFile(CMemoryFile&& aSrc)
  : iBuffer(std::move(aSrc.iBuffer))
 {
-   LOG_DEBUG("Move constructor.");
+   LOG_METHOD();
 }
 
 // Copy constructor
 CMemoryFile::CMemoryFile(const CMemoryFile& aSrc)
  : iBuffer(aSrc.iBuffer)
 {
-   LOG_DEBUG("Copy constructor.");
+   LOG_METHOD();
 }
 
 TMemoryFilePtr CMemoryFile::FromFile(CFile& aFile)
 {
+   LOG_METHOD();
    TFileData result;
    TSize size = aFile.Size();
    TSize maxSize = result.max_size();
@@ -68,24 +69,27 @@ bool CMemoryFile::Read(TFileData& aResult, TSize aPosition, TSize aSize)
    return true;
 }
 
-/*std::stringstream CMemoryFile::CreateStream()
+CMemoryFile::TStringStreamPtr CMemoryFile::CreateStream()
 {
+   LOG_METHOD();
 #ifdef _WIN32 // MSVC does not support replacing the stringstream back buffer
-   return std::stringstream(std::string(&iBuffer[0], Size()), std::stringstream::in);
+   return make_unique(std::string(&iBuffer[0], Size()), std::stringstream::in);
 #else
-   std::stringstream stream;
-   stream.rdbuf()->pubsetbuf(&iBuffer[0], Size());
-   return stream;
+   std::stringstream* stream = new std::stringstream();
+   stream->rdbuf()->pubsetbuf(&iBuffer[0], Size());
+   return TStringStreamPtr(stream);
 #endif
-}*/
+}
 
 
 CWriteableMemoryFile::CWriteableMemoryFile(TSize aSize) : CMemoryFile(TFileData(aSize))
 {
+   LOG_METHOD();
 }
 
 bool CWriteableMemoryFile::Insert(const TFileData& aData, TSize aFileOffset, TSize aDataOffset, TSize aDataSize)
 {
+   LOG_METHOD();
    if (aFileOffset > Size()) {
       return false;
    }
@@ -99,6 +103,7 @@ bool CWriteableMemoryFile::Insert(const TFileData& aData, TSize aFileOffset, TSi
 
 bool CWriteableMemoryFile::Overwrite(const TFileData& aData, TSize aFileOffset, TSize aDataOffset, TSize aDataSize)
 {
+   LOG_METHOD();
    if (aFileOffset > Size()) {
       return false;
    }
@@ -115,6 +120,7 @@ bool CWriteableMemoryFile::Overwrite(const TFileData& aData, TSize aFileOffset, 
 
 bool CWriteableMemoryFile::Remove(TSize aDataOffset, TSize aDataSize)
 {
+   LOG_METHOD();
    if (aDataOffset < Size()) {
       return false;
    }
@@ -132,3 +138,4 @@ bool CWriteableMemoryFile::Remove(TSize aDataOffset, TSize aDataSize)
    }
    return true;
 }
+

@@ -38,30 +38,30 @@ std::string CFile::ReadLine()
 
 std::string CFile::GetNextConfigLine(const std::string& aCommentSymbols)
 {
-	std::string line;
-	while (!AtEOF()) {
+   std::string line;
+   while (!AtEOF()) {
       line = ReadLine();
-		if (!line.empty()) { // ignore empty lines
-			TSize pos = line.find_first_not_of(" \t");
-			if (pos != std::string::npos) { // ignore whitespace-only lines
-				if (pos > 0) {
+      if (!line.empty()) { // ignore empty lines
+         TSize pos = line.find_first_not_of(" \t");
+         if (pos != std::string::npos) { // ignore whitespace-only lines
+            if (pos > 0) {
                line.substr(pos).swap(line);
             }
-				pos = line.find_first_of(aCommentSymbols);
-				if (pos > 0) { // ignore comment-only lines
-					if (pos != std::string::npos) {
+            pos = line.find_first_of(aCommentSymbols);
+            if (pos > 0) { // ignore comment-only lines
+               if (pos != std::string::npos) {
                   line.substr(0,pos).swap(line);
                }
-					pos = line.find_last_not_of(" \t");
-					if (pos != std::string::npos) {
+               pos = line.find_last_not_of(" \t");
+               if (pos != std::string::npos) {
                   line.substr(0,pos+1).swap(line);
                }
-					break;
-				}
-			}
-		}
-	}
-	return line;
+               break;
+            }
+         }
+      }
+   }
+   return line;
 }
 
 bool CFile::CheckOffsets(TSize& aDataOffset, TSize& aDataSize, TSize aRealDataSize)
@@ -138,3 +138,4 @@ bool CWriteableFile::Insert(CFile& aSourceFile, TSize aDestinationOffset, TSize 
    }
    return bOK;
 }
+
