@@ -19,12 +19,12 @@ namespace WinGL {
 CStringWindows appCaption;
 bool bWindowClosed = false;
 bool bVisible = false;
-TInt32 fps;
-TInt32 frame = 0;
-TInt64 frameStartUs = 0;
-TInt64 drawTimeUs = 0;
+int32_t fps;
+int32_t frame = 0;
+int64_t frameStartUs = 0;
+int64_t drawTimeUs = 0;
 
-TInt64 nextTick = 0;
+int64_t nextTick = 0;
 
 float angle = 0.0f;
 
@@ -63,8 +63,8 @@ void renderBitmapString(float x, float y, void *font, const std::string& text)
 
 void OnRenderScene(void)
 {
-   TInt64 timeUs = CClock::GetCurrentTicksUs();
-   TInt64 frametimeUs = timeUs - frameStartUs;
+   int64_t timeUs = CClock::GetCurrentTicksUs();
+   int64_t frametimeUs = timeUs - frameStartUs;
    if (frametimeUs >= 999900) {
       fps = frame;
       frameStartUs += 1000000;
@@ -141,7 +141,7 @@ void OnChangeSize(int width, int height)
    if (bVisible) glutPostRedisplay();
 
    // Restart the timer
-   TInt32 tickRate = GetTickRate();
+   int32_t tickRate = GetTickRate();
    glutTimerFunc(1000/tickRate, OnTimer, 7);
 }*/
 
@@ -183,9 +183,9 @@ void OnIdle()
 {
    // Sleep until the next game tick is due
    if (bWindowClosed) return;
-   TInt64 timeUs = CClock::GetCurrentTicksUs();
+   int64_t timeUs = CClock::GetCurrentTicksUs();
    if (timeUs+1000 < nextTick) {
-      TInt32 sleepTime = static_cast<TInt32>((nextTick-timeUs)/1000);
+      int32_t sleepTime = static_cast<int32_t>((nextTick-timeUs)/1000);
       //LOG_DEBUG("Spleeping for %d ms (diff: %"PRId64")", sleepTime, (nextTick-timeUs));
       Sleep(sleepTime);
    } else if (nextTick+100000 < timeUs) {
@@ -195,8 +195,8 @@ void OnIdle()
 
    // Execute one tick and schedule the next tick according to the set tick rate
    bool bResetTicks = OnTick();
-   TInt32 tickRate = GetTickRate();
-   TInt64 tickIntervalUs = (1000000 + tickRate/2) / tickRate;
+   int32_t tickRate = GetTickRate();
+   int64_t tickIntervalUs = (1000000 + tickRate/2) / tickRate;
    /*if (bResetTicks) {
       nextTick = CClock::GetCurrentTicksUs();
    }*/

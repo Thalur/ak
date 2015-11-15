@@ -23,7 +23,7 @@ public:
       iString.push_back('\0');
    }
 
-   CStringWindows(TInt32 aSize) : iString(aSize)
+   CStringWindows(int32_t aSize) : iString(aSize)
    {
       iString.push_back('\0');
    }
@@ -31,14 +31,14 @@ public:
    CStringWindows(const std::string& aString)
    {
       const char* multiByteString = aString.c_str();
-	   const TInt32 l = MultiByteToWideChar(CP_UTF8, 0, multiByteString, -1, NULL, 0);
+	   const int32_t l = MultiByteToWideChar(CP_UTF8, 0, multiByteString, -1, NULL, 0);
 	   iString.resize(l);
 	   MultiByteToWideChar(CP_UTF8, 0, multiByteString, -1, &iString[0], l);
    }
 
    CStringWindows(const char* const aString)
    {
-      const TInt32 l = MultiByteToWideChar(CP_UTF8, 0, aString, -1, NULL, 0);
+      const int32_t l = MultiByteToWideChar(CP_UTF8, 0, aString, -1, NULL, 0);
 	   iString.resize(l);
 	   MultiByteToWideChar(CP_UTF8, 0, aString, -1, &iString[0], l);
    }

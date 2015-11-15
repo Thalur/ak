@@ -8,10 +8,10 @@
 
 
 const CGameStatePtr& GetCurrentState();
-TInt32 GetTickRate();
+int32_t GetTickRate();
 
 void OnInit();
 bool OnTick();
-void OnDraw(TInt32 aFps);
+void OnDraw(int32_t aFps);
 
 #endif // AK_CONTROL_H_INCLUDED

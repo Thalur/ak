@@ -73,7 +73,7 @@ CMemoryFile::TStringStreamPtr CMemoryFile::CreateStream()
 {
    LOG_METHOD();
 #ifdef _WIN32 // MSVC does not support replacing the stringstream back buffer
-   return make_unique(std::string(&iBuffer[0], Size()), std::stringstream::in);
+   return ::make_unique<std::stringstream>(std::string(&iBuffer[0], Size()), std::stringstream::in);
 #else
    std::stringstream* stream = new std::stringstream();
    stream->rdbuf()->pubsetbuf(&iBuffer[0], Size());

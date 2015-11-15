@@ -38,7 +38,7 @@ typedef std::size_t TSize;
 #define PRIXS __PRIS_PREFIX "X"
 #define PRIoS __PRIS_PREFIX "o"
 
-// C++11 replacement formake_unique
+// C++11 replacement for std::make_unique()
 template<typename T, typename... Ts>
 std::unique_ptr<T> make_unique(Ts&&... params)
 {

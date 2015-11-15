@@ -56,7 +56,7 @@ public:
             LARGE_INTEGER data {};
             if (QueryPerformanceCounter(&data)) {
                if (data.QuadPart > 9000000000000) {
-                  return (TInt64)((double)data.QuadPart * 1000000.0 / (double)sTicksPerSecond);
+                  return (int64_t)((double)data.QuadPart * 1000000.0 / (double)sTicksPerSecond);
                } else {
                   return data.QuadPart * 1000000 / sTicksPerSecond;
                }
@@ -66,7 +66,7 @@ public:
             bContinue = true;
          }
       } while (bContinue);
-      return static_cast<TInt64>(GetTickCount64()) * 1000;
+      return static_cast<int64_t>(GetTickCount64()) * 1000;
    }
 };
 

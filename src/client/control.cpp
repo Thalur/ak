@@ -31,7 +31,7 @@ const CGameStatePtr& GetCurrentState()
    return currentState;
 }
 
-TInt32 GetTickRate()
+int32_t GetTickRate()
 {
    return 60;
 }
@@ -66,7 +66,7 @@ bool OnTick()
    return true;
 }
 
-void OnDraw(TInt32 aFps)
+void OnDraw(int32_t aFps)
 {
    switch (state) {
    case STATE_DISPLAY:

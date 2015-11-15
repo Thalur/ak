@@ -39,7 +39,7 @@ public:
    virtual void OnActivate(EDialogButton aDialogResult) = 0;
 
    // Draw the current frame
-   virtual void OnDraw(TInt32 aFps) = 0;
+   virtual void OnDraw(int32_t aFps) = 0;
 
    // Execute a tick event (usually right before drawing)
    // Returns true, if the tick counter should be reset (e.g. after loading data)
@@ -56,10 +56,10 @@ public:
 	 * @arg x X coordinate of the touch or mouse action.
 	 * @arg y Y coordinate of the touch or mouse action.
 	 */
-	virtual void OnTouch(TInt32 aEventID, ETouchAction aAction, TInt32 aX, TInt32 aY) = 0;
+	virtual void OnTouch(int32_t aEventID, ETouchAction aAction, int32_t aX, int32_t aY) = 0;
 
    // ToDo
-   virtual void OnKeyDown(TInt32 aKeyCode)
+   virtual void OnKeyDown(int32_t aKeyCode)
 	{
 		// do nothing
 	}
@@ -85,7 +85,7 @@ public:
 		// do nothing
 	}
 
-   virtual bool GetDesiredFrameRate(TInt32& aTicksPerSecond, TInt32 aFramesPerSecond) = 0;
+   virtual bool GetDesiredFrameRate(int32_t& aTicksPerSecond, int32_t aFramesPerSecond) = 0;
 
    // Returns a shared pointer to the base state of the state provided as parameter
    static CGameStatePtr GetBaseState(CGameStatePtr aCurrentState)
