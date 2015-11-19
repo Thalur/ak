@@ -16,6 +16,7 @@ from subprocess import call
 
 # For now, all build targets and options are hard-coded in this file
 glob_targets = [ [ "akcab", "    - Cabinet file command line tool" ],
+                 [ "ogltest", "  - OpenGL engine test project" ],
                  [ "animview", " - Animation file viewer" ] ]
 glob_systems = [ [ "win", "     - Windows 64 bit (windowed or console, depending on target)" ],
                  [ "linux", "   - Linux 64 bit (host operating system binaries)" ],
@@ -27,10 +28,11 @@ glob_modes = [ [ "debug", "   - Debug build with full log output" ],
 glob_target_supports_system = [
   # win,   linux, osx,  android, ios
   [ True,  True,  True,  False, False ], # akcab
+  [ True,  True,  True,  True,  True  ], # ogltest
   [ True,  True,  True,  True,  True  ] ] # animview
 glob_target_requires_client = [
-  #akcab, animview
-   False, True ]
+  #akcab, ogltest, animview
+   False, False,   True ]
 
 
 def print_usage():
@@ -121,7 +123,7 @@ def copy_files(source, target):
 def run_build(target, system, mode, clean):
   print "\n*** Starting build of " + target + " for " + system + " (" + mode + ")..."
   buildResult = False;
-  outputDir = os.path.join("..", "bin", "cmake", target, system)
+  outputDir = os.path.join("..", "gen", "cmake", target, system)
   if clean and os.path.exists(outputDir):
     print "*** Cleaning workspace by removing " + outputDir
     shutil.rmtree(outputDir)
@@ -131,18 +133,23 @@ def run_build(target, system, mode, clean):
     build_fct = "build_" + system
     buildResult = globals().get(build_fct, build_nyi)(target, mode)
   if buildResult:
-    binDir = os.path.join("..", "bin", target, system, mode)
+    binDir = os.path.join("..", "gen", target, system, mode)
     if not os.path.exists(binDir):
       os.makedirs(binDir)
     # TODO: generalize for all projects / targets
     if system == "win":
       copy_files(outputDir+"/projects/"+target+"/"+mode+"/*.exe", binDir)
       copy_files(outputDir+"/projects/"+target+"/"+mode+"/*.pdb", binDir)
-      if (target == "animview"):
+      if target == "ogltest" or target == "animview":
         shutil.copy2("../lib/freeglut/bin/x64/freeglut.dll", binDir)
         shutil.copy2("../lib/glew-1.12.0/bin/Release/x64/glew32.dll", binDir)
     elif system == "linux":
-      shutil.copy2(outputDir+"/projects/"+target+"/AKCab", binDir)
+      if target == "akcab":
+        shutil.copy2(outputDir+"/projects/"+target+"/AKCab", binDir)
+      elif target == "ogltest":
+        shutil.copy2(outputDir+"/projects/"+target+"/OGLtest", binDir)
+      elif target == "animview":
+        shutil.copy2(outputDir+"/projects/"+target+"/AnimView", binDir)
   return buildResult
 
 def get_targets(argv, target_system):

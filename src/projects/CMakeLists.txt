@@ -1,6 +1,8 @@
 
 IF ("${AK_PROJECT}" STREQUAL "AKCAB")
   add_subdirectory(akcab)
+ELSEIF ("${AK_PROJECT}" STREQUAL "OGLTEST")
+  add_subdirectory(ogltest)
 ELSEIF ("${AK_PROJECT}" STREQUAL "ANIMVIEW")
   add_subdirectory(animview)
 ELSE ()

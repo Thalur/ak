@@ -11,7 +11,7 @@
 #include "GL/glew.h"
 #include "GL/freeglut.h"
 
-#include "client/control.h"
+//#include "client/control.h"
 
 
 namespace WinGL {
@@ -102,7 +102,7 @@ void OnRenderScene(void)
    renderBitmapString(-1, 1, GLUT_BITMAP_TIMES_ROMAN_24, std::to_string(fps));
 
    // Actual Drawing:
-   OnDraw(fps);
+   //OnDraw(fps);
 
    if (frame == 3) {
       drawTimeUs = CClock::GetCurrentTicksUs() - timeUs;
@@ -194,8 +194,8 @@ void OnIdle()
    }
 
    // Execute one tick and schedule the next tick according to the set tick rate
-   bool bResetTicks = OnTick();
-   int32_t tickRate = GetTickRate();
+   //bool bResetTicks = OnTick();
+   int32_t tickRate = 60;//GetTickRate();
    int64_t tickIntervalUs = (1000000 + tickRate/2) / tickRate;
    /*if (bResetTicks) {
       nextTick = CClock::GetCurrentTicksUs();
@@ -249,7 +249,7 @@ bool SetupOpenGL(int& argc, char** argv,const std::string& aWindowTitle)
 void RunGame()
 {
    //nextTick = frameStartUs = CClock::GetCurrentTicksUs();
-   OnInit();
+   //OnInit();
    LOG_INFO("Starting the main OpenGL loop");
    glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
    glutMainLoop();
