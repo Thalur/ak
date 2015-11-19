@@ -13,6 +13,7 @@ namespace {
 
 bool loggerInitialized = false;
 bool uninitializedLoggerUseReported = false;
+bool simplifiedConsoleOutput = false;
 ELogLevel fileLogLevel = ELogLevel::DEBUG;
 ELogLevel consoleLogLevel = ELogLevel::DEBUG;
 boost::optional<std::ofstream> logFile;
@@ -62,13 +63,15 @@ inline void WriteLogEntry(std::ostream& aOut, const std::string& aTimeStamp,
 
 namespace NLogging {
 
-void InitLogFile(const std::string& aAppName, ELogLevel aFileLogLevel, ELogLevel aConsoleLogLevel)
+void InitLogFile(const std::string& aAppName, ELogLevel aFileLogLevel, ELogLevel aConsoleLogLevel,
+                 bool aSimplifiedConsoleOutput)
 {
    if (loggerInitialized) {
       LOG_WARN("Ignoring repeated init call");
    } else {
       fileLogLevel = aFileLogLevel;
       consoleLogLevel = aConsoleLogLevel;
+      simplifiedConsoleOutput = aSimplifiedConsoleOutput;
       if (fileLogLevel < ELogLevel::NONE) {
          std::string filename("log.txt");
          logFile = boost::in_place(filename.c_str(), std::ofstream::out);
@@ -106,7 +109,11 @@ void LogAppend(ELogLevel aLogLevel, const std::string& aFile, const std::string&
       WriteLogEntry(*logFile, timestamp, GetLevelString(aLogLevel), aFile, aFunc, aLine, buffer);
    }
    if (aLogLevel >= consoleLogLevel) {
-      WriteLogEntry(std::cout, timestamp, GetLevelString(aLogLevel), aFile, aFunc, aLine, buffer);
+      if (simplifiedConsoleOutput) {
+         std::cout << buffer << std::endl;
+      } else {
+         WriteLogEntry(std::cout, timestamp, GetLevelString(aLogLevel), aFile, aFunc, aLine, buffer);
+      }
    }
 }
 

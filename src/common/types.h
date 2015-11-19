@@ -1,5 +1,5 @@
 /**
- * Basic type definitions (platform-independend)
+ * Basic type definitions (platform-independent)
  */
 #ifndef AK_TYPES_H_INCLUDED
 #define AK_TYPES_H_INCLUDED

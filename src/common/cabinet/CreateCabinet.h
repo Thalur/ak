@@ -48,7 +48,7 @@ public:
    {
       TCreatedEntry(const std::string& aFilename, bool aEncrypted, bool aCompressed, const TFilePtr& aSourceFile)
        : iFilename(aFilename), iFileSize(aSourceFile->Size()), iEncrypted(aEncrypted)
-       , iCompressed(aCompressed), iInCabinet(false), iSourceFile(aSourceFile)
+       , iCompressed(aCompressed), iInCabinet(false), iSourceFile(aSourceFile), iSourceIndex(-1)
       {}
       TCreatedEntry(const std::string& aFilename, bool aEncrypted, bool aCompressed,
                     const TCabinetPtr& aSourceCabinet, TSize aSourceIndex)
