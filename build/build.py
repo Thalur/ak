@@ -4,8 +4,7 @@
 # Copyright (C) 2015 by Andre Koschmieder
 #
 # ToDo list:
-#  * add cmake parameters to allow generation (no GUI required)
-#  * add missing build target systems: linux, android, osx, ios
+#  * add missing build target systems: android, osx, ios
 #  * generalize build configurations by having one config file per target
 #
 import sys
@@ -13,6 +12,8 @@ import os
 import glob
 import shutil
 from subprocess import call
+
+from colored import *
 
 # For now, all build targets and options are hard-coded in this file
 glob_targets = [ [ "akcab", "    - Cabinet file command line tool" ],
@@ -36,16 +37,16 @@ glob_target_requires_client = [
 
 
 def print_usage():
-  print "USAGE: python build.py [<TARGET>+] [<SYSTEM>] [<MODE>] [CLEAN]"
+  print cyan(bright("USAGE: python build.py [<TARGET>+] [<SYSTEM>] [<MODE>] [CLEAN]"))
   print "TARGET: (default: ALL)"
   for target in glob_targets:
-    print " * " + target[0] + target[1]
+    print " * " + yellow(bright(target[0])) + target[1]
   print "SYSTEM: (default: host operating system)"
   for system in glob_systems:
-    print " * " + system[0] + system[1]
+    print " * " + yellow(bright(system[0])) + system[1]
   print "MODE: (default: DEBUG)"
   for mode in glob_modes:
-    print " * " + mode[0] + mode[1]
+    print " * " + yellow(bright(mode[0])) + mode[1]
   print "CLEAN: first clean the workspace to re-compile all sources"
 
 def option_contains(options, selection):
@@ -92,6 +93,7 @@ def build_win(target, mode):
     res = call(buildCmd, shell=True)
     return res == 0
   except KeyboardInterrupt: # do not crash on Ctrl+C
+    print magenta(bright("*** Keyboard interrupt detected"))
     return False
 
 def build_linux(target, mode):
@@ -108,12 +110,13 @@ def build_linux(target, mode):
     res = call('make')
     return res == 0
   except KeyboardInterrupt: # do not crash on Ctrl+C
+    print magenta(bright("*** Keyboard interrupt detected"))
     return False
 
 #####
 
 def build_nyi(target, mode, clean):
-  print "This configuration has not been implemented yet."
+  print magenta(bright("This configuration has not been implemented yet."))
   return False
 
 def copy_files(source, target):
@@ -121,7 +124,7 @@ def copy_files(source, target):
     shutil.copy2(file, target)
 
 def run_build(target, system, mode, clean):
-  print "\n*** Starting build of " + target + " for " + system + " (" + mode + ")..."
+  print cyan(bright("\n*** Starting build of " + target + " for " + system + " (" + mode + ")..."))
   buildResult = False;
   outputDir = os.path.join("..", "gen", "cmake", target, system)
   if clean and os.path.exists(outputDir):
@@ -168,7 +171,7 @@ def get_targets(argv, target_system):
             targets.append(target[0])
         return targets
       else:
-        print "Unknown target specified: " + arg
+        print magenta(bright("Unknown target specified: " + arg))
   return targets
 
 def get_clean(argv):
@@ -187,31 +190,38 @@ def get_mode(argv):
       argv.remove(arg)
   return mode
 
-def get_system(argv):
+def get_system(argv, host_os):
   os = ""
   for arg in argv:
     if option_contains(glob_systems, arg.lower()) >= 0:
       os = arg.lower()
       argv.remove(arg)
   if not os:
-    platform = sys.platform
-    if platform == "win32":
-      os = "win"
-    elif platform == "linux" or platform == "linux2":
-      os = "linux"
-    elif platform == "darwin":
-      os = "osx"
-    if os:
-      print "Auto-detected platform " + os + " from " + platform
-    else:
-      print "Error: could not detect host platform from " + platform
+    os = host_os
+  return os
+
+def get_host_os():
+  os = ""
+  platform = sys.platform
+  if platform == "win32":
+    os = "win"
+  elif platform == "linux" or platform == "linux2":
+    os = "linux"
+  elif platform == "darwin":
+    os = "osx"
+  if os:
+    print "Auto-detected platform " + os + " from " + platform
+  else:
+    print magenta(bright("Error: could not detect host platform from " + platform))
   return os
 
 def main(argv):
+  host_os = get_host_os()
+  init_color(host_os)
   if not os.path.isfile("build.py"):
-    print "ERROR: This script needs to be executed from the build/ directory."
+    print magenta(bright("ERROR: This script needs to be executed from the build/ directory."))
     return -1
-  system = get_system(argv)
+  system = get_system(argv, host_os)
   mode = get_mode(argv)
   clean = get_clean(argv)
   targets = get_targets(argv, system)
@@ -219,11 +229,11 @@ def main(argv):
     for target in targets:
       if check_config(target, system, mode):
         if not run_build(target, system, mode, clean):
-          print "*** ERROR - BUILD STOPPED"
+          print red(bright("*** ERROR - BUILD STOPPED"))
           return -1
       else:
-        print "*** Skipping unsupported configuration: " + target + " " + system + " " + mode
-    print "*** BUILD COMPLETE"
+        print magenta(bright("*** Skipping unsupported configuration: " + target + " " + system + " " + mode))
+    print green(bright("*** BUILD COMPLETE"))
   else:
     print_usage()
   return 0
