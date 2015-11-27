@@ -113,9 +113,32 @@ def build_linux(target, mode):
     print magenta(bright("*** Keyboard interrupt detected"))
     return False
 
+def build_android(target, mode):
+  try:
+    config = "-D_AK_PROJECT=" + target.upper()
+    client = "-D_AK_CLIENT=0"
+    target_index = option_contains(glob_targets, target)
+    if glob_target_requires_client[target_index]:
+      client = "-D_AK_CLIENT=1"
+    ndk = os.environ['ANDROID_NDK']
+    print "Detected NDK path as " + ndk
+    cmakeCmd = [ 'cmake', '-DCMAKE_TOOLCHAIN_FILE=../../../../lib/android-cmake/android.toolchain.cmake',
+                 '-DANDROID_ABI=armeabi-v7a with NEON', '-DANDROID_NATIVE_API_LEVEL=android-9',
+                 '-DANDROID_NDK='+ndk, '-DCMAKE_VERBOSE_MAKEFILE=OFF',
+                 config, client, '-D_AK_TARGET=ANDROID', "-DCMAKE_BUILD_TYPE="+mode, '../../../../src']
+    res = call(cmakeCmd)
+    if res != 0:
+      return False
+    buildCmd = "cmake --build . --config " + mode.upper()
+    res = call(buildCmd, shell=True)
+    return res == 0
+  except KeyboardInterrupt: # do not crash on Ctrl+C
+    print magenta(bright("*** Keyboard interrupt detected"))
+    return False
+
 #####
 
-def build_nyi(target, mode, clean):
+def build_nyi(target, mode):
   print magenta(bright("This configuration has not been implemented yet."))
   return False
 

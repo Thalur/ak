@@ -9,14 +9,19 @@
 #include <fstream>
 #include <cstdarg>
 
+#ifdef AK_SYSTEM_ANDROID
+#include <android/log.h>
+#endif
+
 namespace {
 
 bool loggerInitialized = false;
 bool uninitializedLoggerUseReported = false;
 bool simplifiedConsoleOutput = false;
-ELogLevel fileLogLevel = ELogLevel::DEBUG;
-ELogLevel consoleLogLevel = ELogLevel::DEBUG;
+ELogLevel fileLogLevel = ELogLevel::EDEBUG;
+ELogLevel consoleLogLevel = ELogLevel::EDEBUG;
 boost::optional<std::ofstream> logFile;
+std::string appName;
 
 const std::string logDebug("DEBUG");
 const std::string logInfo("INFO ");
@@ -28,13 +33,13 @@ inline const std::string& GetLevelString(ELogLevel aLogLevel)
 {
    switch (aLogLevel)
    {
-   case ELogLevel::DEBUG:
+   case ELogLevel::EDEBUG:
       return logDebug;
-   case ELogLevel::INFO:
+   case ELogLevel::EINFO:
       return logInfo;
-   case ELogLevel::WARN:
+   case ELogLevel::EWARN:
       return logWarn;
-   case ELogLevel::ERR:
+   case ELogLevel::EERR:
       return logError;
    default:
       return logInvalid;
@@ -72,11 +77,12 @@ void InitLogFile(const std::string& aAppName, ELogLevel aFileLogLevel, ELogLevel
       fileLogLevel = aFileLogLevel;
       consoleLogLevel = aConsoleLogLevel;
       simplifiedConsoleOutput = aSimplifiedConsoleOutput;
-      if (fileLogLevel < ELogLevel::NONE) {
+      appName = aAppName;
+      if (fileLogLevel < ELogLevel::ENONE) {
          std::string filename("log.txt");
          logFile = boost::in_place(filename.c_str(), std::ofstream::out);
          CClock now;
-         *logFile << "*** " << aAppName << " log file started at " << now.GetDateLong() << std::endl;
+         *logFile << "*** " << appName << " log file started at " << now.GetDateLong() << std::endl;
          *logFile << "*** " AK_PLATFORM_NAME " system detected as "
                   << (sizeof(int*)*8) << " bit" << std::endl;
       }
@@ -109,11 +115,15 @@ void LogAppend(ELogLevel aLogLevel, const std::string& aFile, const std::string&
       WriteLogEntry(*logFile, timestamp, GetLevelString(aLogLevel), aFile, aFunc, aLine, buffer);
    }
    if (aLogLevel >= consoleLogLevel) {
+#ifdef AK_SYSTEM_ANDROID
+         __android_log_print(ANDROID_LOG_DEBUG + static_cast<int32_t>(aLogLevel), appName.c_str(), buffer);
+#else
       if (simplifiedConsoleOutput) {
          std::cout << buffer << std::endl;
       } else {
          WriteLogEntry(std::cout, timestamp, GetLevelString(aLogLevel), aFile, aFunc, aLine, buffer);
       }
+#endif
    }
 }
 

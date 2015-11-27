@@ -3,6 +3,23 @@
  */
 #include "common/util/typeconversions.h"
 
+// Work-around the missing to_string support in the Android NDK
+#ifdef AK_SYSTEM_ANDROID
+#include <sstream>
+namespace {
+
+template <typename T>
+std::string to_string(T value)
+{
+   std::ostringstream os;
+   os << value ;
+   return os.str();
+}
+
+}
+#else // AK_SYSTEM_ANDROID
+using std::to_string;
+#endif // AK_SYSTEM_ANDROID
 
 std::string FormatSize(uint64_t aSize)
 {

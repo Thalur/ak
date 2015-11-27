@@ -9,17 +9,17 @@
 
 enum class ELogLevel : int32_t
 {
-   DEBUG = 0,
-   INFO  = 1,
-   WARN  = 2,
-   ERR   = 3,
-   NONE  = 4
+   EDEBUG = 0,
+   EINFO  = 1,
+   EWARN  = 2,
+   EERR   = 3,
+   ENONE  = 4
 };
 
 namespace NLogging {
 
-void InitLogFile(const std::string& aAppName, ELogLevel aFileLogLevel=ELogLevel::DEBUG,
-                 ELogLevel aConsoleLogLevel=ELogLevel::NONE, bool aSimplifiedConsoleOutput=true);
+void InitLogFile(const std::string& aAppName, ELogLevel aFileLogLevel=ELogLevel::EDEBUG,
+                 ELogLevel aConsoleLogLevel=ELogLevel::ENONE, bool aSimplifiedConsoleOutput=true);
 
 void LogAppend(ELogLevel aLogLevel, const std::string& aFile, const std::string& aFunc, int aLine, const std::string& aMessage, ...);
 
@@ -31,23 +31,23 @@ struct CMethodLogger
    CMethodLogger(const char* aFile, const char* aFunction, int aLine)
     : iFile(aFile), iFunction(aFunction), iLine(aLine)
    {
-      LogAppend(ELogLevel::DEBUG, iFile, iFunction, iLine, ">> ENTRY");
+      LogAppend(ELogLevel::EDEBUG, iFile, iFunction, iLine, ">> ENTRY");
    }
    ~CMethodLogger() {
-      LogAppend(ELogLevel::DEBUG, iFile, iFunction, iLine, "<< EXIT");
+      LogAppend(ELogLevel::EDEBUG, iFile, iFunction, iLine, "<< EXIT");
    }
 };
 
 }
 
-#define LOG_ERROR(s, ...) NLogging::LogAppend(ELogLevel::ERR, (__FILE__), (__FUNCTION__), (__LINE__), s, ##__VA_ARGS__)
-#define LOG_WARN(s, ...) NLogging::LogAppend(ELogLevel::WARN, (__FILE__), (__FUNCTION__), (__LINE__), s, ##__VA_ARGS__)
-#define LOG_INFO(s, ...) NLogging::LogAppend(ELogLevel::INFO, (__FILE__), (__FUNCTION__), (__LINE__), s, ##__VA_ARGS__)
+#define LOG_ERROR(s, ...) NLogging::LogAppend(ELogLevel::EERR, (__FILE__), (__FUNCTION__), (__LINE__), s, ##__VA_ARGS__)
+#define LOG_WARN(s, ...) NLogging::LogAppend(ELogLevel::EWARN, (__FILE__), (__FUNCTION__), (__LINE__), s, ##__VA_ARGS__)
+#define LOG_INFO(s, ...) NLogging::LogAppend(ELogLevel::EINFO, (__FILE__), (__FUNCTION__), (__LINE__), s, ##__VA_ARGS__)
 #if defined(_RELEASE) || defined(NDEBUG)  // disable debug logging in release versions
 #define LOG_DEBUG(s, ...)
 #define LOG_METHOD()
 #else
-#define LOG_DEBUG(s, ...) NLogging::LogAppend(ELogLevel::DEBUG, (__FILE__), (__FUNCTION__), (__LINE__), s, ##__VA_ARGS__)
+#define LOG_DEBUG(s, ...) NLogging::LogAppend(ELogLevel::EDEBUG, (__FILE__), (__FUNCTION__), (__LINE__), s, ##__VA_ARGS__)
 #define LOG_METHOD() NLogging::CMethodLogger _method_logger_((__FILE__), (__FUNCTION__), (__LINE__))
 #endif
 
