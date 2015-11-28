@@ -643,7 +643,7 @@ uint32_t GetRandomNumber()
 
 int main(int argc, char** argv)
 {
-   NLogging::InitLogFile(appName, ELogLevel::EDEBUG, ELogLevel::EINFO);
+   NLogging::InitLogFile(appName, "log.txt", ELogLevel::EDEBUG, ELogLevel::EINFO);
    cout << appName << endl;
    std::string cabFileName;
    if (argc >= 2) cabFileName = argv[1];

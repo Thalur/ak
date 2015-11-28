@@ -223,7 +223,7 @@ void RunApplication()
 
 int main(int argc, char** argv)
 {
-   NLogging::InitLogFile("OpenGLtest by AK");
+   NLogging::InitLogFile("OpenGLtest by AK", "log.txt");
    LOG_METHOD();
    if (SetUpOGL(argc, argv)) {
       RunApplication();

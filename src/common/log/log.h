@@ -18,10 +18,10 @@ enum class ELogLevel : int32_t
 
 namespace NLogging {
 
-void InitLogFile(const std::string& aAppName, ELogLevel aFileLogLevel=ELogLevel::EDEBUG,
+void InitLogFile(const std::string& aAppName, const std::string& aLogFile, ELogLevel aFileLogLevel=ELogLevel::EDEBUG,
                  ELogLevel aConsoleLogLevel=ELogLevel::ENONE, bool aSimplifiedConsoleOutput=true);
 
-void LogAppend(ELogLevel aLogLevel, const std::string& aFile, const std::string& aFunc, int aLine, const std::string& aMessage, ...);
+void LogAppend(ELogLevel aLogLevel, const char* aFile, const std::string& aFunc, int aLine, const std::string& aMessage, ...);
 
 struct CMethodLogger
 {

@@ -68,8 +68,8 @@ inline void WriteLogEntry(std::ostream& aOut, const std::string& aTimeStamp,
 
 namespace NLogging {
 
-void InitLogFile(const std::string& aAppName, ELogLevel aFileLogLevel, ELogLevel aConsoleLogLevel,
-                 bool aSimplifiedConsoleOutput)
+void InitLogFile(const std::string& aAppName, const std::string& aLogFile, ELogLevel aFileLogLevel,
+                 ELogLevel aConsoleLogLevel, bool aSimplifiedConsoleOutput)
 {
    if (loggerInitialized) {
       LOG_WARN("Ignoring repeated init call");
@@ -79,8 +79,7 @@ void InitLogFile(const std::string& aAppName, ELogLevel aFileLogLevel, ELogLevel
       simplifiedConsoleOutput = aSimplifiedConsoleOutput;
       appName = aAppName;
       if (fileLogLevel < ELogLevel::ENONE) {
-         std::string filename("log.txt");
-         logFile = boost::in_place(filename.c_str(), std::ofstream::out);
+         logFile = boost::in_place(aLogFile.c_str(), std::ofstream::out);
          CClock now;
          *logFile << "*** " << appName << " log file started at " << now.GetDateLong() << std::endl;
          *logFile << "*** " AK_PLATFORM_NAME " system detected as "
@@ -90,13 +89,29 @@ void InitLogFile(const std::string& aAppName, ELogLevel aFileLogLevel, ELogLevel
    }
 }
 
-void LogAppend(ELogLevel aLogLevel, const std::string& aFile, const std::string& aFunc,
+inline const char* RemovePath(const char* path)
+{
+   const char* pDelimeter = strrchr(path, '\\');
+   if (pDelimeter != nullptr) {
+      path = pDelimeter+1;
+   }
+   pDelimeter = strrchr(path, '/');
+   if (pDelimeter) {
+      path = pDelimeter+1;
+   }
+   return path;
+}
+
+void LogAppend(ELogLevel aLogLevel, const char* aFile, const std::string& aFunc,
                int aLine, const std::string& aMessage, ...)
 {
    if (!loggerInitialized && !uninitializedLoggerUseReported) {
       uninitializedLoggerUseReported = true;
       std::cout << "WARNING: Logger used without initialization. Call InitLogFile() first!" << std::endl;
    }
+
+   // Remove the path from the filename
+   aFile = RemovePath(aFile);
 
    // Assemble the user-generated message
    char buffer[510];

@@ -7,7 +7,7 @@
 
 int main(int argc, char** argv)
 {
-   NLogging::InitLogFile("AK-multitest1");
+   NLogging::InitLogFile("AK-multitest1", "log.txt");
    LOG_INFO("main() called.");
 
    if (WinGL::SetupOpenGL(argc, argv, "Multitest1 Main Window ßäöü")) {
