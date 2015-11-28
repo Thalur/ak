@@ -9,6 +9,6 @@ void android_main(struct android_app* state)
    //__android_log_print(ANDROID_LOG_INFO, APPNAME, "HolyShit you did it !");
    LOG_INFO("My first C++ Android app!");
 
-   ANativeActivity_finish(state->activity);
+   //ANativeActivity_finish(state->activity);
 }
 

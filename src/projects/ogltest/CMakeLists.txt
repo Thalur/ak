@@ -18,7 +18,6 @@ ELSEIF ("${AK_TARGET}" STREQUAL "ANDROID")
 
   if (ANDROID)
     message(STATUS "Android build")
-    include("../../../lib/pixellight/Apk.cmake" REQUIRED)
   else()
     message(ERROR "NOT ANDROID")
   endif()
@@ -26,9 +25,6 @@ ELSEIF ("${AK_TARGET}" STREQUAL "ANDROID")
   target_link_libraries (OGLtest Common.Log Common.Util)
   target_link_libraries (OGLtest log android)
   set_target_properties (OGLtest PROPERTIES COMPILE_DEFINITIONS "ANDROID")
-
-  set (APP_SHARED_LIBRARIES libOGLtest.so)
-  android_create_apk (OGLtest "${CMAKE_BINARY_DIR}/apk" "${APP_SHARED_LIBRARIES}" "" "data")
 
 ELSE()
 
