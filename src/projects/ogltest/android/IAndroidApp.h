@@ -5,6 +5,7 @@
 #define AK_IANDROIDAPP_H_INCLUDED
 
 #include "common/types.h"
+#include <android/native_activity.h>
 
 /**
  * Touch event structure with codes from android/input.h
@@ -33,7 +34,7 @@ public:
    virtual void OnResume() = 0;
    virtual void OnPause() = 0;
    virtual void* OnSaveState() = 0; // return nullptr or a saved state allocated with malloc()
-   virtual void OnInitWindow() = 0;
+   virtual void OnInitWindow(ANativeWindow* aNativeWindow) = 0;
    virtual void OnDestroyWindow() = 0;
    virtual void OnIdle() = 0;
 

@@ -83,10 +83,10 @@ void HandleCommand(android_app* const aApp, const int32_t aCommand)
       LOG_DEBUG("Input handling changed");
       break;
    case APP_CMD_INIT_WINDOW:
-      LOG_DEBUG("Initializing application window");
+      pAndroidApp->OnInitWindow(aApp->window);
       break;
    case APP_CMD_TERM_WINDOW:
-      LOG_DEBUG("Destroying application window");
+      pAndroidApp->OnDestroyWindow();
       break;
    case APP_CMD_WINDOW_RESIZED:
       // This should not happen on a device

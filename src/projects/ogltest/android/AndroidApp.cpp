@@ -3,6 +3,11 @@
  */
 #include "AndroidApp.h"
 #include "common/log/log.h"
+#include "common/util/clock.h"
+#include <chrono>
+#include <thread>
+#include <EGL/egl.h>
+#include <GLES/gl.h>
 
 namespace {
 
@@ -97,18 +102,92 @@ void* CAndroidApp::OnSaveState()
    return nullptr;
 }
 
-void CAndroidApp::OnInitWindow()
+// https://github.com/googlesamples/android-ndk/blob/master/native-activity/app/src/main/jni/main.c
+void CAndroidApp::OnInitWindow(ANativeWindow* aNativeWindow)
 {
    LOG_METHOD();
+   iNativeWindow = aNativeWindow;
+   const EGLint attribs[] = { EGL_SURFACE_TYPE, EGL_WINDOW_BIT, EGL_BLUE_SIZE, 8, EGL_GREEN_SIZE, 8,
+                              EGL_RED_SIZE, 8, EGL_ALPHA_SIZE, 8, EGL_NONE };
+   EGLint dummy, format;
+   EGLint numConfigs;
+   EGLConfig config;
+   LOG_DEBUG("Getting the EGL display");
+   iDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+   LOG_DEBUG("Initializing EGL display");
+   eglInitialize(iDisplay, 0, 0);
+   LOG_DEBUG("Getting EGL config");
+   eglChooseConfig(iDisplay, attribs, &config, 1, &numConfigs);
+   LOG_DEBUG("Retrieving EGL format");
+   eglGetConfigAttrib(iDisplay, config, EGL_NATIVE_VISUAL_ID, &format);
+   LOG_DEBUG("Setting native window geometry");
+   ANativeWindow_setBuffersGeometry(iNativeWindow, 0, 0, format);
+   LOG_DEBUG("Creating EGL Surface");
+   iSurface = eglCreateWindowSurface(iDisplay, config, iNativeWindow, NULL);
+   LOG_DEBUG("Creating EGL Context");
+   iContext = eglCreateContext(iDisplay, config, NULL, NULL);
+   LOG_DEBUG("Setting EGL display as current");
+   if (eglMakeCurrent(iDisplay, iSurface, iSurface, iContext) == EGL_FALSE) {
+      LOG_ERROR("Could not create OpenGL display");
+      return;
+   }
+   LOG_DEBUG("Getting screen size");
+   eglQuerySurface(iDisplay, iSurface, EGL_WIDTH, &iWidth);
+   eglQuerySurface(iDisplay, iSurface, EGL_HEIGHT, &iHeight);
+   iSurfaceCreated = true;
+   LOG_INFO("OpenGL display created with %dx%d", iWidth, iHeight);
+   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
+   glEnable(GL_CULL_FACE);
+   glShadeModel(GL_SMOOTH);
+   //glDisable(GL_DEPTH_TEST);
 }
 
 void CAndroidApp::OnDestroyWindow()
 {
    LOG_METHOD();
+   iSurfaceCreated = false;
+   if (iDisplay != EGL_NO_DISPLAY) {
+      eglMakeCurrent(iDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+      if (iContext != EGL_NO_CONTEXT) {
+         eglDestroyContext(iDisplay, iContext);
+      }
+      if (iSurface != EGL_NO_SURFACE) {
+         eglDestroySurface(iDisplay, iSurface);
+      }
+      eglTerminate(iDisplay);
+   }
+   iDisplay = EGL_NO_DISPLAY;
+   iContext = EGL_NO_CONTEXT;
+   iSurface = EGL_NO_SURFACE;
 }
 
 void CAndroidApp::OnIdle()
 {
+   if (!iSurfaceCreated) {
+      return;
+   }
+   int64_t timeUs = CClock::GetCurrentTicksUs();
+   if (timeUs+1000 < nextTick) {
+      int32_t sleepTime = static_cast<int32_t>((nextTick-timeUs)/1000);
+      LOG_DEBUG("Spleeping for %d ms (diff: %" PRId64 ")", sleepTime, (nextTick-timeUs));
+      std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
+   } else if (nextTick+500000 < timeUs) {
+      LOG_DEBUG("Resetting tick timer (difference was %" PRId64 " ms)", (timeUs-nextTick+500)/1000);
+      nextTick = timeUs;
+   }
+
+   // Execute one tick and schedule the next tick according to the set tick rate
+   LOG_DEBUG("Tick");
+   //bool bResetTicks = OnTick();
+   int32_t tickRate = 60;//GetTickRate();
+   int64_t tickIntervalUs = (1000000 + tickRate/2) / tickRate;
+   /*if (bResetTicks) {
+      nextTick = CClock::GetCurrentTicksUs();
+   }*/
+   if (timeUs-100000 < nextTick) {
+      OnDrawFrame();
+   }
+   nextTick += tickIntervalUs;
 }
 
 
@@ -138,4 +217,62 @@ bool CAndroidApp::OnTouchEvent(const CTouchEvent& aEvent)
 {
    return true;
 }
+
+
+void CAndroidApp::OnDrawFrame()
+{
+   if (iDisplay == nullptr) {
+      LOG_ERROR("Display not initialized");
+      return;
+   }
+   int64_t timeUs = CClock::GetCurrentTicksUs();
+   int64_t frametimeUs = timeUs - frameStartUs;
+   //LOG_DEBUG("time: %" PRId64 " start: %" PRId64 " frametime: %" PRId64, timeUs, frameStartUs, frametimeUs);
+   if (frametimeUs >= 999900) {
+      fps = frame;
+      frameStartUs += 1000000;
+      if (frameStartUs + 900000 < timeUs) {
+         LOG_DEBUG("Resetting fps timer (difference was %" PRId64 " ms)", (timeUs-frameStartUs+500)/1000);
+         frameStartUs = timeUs;
+      }
+      frame = 0;
+      LOG_DEBUG("FPS: %2d (drawTime: %4" PRId64 " µs)", fps, drawTimeUs);
+   }
+   frame++;
+
+   // Clear Color and Depth Buffers
+   glClearColor(angle/360.0f, angle/360.0f, angle/360.0f, 1);
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+   // Reset transformations and set the camera
+   /*glLoadIdentity();
+   xgluLookAt(0.0f, 0.0f, 10.0f,
+              0.0f, 0.0f,  0.0f,
+              0.0f, 1.0f,  0.0f);
+
+   glPushMatrix();
+   glRotatef(angle, 0.0f, 1.0f, 0.0f);
+
+   glColor3f(0, 1, 1);
+   glBegin(GL_TRIANGLES);
+   glVertex3f(-0.5,-0.5,0.0);
+   glVertex3f(0.5,0.0,0.0);
+   glVertex3f(0.0,0.5,0.0);
+   glEnd();
+   glPopMatrix();*/
+
+   angle += 1.0f;
+   if (angle > 360.0f) angle -= 360.0f;
+   //glColor3f(1, 1, 1);
+   //renderBitmapString(-1, 1, GLUT_BITMAP_TIMES_ROMAN_24, std::to_string(fps));
+
+   // Actual Drawing:
+   //OnDraw(fps);
+
+   if (frame == 3) {
+      drawTimeUs = CClock::GetCurrentTicksUs() - timeUs;
+   }
+   eglSwapBuffers(iDisplay, iSurface);
+}
+
 

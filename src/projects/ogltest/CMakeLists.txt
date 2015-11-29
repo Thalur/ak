@@ -24,6 +24,7 @@ ELSEIF ("${AK_TARGET}" STREQUAL "ANDROID")
   add_library (OGLtest SHARED android/main.cpp android/android_native_app_glue.c android/AndroidApp.cpp)
   target_link_libraries (OGLtest Common.Log Common.Util)
   target_link_libraries (OGLtest log android)
+  target_link_libraries (OGLtest EGL GLESv1_CM)
   set_target_properties (OGLtest PROPERTIES COMPILE_DEFINITIONS "ANDROID")
 
 ELSE()
