@@ -139,21 +139,23 @@ def build_android(target, mode):
   if call(buildCmd, shell=True) != 0:
     return False
 
+  # 4. Copy everything we need into the apk directory
   apkDir = "apk"
   if os.path.exists(apkDir):
     shutil.rmtree(apkDir)
-  os.makedirs(apkDir+"/lib/armeabi")
-  os.makedirs(apkDir+"/assets/drawable")
+  os.makedirs(apkDir+"/lib/armeabi") # Shared library directory
+  os.makedirs(apkDir+"/res/drawable") # Android resources (icons)
+  os.makedirs(apkDir+"/assets") # Binary asset files (.ak)
   with cd(apkDir):
     
-    # 4. Copy everything we need into the apk directory
     #shutil.copy2("../classes.dex", "./")
     copy_files("../projects/"+target+"/*.so", "lib/armeabi/")
     shutil.copy2("../../../../../src/projects/"+target+"/android/AndroidManifest.xml", "./")
-    copy_files("../../../../../src/projects/"+target+"/data/*", "assets/drawable/")
+    copy_files("../../../../../src/projects/"+target+"/android/res/drawable/*", "res/drawable/")
+    copy_files("../../../../../src/projects/"+target+"/*.ak", "assets/")
 
     # 5. Create the APK
-    buildCmd = "aapt package -f -M ./AndroidManifest.xml -S assets/ -I "+android_platform+"/android.jar -F OGLtest.apk.unaligned"
+    buildCmd = "aapt package -f -M ./AndroidManifest.xml -S res/ -A assets/ -I "+android_platform+"/android.jar -F OGLtest.apk.unaligned"
     if call(buildCmd, shell=True) != 0:
       return False
     buildCmd = "aapt add -f OGLtest.apk.unaligned lib/armeabi/*"
