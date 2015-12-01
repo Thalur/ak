@@ -69,6 +69,24 @@ std::unique_ptr<IAndroidApp> SetupApplication(ANativeActivity* aNativeActivity)
 void CAndroidApp::OnCreate(const void* aSavedState)
 {
    LOG_METHOD();
+   AAssetManager* manager = iNativeActivity->assetManager;
+   if (manager == nullptr) {
+      LOG_ERROR("Asset manager is unavailable");
+      return;
+   }
+   AAsset* assetFile = AAssetManager_open(manager, "test.ak", AASSET_MODE_BUFFER);
+   if (assetFile == nullptr) {
+      LOG_ERROR("Could not open asset file");
+      return;
+   }
+   const void* buffer = AAsset_getBuffer(assetFile);
+   if (buffer != nullptr) {
+      int fileSize = AAsset_getLength(assetFile);
+      LOG_INFO("Loaded asset file: %d bytes", fileSize);
+   } else {
+      LOG_ERROR("Could not read asset content");
+   }
+   AAsset_close(assetFile);
 }
 
 void CAndroidApp::OnDestroy()
