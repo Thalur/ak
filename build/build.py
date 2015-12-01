@@ -120,50 +120,8 @@ def build_android(target, mode):
 
   # Run the build with cmake
   buildCmd = "cmake --build . --config " + mode.upper()
-<<<<<<< HEAD
   return call(buildCmd, shell=True) == 0
-  
-=======
-  if call(buildCmd, shell=True) != 0:
-    return False
 
-  # 4. Copy everything we need into the apk directory
-  apkDir = "apk"
-  if os.path.exists(apkDir):
-    shutil.rmtree(apkDir)
-  os.makedirs(apkDir+"/lib/armeabi") # Shared library directory
-  os.makedirs(apkDir+"/res/drawable") # Android resources (icons)
-  os.makedirs(apkDir+"/assets") # Binary asset files (.ak)
-  with cd(apkDir):
-    
-    #shutil.copy2("../classes.dex", "./")
-    copy_files("../projects/"+target+"/*.so", "lib/armeabi/")
-    shutil.copy2("../../../../../src/projects/"+target+"/android/AndroidManifest.xml", "./")
-    copy_files("../../../../../src/projects/"+target+"/android/res/drawable/*", "res/drawable/")
-    copy_files("../../../../../src/projects/"+target+"/*.ak", "assets/")
-
-    # 5. Create the APK
-    buildCmd = "aapt package -f -M ./AndroidManifest.xml -S res/ -A assets/ -I "+android_platform+"/android.jar -F OGLtest.apk.unaligned"
-    if call(buildCmd, shell=True) != 0:
-      return False
-    buildCmd = "aapt add -f OGLtest.apk.unaligned lib/armeabi/*"
-    if call(buildCmd, shell=True) != 0:
-      return False
-
-    # 6. Sign the package
-    buildCmd = "jarsigner -sigalg MD5withRSA -digestalg SHA1 -storepass test1234 -keypass test1234 -keystore ~/akkeystore OGLtest.apk.unaligned ogltestkey"
-    if call(buildCmd, shell=True) != 0:
-      return False
-
-    # 7. Run zipalign
-    buildCmd = "zipalign 4 OGLtest.apk.unaligned OGLtest.apk"
-    if call(buildCmd, shell=True) != 0:
-      return False
-
-  return True
-
-#####
->>>>>>> 33c4539159e75f4292c434374f1b366e3b85b340
 
 def build_nyi(prj):
   print magenta(bright("This configuration has not been implemented yet."))
