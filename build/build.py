@@ -99,13 +99,13 @@ def build_win(prj):
   buildCmd = "cmake --build . --config " + prj.mode.upper()
   return call(buildCmd, shell=True) == 0
 
-def build_linux(target, mode):
+def build_linux(prj):
   cmakeCmd = [ 'cmake', '-G', 'Unix Makefiles', prj.config, prj.client, '-D_AK_TARGET=LINUX', "-DCMAKE_BUILD_TYPE="+prj.mode, '../../../../src']
   if call(cmakeCmd) != 0:
     return False
   return call('make') == 0
 
-def build_android(target, mode):
+def build_android(prj):
   # http://spin.atomicobject.com/2011/08/22/building-android-application-bundles-apks-by-hand/
   ndk = os.environ['ANDROID_NDK']
   print "Detected NDK path as " + ndk
@@ -119,7 +119,7 @@ def build_android(target, mode):
     return False
 
   # Run the build with cmake
-  buildCmd = "cmake --build . --config " + mode.upper()
+  buildCmd = "cmake --build . --config " + prj.mode.upper()
   return call(buildCmd, shell=True) == 0
 
 

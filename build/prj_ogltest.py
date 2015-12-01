@@ -5,6 +5,8 @@
 #
 import os
 import shutil
+from subprocess import call
+
 import build
 from colored import *
 
@@ -64,14 +66,14 @@ class project_ogltest:
     os.makedirs(apkDir+"/lib/armeabi") # Shared library directory
     os.makedirs(apkDir+"/res/drawable") # Android resources (icons)
     os.makedirs(apkDir+"/assets") # Binary asset files (.ak)
-    with cd(apkDir):
+    with build.cd(apkDir):
 
       # Copy everything we need into the apk directory
       #shutil.copy2("../classes.dex", "./")
       build.copy_files("../projects/ogltest/*.so", "lib/armeabi/")
       shutil.copy2("../../../../../src/projects/ogltest/android/AndroidManifest.xml", "./")
-      copy_files("../../../../../src/projects/ogltest/android/res/drawable/*", "res/drawable/")
-      copy_files("../../../../../src/projects/ogltest/*.ak", "assets/")
+      build.copy_files("../../../../../src/projects/ogltest/android/res/drawable/*", "res/drawable/")
+      build.copy_files("../../../../../src/projects/ogltest/*.ak", "assets/")
 
       # Create the APK
       buildCmd = "aapt package -f -M ./AndroidManifest.xml -S res/ -A assets/ -I " + android_platform + "/android.jar -F OGLtest.apk.unaligned"

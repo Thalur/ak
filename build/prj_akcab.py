@@ -4,6 +4,7 @@
 # Copyright (C) 2015 by Andre Koschmieder
 #
 import shutil
+
 import build
 from colored import *
 
