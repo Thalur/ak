@@ -3,6 +3,7 @@
 # Multi-platform and multi-target build configuration script for cmake
 # Copyright (C) 2015 by Andre Koschmieder
 #
+import glob
 import os
 import shutil
 from subprocess import call
@@ -45,11 +46,13 @@ class project_ogltest:
   def create_assets(self, binDir):
     # create one .ak file for each subdirectory in projects/ogltest/data
     with build.cd("../../../../src/projects/ogltest/data"):
-      call("rm *.ak", shell=True)
+      for file in glob.glob("*.ak"):
+        os.remove(file)
       for folder in os.listdir("."):
         if os.path.isdir(folder):
           print "Creating asset file " + folder + ".ak from folder " + folder + " ..."
-          cmd = "../../../../gen/akcab/linux/debug/AKCab " + folder + ".ak -add -recursive " + folder
+          exe = os.path.join("..", "..", "..", "..", "gen", "akcab", self.system, "debug", "AKCab")
+          cmd = exe + " " + folder + ".ak -add -recursive " + folder
           if call(cmd, shell=True) != 0:
             return False
     build.copy_files("../../../../src/projects/ogltest/data/*.ak", binDir)
