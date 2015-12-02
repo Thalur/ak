@@ -4,6 +4,8 @@
 #include "AndroidApp.h"
 #include "common/log/log.h"
 #include "common/util/clock.h"
+#include "common/cabinet/AndroidAssetFile.h"
+#include "common/cabinet/Cabinet.h"
 #include <chrono>
 #include <thread>
 #include <EGL/egl.h>
@@ -69,7 +71,7 @@ std::unique_ptr<IAndroidApp> SetupApplication(ANativeActivity* aNativeActivity)
 void CAndroidApp::OnCreate(const void* aSavedState)
 {
    LOG_METHOD();
-   AAssetManager* manager = iNativeActivity->assetManager;
+   /*AAssetManager* manager = iNativeActivity->assetManager;
    if (manager == nullptr) {
       LOG_ERROR("Asset manager is unavailable");
       return;
@@ -86,7 +88,27 @@ void CAndroidApp::OnCreate(const void* aSavedState)
    } else {
       LOG_ERROR("Could not read asset content");
    }
-   AAsset_close(assetFile);
+   AAsset_close(assetFile);*/
+   TFilePtr asset = CAndroidAssetFile::OpenAsset(iNativeActivity->assetManager, "test.ak");
+   if (asset) {
+      TCabinetPtr cabinet = CCabinet::Open(asset);
+      if (cabinet) {
+         LOG_INFO("Cabinet successfully opened");
+         TMemoryFilePtr file = cabinet->ReadFileByName("CMakeLists.txt");
+         if (file) {
+            CMemoryFile::TStringStreamPtr stream = file->CreateStream();
+            char buffer[100];
+            stream->getline(buffer, 99);
+            LOG_INFO("DATA: %s", buffer);
+         } else {
+            LOG_ERROR("Could not read CMakeLists.txt");
+         }
+      } else {
+         LOG_ERROR("Could not open the cabinet");
+      }
+   } else {
+      LOG_ERROR("Asset file test.ak is not available");
+   }
 }
 
 void CAndroidApp::OnDestroy()

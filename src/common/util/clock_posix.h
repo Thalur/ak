@@ -58,7 +58,7 @@ public:
    {
       timespec time;
       if (0 == clock_gettime(CLOCK_MONOTONIC, &time)) {
-         return time.tv_sec * 1000000L + time.tv_nsec / 1000;
+         return static_cast<int64_t>(time.tv_sec) * 1000000L + static_cast<int64_t>(time.tv_nsec) / 1000;
       } else {
          return 0;
       }
