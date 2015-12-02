@@ -42,16 +42,33 @@ class project_ogltest:
       pass
     return True
 
-  def post_build_actions_win(self, binDir):
-    build.copy_files("projects/ogltest/" + self.mode + "/*.exe", binDir)
-    build.copy_files("projects/ogltest/" + self.mode + "/*.pdb", binDir)
-    shutil.copy2("../../../../lib/freeglut/bin/x64/freeglut.dll", binDir)
-    shutil.copy2("../../../../lib/glew-1.12.0/bin/Release/x64/glew32.dll", binDir)
+  def create_assets(self, binDir):
+    # create one .ak file for each subdirectory in projects/ogltest/data
+    with build.cd("../../../../src/projects/ogltest/data"):
+      call("rm *.ak", shell=True)
+      for folder in os.listdir("."):
+        if os.path.isdir(folder):
+          print "Creating asset file " + folder + ".ak from folder " + folder + " ..."
+          cmd = "../../../../gen/akcab/linux/debug/AKCab " + folder + ".ak -add -recursive " + folder
+          if call(cmd, shell=True) != 0:
+            return False
+    build.copy_files("../../../../src/projects/ogltest/data/*.ak", binDir)
     return True
 
+  def post_build_actions_win(self, binDir):
+    if self.create_assets(binDir):
+      build.copy_files("projects/ogltest/" + self.mode + "/*.exe", binDir)
+      build.copy_files("projects/ogltest/" + self.mode + "/*.pdb", binDir)
+      shutil.copy2("../../../../lib/freeglut/bin/x64/freeglut.dll", binDir)
+      shutil.copy2("../../../../lib/glew-1.12.0/bin/Release/x64/glew32.dll", binDir)
+      return True
+    return False
+
   def post_build_actions_linux(self, binDir):
-    shutil.copy2("projects/ogltest/OGLtest", binDir)
-    return True
+    if self.create_assets(binDir):
+      shutil.copy2("projects/ogltest/OGLtest", binDir)
+      return True
+    return False
 
   def post_build_actions_osx(self, binDir):
     print magenta(bright("TODO: OSX post-actions"))
@@ -64,16 +81,16 @@ class project_ogltest:
     if os.path.exists(apkDir):
       shutil.rmtree(apkDir)
     os.makedirs(apkDir+"/lib/armeabi") # Shared library directory
-    os.makedirs(apkDir+"/res/drawable") # Android resources (icons)
     os.makedirs(apkDir+"/assets") # Binary asset files (.ak)
+    if not self.create_assets(apkDir+"/assets"):
+      return False
     with build.cd(apkDir):
 
       # Copy everything we need into the apk directory
       #shutil.copy2("../classes.dex", "./")
       build.copy_files("../projects/ogltest/*.so", "lib/armeabi/")
       shutil.copy2("../../../../../src/projects/ogltest/android/AndroidManifest.xml", "./")
-      build.copy_files("../../../../../src/projects/ogltest/android/res/drawable/*", "res/drawable/")
-      build.copy_files("../../../../../src/projects/ogltest/*.ak", "assets/")
+      shutil.copytree("../../../../../src/projects/ogltest/android/res", "res")
 
       # Create the APK
       buildCmd = "aapt package -f -M ./AndroidManifest.xml -S res/ -A assets/ -I " + android_platform + "/android.jar -F OGLtest.apk.unaligned"
