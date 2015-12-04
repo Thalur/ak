@@ -6,6 +6,7 @@
 #include "common/log/log.h"
 #include "common/util/clock.h"
 #include "wingl.h"
+#include "../pngLoader.h"
 
 #define FREEGLUT_LIB_PRAGMAS 0
 #include "GL/glew.h"
@@ -27,6 +28,7 @@ int64_t drawTimeUs = 0;
 int64_t nextTick = 0;
 
 float angle = 0.0f;
+TTexturePtr texture;
 
 
 std::string GetGlewErrorString(const std::string& aMessage, int aErrorCode)
@@ -59,6 +61,21 @@ void renderBitmapString(float x, float y, void *font, const std::string& text)
    for (int i = 0; i < l; i++) {
       glutBitmapCharacter(font, cText[i]);
    }
+}
+
+void blit(int32_t texID, float x1, float y1, float dx, float dy, float cropX, float cropY)
+{
+   glBindTexture(GL_TEXTURE_2D, texID);
+   glBegin(GL_QUADS);
+   glTexCoord2f(0, 0);
+   glVertex2f(x1, y1);
+   glTexCoord2f(cropX, 0);
+   glVertex2f(x1 + dx, y1);
+   glTexCoord2f(cropX, cropY);
+   glVertex2f(x1 + dx, y1 + dy);
+   glTexCoord2f(0, cropY);
+   glVertex2f(x1, y1 + dy);
+   glEnd();
 }
 
 void OnRenderScene(void)
@@ -100,6 +117,27 @@ void OnRenderScene(void)
    angle += 1.0f;
    glColor3f(1, 1, 1);
    renderBitmapString(-1, 1, GLUT_BITMAP_TIMES_ROMAN_24, std::to_string(fps));
+
+   /*glViewport(0,0,800,480);
+   glMatrixMode(GL_PROJECTION);*/
+   glLoadIdentity();
+   glEnable(GL_TEXTURE_2D);
+   glTranslatef(0.0, 0.0, -5.0);
+   blit(texture->ID(), 0, 0, 0.5, 0.5, 1.0f, 1.0f);
+   glDisable(GL_TEXTURE_2D);
+   //blit(texture->ID(), 0, 0, texture->Width(), texture->Height(), 1.0f, 1.0f);
+
+   /*glTranslatef(0.0, 0.0, -5.0);
+   glBegin (GL_QUADS);
+   glTexCoord2f(0.0f, 0.0f);
+   glVertex3f(-1.0f, -1.0f, 0.0f);
+   glTexCoord2f(1.0f, 0.0f);
+   glVertex3f(1.0f, -1.0f, 0.0f);
+   glTexCoord2f(1.0f, 1.0f);
+   glVertex3f(1.0f, 1.0f, 0.0f);
+   glTexCoord2f(0.0f, 1.0f);
+   glVertex3f(-1.0f, 1.0f, 0.0f);
+   glEnd();*/
 
    // Actual Drawing:
    //OnDraw(fps);
@@ -246,10 +284,16 @@ bool SetupOpenGL(int& argc, char** argv,const std::string& aWindowTitle)
    return true;
 }
 
-void RunGame()
+void RunGame(TCabinetPtr& aCabinet)
 {
    //nextTick = frameStartUs = CClock::GetCurrentTicksUs();
    //OnInit();
+   if (aCabinet) {
+      TFilePtr file = aCabinet->ReadFileByName("icon.png");
+      if (file) {
+         texture = CTexture::LoadFromMemory(file, "icon.png");
+      }
+   }
    LOG_INFO("Starting the main OpenGL loop");
    glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
    glutMainLoop();

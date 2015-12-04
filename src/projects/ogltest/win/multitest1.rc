@@ -1,2 +1,4 @@
 
-GLUT_ICON ICON DISCARDABLE "app.ico"
+GLUT_ICON ICON "app.ico"
+
+9999 RCDATA "..\\..\\..\\..\\gen\\cmake\\ogltest\\win\\test.ak"

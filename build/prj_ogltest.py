@@ -27,6 +27,7 @@ class project_ogltest:
     return [ "win", "linux", "osx", "android", "ios" ]
 
   def pre_build_actions(self):
+    # Android only needs the app resources for compilation, the assets can be created later
     if self.system == "android":
       # Build Java stuff and the native android resources to R.java
       #if os.path.exists("class"):
@@ -40,8 +41,9 @@ class project_ogltest:
       #  return False
       # ToDo
       # aapt package -m -J gen/ -M ./AndroidManifest.xml -S res1/ -S res2 ... -I android.jar
-      pass
-    return True
+      return True
+    else:
+      return self.create_assets(".")
 
   def create_assets(self, binDir):
     # create one .ak file for each subdirectory in projects/ogltest/data
@@ -59,19 +61,17 @@ class project_ogltest:
     return True
 
   def post_build_actions_win(self, binDir):
-    if self.create_assets(binDir):
-      build.copy_files("projects/ogltest/" + self.mode + "/*.exe", binDir)
-      build.copy_files("projects/ogltest/" + self.mode + "/*.pdb", binDir)
-      shutil.copy2("../../../../lib/freeglut/bin/x64/freeglut.dll", binDir)
-      shutil.copy2("../../../../lib/glew-1.12.0/bin/Release/x64/glew32.dll", binDir)
-      return True
-    return False
+    build.copy_files("projects/ogltest/" + self.mode + "/*.exe", binDir)
+    build.copy_files("projects/ogltest/" + self.mode + "/*.pdb", binDir)
+    shutil.copy2("../../../../lib/freeglut/bin/x64/freeglut.dll", binDir)
+    shutil.copy2("../../../../lib/glew-1.12.0/bin/Release/x64/glew32.dll", binDir)
+    build.copy_files("projects/ogltest/libpng/" + self.mode + "/*.dll", binDir)
+    return True
 
   def post_build_actions_linux(self, binDir):
-    if self.create_assets(binDir):
-      shutil.copy2("projects/ogltest/OGLtest", binDir)
-      return True
-    return False
+    shutil.copy2("projects/ogltest/OGLtest", binDir)
+    build.copy_files("*.ak", binDir)
+    return True
 
   def post_build_actions_osx(self, binDir):
     print magenta(bright("TODO: OSX post-actions"))
