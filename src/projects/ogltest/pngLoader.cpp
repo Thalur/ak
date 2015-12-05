@@ -4,6 +4,7 @@
 #include "pngLoader.h"
 #include "common/log/log.h"
 #include "png.h"
+#include <cstring>
 
 #define FREEGLUT_LIB_PRAGMAS 0
 #include "GL/glew.h"

@@ -7,3 +7,4 @@ add_library(Common.Cabinet File.cpp MemoryFile.cpp PosixFile.cpp AndroidAssetFil
 ELSE ()
 add_library(Common.Cabinet File.cpp MemoryFile.cpp PosixFile.cpp Cabinet.cpp JavaRandom.cpp CabManager.cpp CreateCabinet.cpp)
 ENDIF ()
+target_link_libraries(Common.Cabinet Common.Util)

@@ -104,7 +104,7 @@ void OnRenderScene(void)
              0.0f, 1.0f,  0.0f);
 
    glPushMatrix();
-	glRotatef(angle, 0.0f, 1.0f, 0.0f);
+   glRotatef(angle, 0.0f, 1.0f, 0.0f);
 
    glColor3f(0, 1, 1);
    glBegin(GL_TRIANGLES);
