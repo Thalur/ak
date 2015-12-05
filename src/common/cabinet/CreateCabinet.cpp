@@ -294,7 +294,7 @@ bool CCreateCabinet::DeflateData(TFileData& aData, bool aForceDeflation)
    }
 
    TSize small = strm.total_out;
-   if (aForceDeflation || (small+100 < size) && (static_cast<double>(small)/static_cast<double>(size) <= 0.9)) {
+   if (aForceDeflation || ((small+100 < size) && (static_cast<double>(small)/static_cast<double>(size) <= 0.9))) {
       LOG_DEBUG("Deflated data from %" PRIuS " to %" PRIuS, size, small);
       deflateBuffer.resize(small+4);
       aData.swap(deflateBuffer);

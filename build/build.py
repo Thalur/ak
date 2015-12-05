@@ -122,6 +122,11 @@ def build_android(prj):
   buildCmd = "cmake --build . --config " + prj.mode.upper()
   return call(buildCmd, shell=True) == 0
 
+def build_osx(prj):
+  cmakeCmd = [ 'cmake', '-G', 'Unix Makefiles', prj.config, prj.client, '-D_AK_TARGET=OSX', "-DCMAKE_BUILD_TYPE="+prj.mode, '../../../../src']
+  if call(cmakeCmd) != 0:
+    return False
+  return call('make') == 0
 
 def build_nyi(prj):
   print magenta(bright("This configuration has not been implemented yet."))

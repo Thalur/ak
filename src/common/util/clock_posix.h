@@ -9,6 +9,10 @@
 #include <ctime>
 #include <boost/date_time/local_time/local_time.hpp>
 
+#ifdef AK_SYSTEM_OSX
+#include <sys/time.h>
+#endif
+
 class CClock
 {
    boost::local_time::local_date_time iTimestamp;
@@ -54,6 +58,18 @@ public:
       return ss.str();
    }
 
+#ifdef AK_SYSTEM_OSX
+   // OSX does not provide clock_gettime()
+   static int64_t GetCurrentTicksUs()
+   {
+      struct timeval now;
+      if (0 == gettimeofday(&now, nullptr)) {
+         return static_cast<int64_t>(now.tv_sec) * 1000000L + static_cast<int64_t>(now.tv_usec);
+      } else {
+         return 0;
+      }
+   }
+#else
    static int64_t GetCurrentTicksUs()
    {
       timespec time;
@@ -63,6 +79,7 @@ public:
          return 0;
       }
    }
+#endif
 };
 
 #endif // AK_CLOCK_POSIX_H_INCLUDED

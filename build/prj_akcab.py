@@ -36,5 +36,5 @@ class project_akcab:
     return True
 
   def post_build_actions_osx(self, binDir):
-    print magenta(bright("TODO: OSX post-actions"))
-    return False
+    shutil.copy2("projects/akcab/AKCab", binDir)
+    return True

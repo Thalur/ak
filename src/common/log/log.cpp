@@ -103,7 +103,7 @@ inline const char* RemovePath(const char* path)
 }
 
 void LogAppend(ELogLevel aLogLevel, const char* aFile, const std::string& aFunc,
-               int aLine, const std::string& aMessage, ...)
+               const std::string& aMessage, int aLine, ...)
 {
    if (!loggerInitialized && !uninitializedLoggerUseReported) {
       uninitializedLoggerUseReported = true;
@@ -116,7 +116,7 @@ void LogAppend(ELogLevel aLogLevel, const char* aFile, const std::string& aFunc,
    // Assemble the user-generated message
    char buffer[510];
    va_list args;
-   va_start(args, aMessage);
+   va_start(args, aLine);
 #ifdef AK_SYSTEM_WINDOWS
    vsnprintf_s(buffer, 500, _TRUNCATE, aMessage.c_str(), args);
 #else

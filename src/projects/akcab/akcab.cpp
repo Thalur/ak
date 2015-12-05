@@ -344,6 +344,9 @@ int ExecuteRead(CCabinet& aCabinet, const TParameter& aParam)
          excludedFiles.emplace_back(s);
       }
       break;
+   default:
+      // necessary for clang/osx warning
+      break;
    }
    return numExtracted;
 }
@@ -599,6 +602,9 @@ bool ExecuteWrite(CCreateCabinet& aCabinet, const TParameter& aParam)
       }
       break;
    }
+   default:
+      // necessary for clang/osx warning
+      break;
    }
    return bChanged;
 }
