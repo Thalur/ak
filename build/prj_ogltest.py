@@ -99,6 +99,7 @@ class project_ogltest:
       # Copy everything we need into the apk directory
       #shutil.copy2("../classes.dex", "./")
       build.copy_files("../projects/ogltest/*.so", "lib/armeabi/")
+      shutil.copy2("../projects/ogltest/libpng/libpng.so", "lib/armeabi/")
       shutil.copy2("../../../../../src/projects/ogltest/android/AndroidManifest.xml", "./")
       shutil.copytree("../../../../../src/projects/ogltest/android/res", "res")
 
