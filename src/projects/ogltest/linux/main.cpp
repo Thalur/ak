@@ -12,6 +12,10 @@
 #define FREEGLUT_LIB_PRAGMAS 0
 #include "GL/glew.h"
 #include "GL/freeglut.h"
+#ifdef AK_SYSTEM_OSX
+#include "OpenGL/gl.h"
+#include "OpenGL/glext.h"
+#endif
 
 
 bool bWindowClosed = false;
@@ -31,10 +35,12 @@ std::string GetGlewErrorString(const std::string& aMessage, int aErrorCode)
 {
    std::string msg(aMessage);
    msg += std::to_string(aErrorCode);
+#ifndef AK_SYSTEM_OSX
    const GLubyte* errorBytes = glewGetErrorString(aErrorCode);
    if (errorBytes != NULL) {
       msg += " (" + std::string(reinterpret_cast<const char*>(errorBytes)) + ")";
    }
+#endif
    return msg;
 }
 
@@ -114,11 +120,13 @@ void OnRenderScene(void)
    glColor3f(1, 1, 1);
    renderBitmapString(-1, 1, GLUT_BITMAP_TIMES_ROMAN_24, std::to_string(fps));
 
-   glLoadIdentity();
-   glEnable(GL_TEXTURE_2D);
-   glTranslatef(0.0, 0.0, -5.0);
-   blit(texture->ID(), 0, 0, 0.5, 0.5, 1.0f, 1.0f);
-   glDisable(GL_TEXTURE_2D);
+   if (texture) {
+      glLoadIdentity();
+      glEnable(GL_TEXTURE_2D);
+      glTranslatef(0.0, 0.0, -5.0);
+      blit(texture->ID(), 0, 0, 0.5, 0.5, 1.0f, 1.0f);
+      glDisable(GL_TEXTURE_2D);
+   }
 
    // Actual Drawing:
    //OnDraw(fps);
@@ -161,8 +169,11 @@ void OnVisibilityChanged(int state)
 
 void OnNormalKeydown(unsigned char key, int mouseX, int mouseY)
 {
-   if (key == 27) glutLeaveMainLoop();
-   else {
+   if (key == 27) {
+#ifndef AK_SYSTEM_OSX
+      glutLeaveMainLoop();
+#endif
+   } else {
       int mod = glutGetModifiers();
    }
 }
@@ -221,7 +232,11 @@ bool SetUpOGL(int argc, char** argv)
    glutInitWindowSize(800, 480);
    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_ALPHA);
    int glutWindow = glutCreateWindow("AK_GL_MAIN_WND");
-   GLenum err = glewInit();
+   GLenum err = GLEW_OK;
+#ifndef AK_SYSTEM_OSX
+   // glewInit() on OSX is neither necessary nor available
+   err = glewInit();
+#endif
    if (err != GLEW_OK) {
       std::string errorMsg = GetGlewErrorString("Could not initialize GLEW: ", err);
       LOG_ERROR(errorMsg);
@@ -253,7 +268,9 @@ void RunApplication()
       }
    }
    LOG_INFO("Starting the main OpenGL loop");
+#ifndef AK_SYSTEM_OSX
    glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+#endif
    glutMainLoop();
 }
 

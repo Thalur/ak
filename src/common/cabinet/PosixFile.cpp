@@ -22,6 +22,8 @@ TPosixFilePtr CPosixFile::MakeFile(const std::string& aFilename, std::ios_base::
    std::unique_ptr<std::fstream> stream = make_unique<std::fstream>(aFilename.c_str(), aMode);
    if (stream->good()) {
       return TPosixFilePtr(new CPosixFile(aFilename, aMode&(~std::ios_base::trunc), stream, aAllowWrite));
+   } else {
+      LOG_ERROR("Could not open file %s", aFilename.c_str());
    }
    return TPosixFilePtr();
 }
@@ -35,6 +37,8 @@ TPosixFilePtr CPosixFile::OpenExistingFile(const std::string& aFilename, bool aA
          mode |= std::ios_base::out;
       }
       return MakeFile(aFilename, mode, aAllowWrite);
+   } else {
+      LOG_ERROR("File not found: %s", aFilename.c_str());
    }
    return TPosixFilePtr();
 }
@@ -45,6 +49,8 @@ TPosixFilePtr CPosixFile::CreateEmptyFile(const std::string& aFilename, bool aOv
    if (aOverwrite || !FileExists(aFilename)) {
       std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out | std::ios_base::binary | std::ios_base::trunc;
       return MakeFile(aFilename, mode, true);
+   } else {
+      LOG_DEBUG("Not overwriting file %s", aFilename.c_str());
    }
    return TPosixFilePtr();
 }
@@ -90,7 +96,6 @@ bool CPosixFile::Open()
 
 bool CPosixFile::IsOpen() const
 {
-   LOG_METHOD();
    return iStream->is_open();
 }
 

@@ -28,7 +28,7 @@ class project_ogltest:
 
   def pre_build_actions(self):
     # Android only needs the app resources for compilation, the assets can be created later
-    if self.system == "android":
+    if self.system in ["android", "ios"]:
       # Build Java stuff and the native android resources to R.java
       #if os.path.exists("class"):
       #  shutil.rmtree("class")
@@ -74,8 +74,9 @@ class project_ogltest:
     return True
 
   def post_build_actions_osx(self, binDir):
-    print magenta(bright("TODO: OSX post-actions"))
-    return False
+    shutil.copy2("projects/ogltest/OGLtest", binDir)
+    build.copy_files("*.ak", binDir)
+    return True
 
   def post_build_actions_android(self, binDir):
     android_platform = os.environ['ANDROID_PLATFORM']
