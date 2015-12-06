@@ -67,6 +67,10 @@ std::unique_ptr<IAndroidApp> SetupApplication(ANativeActivity* aNativeActivity)
 }
 #endif
 
+CAndroidApp::~CAndroidApp()
+{
+   NLogging::FinishLogger();
+}
 
 void CAndroidApp::OnCreate(const void* aSavedState)
 {
@@ -94,7 +98,13 @@ void CAndroidApp::OnCreate(const void* aSavedState)
       TCabinetPtr cabinet = CCabinet::Open(asset);
       if (cabinet) {
          LOG_INFO("Cabinet successfully opened");
-         TMemoryFilePtr file = cabinet->ReadFileByName("CMakeLists.txt");
+         TFilePtr file = cabinet->ReadFileByName("icon.png");
+         if (file) {
+            texture = CTexture::LoadFromMemory(file, "icon.png");
+         } else {
+            LOG_ERROR("Could not read icon.png");
+         }
+         /*TMemoryFilePtr file = cabinet->ReadFileByName("CMakeLists.txt");
          if (file) {
             CMemoryFile::TStringStreamPtr stream = file->CreateStream();
             char buffer[100];
@@ -102,7 +112,7 @@ void CAndroidApp::OnCreate(const void* aSavedState)
             LOG_INFO("DATA: %s", buffer);
          } else {
             LOG_ERROR("Could not read CMakeLists.txt");
-         }
+         }*/
       } else {
          LOG_ERROR("Could not open the cabinet");
       }

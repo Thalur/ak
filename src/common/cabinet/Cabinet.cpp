@@ -296,19 +296,19 @@ void CCabinet::PrintFileIndex() const
 
 TMemoryFilePtr CCabinet::ReadFileByName(const std::string& aFilename)
 {
-   LOG_DEBUG("%s", aFilename.c_str());
+   LOG_PARAMS("aFilename=%s", aFilename.c_str());
    return ReadFile(aFilename, true);
 }
 
 TMemoryFilePtr CCabinet::ReadFileByPrefix(const std::string& aPrefix)
 {
-   LOG_DEBUG("%s", aPrefix.c_str());
+   LOG_PARAMS("aPrefix=%s", aPrefix.c_str());
    return ReadFile(aPrefix, false);
 }
 
 bool CCabinet::GetFileIndex(TSize& outIndex, const std::string& aFilename) const
 {
-   LOG_METHOD();
+   LOG_PARAMS("aFilename=%s", aFilename.c_str());
    auto it = std::lower_bound(iEntries.begin(), iEntries.end(), TSearchParam(aFilename, true), CompareEntryForSearch);
    if (it != iEntries.end()) {
       outIndex = it - iEntries.begin();
@@ -319,7 +319,7 @@ bool CCabinet::GetFileIndex(TSize& outIndex, const std::string& aFilename) const
 
 TMemoryFilePtr CCabinet::ReadFile(const std::string& aName, bool aFullName)
 {
-   LOG_METHOD();
+   LOG_PARAMS("aName=%s, aFullName=%d", aName.c_str(), aFullName);
    std::vector<CCabinetEntry>::iterator it = std::lower_bound(iEntries.begin(), iEntries.end(),
       TSearchParam(aName, aFullName), CompareEntryForSearch);
    if (it != iEntries.end()) {

@@ -61,4 +61,5 @@ int main(int argc, char** argv)
       }
    }
    LOG_INFO("LEAVING main.");
+   NLogging::FinishLogger();
 }

@@ -281,5 +281,6 @@ int main(int argc, char** argv)
    if (SetUpOGL(argc, argv)) {
       RunApplication();
    }
+   NLogging::FinishLogger();
 }
 

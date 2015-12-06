@@ -18,7 +18,7 @@ inline bool FileExists(const std::string& aFilename)
 
 TPosixFilePtr CPosixFile::MakeFile(const std::string& aFilename, std::ios_base::openmode aMode, bool aAllowWrite)
 {
-   LOG_METHOD();
+   LOG_PARAMS("aFilename=%s, aMode=%d, aAllowWrite=%d", aFilename.c_str(), aMode, aAllowWrite);
    std::unique_ptr<std::fstream> stream = make_unique<std::fstream>(aFilename.c_str(), aMode);
    if (stream->good()) {
       return TPosixFilePtr(new CPosixFile(aFilename, aMode&(~std::ios_base::trunc), stream, aAllowWrite));
@@ -30,7 +30,7 @@ TPosixFilePtr CPosixFile::MakeFile(const std::string& aFilename, std::ios_base::
 
 TPosixFilePtr CPosixFile::OpenExistingFile(const std::string& aFilename, bool aAllowWrite)
 {
-   LOG_METHOD();
+   LOG_PARAMS("aFilename=%s, aAllowWrite=%d", aFilename.c_str(), aAllowWrite);
    if (FileExists(aFilename)) {
       std::ios_base::openmode mode = std::ios_base::in | std::ios_base::binary;
       if (aAllowWrite) {
@@ -45,7 +45,7 @@ TPosixFilePtr CPosixFile::OpenExistingFile(const std::string& aFilename, bool aA
 
 TPosixFilePtr CPosixFile::CreateEmptyFile(const std::string& aFilename, bool aOverwrite)
 {
-   LOG_METHOD();
+   LOG_PARAMS("aFilename=%s, aOverwrite=%d", aFilename.c_str(), aOverwrite);
    if (aOverwrite || !FileExists(aFilename)) {
       std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out | std::ios_base::binary | std::ios_base::trunc;
       return MakeFile(aFilename, mode, true);
@@ -57,7 +57,7 @@ TPosixFilePtr CPosixFile::CreateEmptyFile(const std::string& aFilename, bool aOv
 
 TPosixFilePtr CPosixFile::OpenOrCreate(const std::string& aFilename)
 {
-   LOG_METHOD();
+   LOG_PARAMS("aFilename=%s", aFilename.c_str());
    std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out | std::ios_base::binary;
    if (!FileExists(aFilename)) {
       mode |= std::ios_base::trunc;
@@ -69,13 +69,13 @@ CPosixFile::CPosixFile(CPosixFile&& aSrc)
  : iFilename(std::move(aSrc.iFilename)), iMode(aSrc.iMode), iStream(std::move(aSrc.iStream))
  , iSize(aSrc.iSize), iCanWrite(aSrc.iCanWrite)
 {
-   LOG_METHOD();
+   LOG_PARAMS("aFilename=%s", iFilename.c_str());
 }
 
 CPosixFile::CPosixFile(const std::string& aFilename, std::ios_base::openmode aMode, TFStreamPtr& aStream, bool aCanWrite)
  : iFilename(aFilename), iMode(aMode), iStream(std::move(aStream)), iSize(0), iCanWrite(aCanWrite) 
 {
-   LOG_METHOD();
+   LOG_PARAMS("aFilename=%s", iFilename.c_str());
    if (Open()) {
       std::streampos fsize = iStream->tellg();
       iStream->seekg(0, std::ios::end);
@@ -107,7 +107,7 @@ void CPosixFile::Close()
 
 bool CPosixFile::Read(TFileData& aResult, TSize aPosition, TSize aSize)
 {
-   LOG_METHOD();
+   LOG_PARAMS("aPosition=%" PRIuS ", aSize=%" PRIuS, aPosition, aSize);
    aResult.clear();
    bool wasOpen = IsOpen();
    if (!wasOpen) {
@@ -133,7 +133,7 @@ bool CPosixFile::Read(TFileData& aResult, TSize aPosition, TSize aSize)
 
 bool CPosixFile::Insert(const TFileData& aData, TSize aFileOffset, TSize aDataOffset, TSize aDataSize)
 {
-   LOG_METHOD();
+   LOG_PARAMS("aFileOffset=%" PRIuS ", aDataOffset=%" PRIuS ", aDataSize=%" PRIuS, aFileOffset, aDataOffset, aDataSize);
    if (iCanWrite && CheckOffsets(aFileOffset, aDataOffset, aDataSize, aData.size())) {
       bool wasOpen = IsOpen();
       if (!wasOpen) {
@@ -164,7 +164,7 @@ bool CPosixFile::Insert(const TFileData& aData, TSize aFileOffset, TSize aDataOf
 
 bool CPosixFile::Overwrite(const TFileData& aData, TSize aFileOffset, TSize aDataOffset, TSize aDataSize)
 {
-   LOG_METHOD();
+   LOG_PARAMS("aFileOffset=%" PRIuS ", aDataOffset=%" PRIuS ", aDataSize=%" PRIuS, aFileOffset, aDataOffset, aDataSize);
    if (iCanWrite && CheckOffsets(aFileOffset, aDataOffset, aDataSize, aData.size())) {
       bool wasOpen = IsOpen();
       if (!wasOpen) {

@@ -177,5 +177,6 @@ void android_main(android_app* const aApplication)
       }
    }
    LOG_INFO("MAIN EXIT");
+   pAndroidApp.reset();
 }
 

@@ -21,6 +21,8 @@ namespace NLogging {
 void InitLogFile(const std::string& aAppName, const std::string& aLogFile, ELogLevel aFileLogLevel=ELogLevel::EDEBUG,
                  ELogLevel aConsoleLogLevel=ELogLevel::ENONE, bool aSimplifiedConsoleOutput=true);
 
+void FinishLogger();
+
 void LogAppend(ELogLevel aLogLevel, const char* aFile, const std::string& aFunc, const std::string& aMessage, int aLine, ...);
 
 struct CMethodLogger
@@ -33,6 +35,7 @@ struct CMethodLogger
    {
       LogAppend(ELogLevel::EDEBUG, iFile, iFunction, ">> ENTRY", iLine);
    }
+   CMethodLogger(const char* aFile, const char* aFunction, const std::string& aMessage, int aLine, ...);
    ~CMethodLogger() {
       LogAppend(ELogLevel::EDEBUG, iFile, iFunction, "<< EXIT", iLine);
    }
@@ -46,9 +49,11 @@ struct CMethodLogger
 #if defined(_RELEASE) || defined(NDEBUG)  // disable debug logging in release versions
 #define LOG_DEBUG(s, ...)
 #define LOG_METHOD()
+#define LOG_PARAMS(s, ...)
 #else
 #define LOG_DEBUG(s, ...) NLogging::LogAppend(ELogLevel::EDEBUG, (__FILE__), (__FUNCTION__), s, (__LINE__), ##__VA_ARGS__)
 #define LOG_METHOD() NLogging::CMethodLogger _method_logger_((__FILE__), (__FUNCTION__), (__LINE__))
+#define LOG_PARAMS(s, ...) NLogging::CMethodLogger _method_logger_((__FILE__), (__FUNCTION__), s, (__LINE__), ##__VA_ARGS__)
 #endif
 
 

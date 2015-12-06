@@ -6,9 +6,14 @@
 #include "png.h"
 #include <cstring>
 
+#ifdef AK_SYSTEM_ANDROID
+#include <EGL/egl.h>
+#include <GLES/gl.h>
+#else
 #define FREEGLUT_LIB_PRAGMAS 0
 #include "GL/glew.h"
 #include "GL/freeglut.h"
+#endif
 
 
 namespace {
@@ -74,7 +79,8 @@ GLuint CreateTexture(char* aData, png_uint_32 aWidth, png_uint_32 aHeight, std::
    GLint alignment(0);
    glGetIntegerv(GL_UNPACK_ALIGNMENT, &alignment);
    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-   gluBuild2DMipmaps (GL_TEXTURE_2D, aType.second, aWidth, aHeight, aType.first, GL_UNSIGNED_BYTE, aData);
+   //gluBuild2DMipmaps (GL_TEXTURE_2D, aType.second, aWidth, aHeight, aType.first, GL_UNSIGNED_BYTE, aData);
+   glTexImage2D(GL_TEXTURE_2D, 0, aType.second, aWidth, aHeight, 0, aType.first, GL_UNSIGNED_BYTE, aData);
    glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
    return id;
 }

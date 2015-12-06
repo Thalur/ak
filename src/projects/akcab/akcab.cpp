@@ -727,5 +727,6 @@ int main(int argc, char** argv)
          }
       }
    }
+   NLogging::FinishLogger();
    return 0;
 }

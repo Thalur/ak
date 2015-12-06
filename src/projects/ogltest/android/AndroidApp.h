@@ -6,6 +6,7 @@
 
 #include "IAndroidApp.h"
 #include <EGL/egl.h>
+#include "../pngLoader.h"
 
 
 class CAndroidApp : public IAndroidApp
@@ -15,7 +16,7 @@ public:
     : iNativeActivity(aNativeActivity), iNativeWindow(nullptr), iSurfaceCreated(false)
     , iDisplay(0), iSurface(0), iContext(0), iWidth(0), iHeight(0)
    {}
-   virtual ~CAndroidApp() {}
+   virtual ~CAndroidApp();
 
    // Application state events
    virtual void OnCreate(const void* aSavedState);
@@ -55,6 +56,7 @@ private:
    int64_t drawTimeUs = 0;
    int64_t nextTick = 0;
    float angle = 0.0f;
+   TTexturePtr texture;
 };
 
 

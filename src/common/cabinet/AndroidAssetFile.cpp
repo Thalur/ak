@@ -7,7 +7,7 @@
 
 TAndroidAssetFilePtr CAndroidAssetFile::OpenAsset(AAssetManager* aManager, const std::string& aFilename)
 {
-   LOG_METHOD();
+   LOG_PARAMS("aFilename=%s", aFilename.c_str());
    if (aManager != nullptr) {
       AAsset* assetFile = AAssetManager_open(aManager, aFilename.c_str(), AASSET_MODE_RANDOM);
       if (assetFile != nullptr) {
@@ -30,14 +30,13 @@ CAndroidAssetFile::CAndroidAssetFile(CAndroidAssetFile&& aSrc)
  : iManager(aSrc.iManager), iFilename(std::move(aSrc.iFilename))
  , iSize(aSrc.iSize), iOpen(aSrc.iOpen), iFile(aSrc.iFile)
 {
-   LOG_METHOD();
+   LOG_PARAMS("file=%s", iFilename.c_str());
 }
 
 CAndroidAssetFile::CAndroidAssetFile(AAssetManager* aManager, const std::string& aFilename, TSize aSize, AAsset* aFile)
  : iManager(aManager), iFilename(aFilename), iSize(aSize), iOpen(true), iFile(aFile)
 {
-   LOG_METHOD();
-   
+   LOG_PARAMS("aFilename=%s", iFilename.c_str());
 }
 
 CAndroidAssetFile::~CAndroidAssetFile()
@@ -70,7 +69,7 @@ void CAndroidAssetFile::Close()
 
 bool CAndroidAssetFile::Read(TFileData& aResult, TSize aPosition, TSize aSize)
 {
-   LOG_METHOD();
+   LOG_PARAMS("aPosition=%" PRIuS ", aSize=%" PRIuS, aPosition, aSize);
    aResult.clear();
    bool wasOpen = IsOpen();
    if (!wasOpen) {

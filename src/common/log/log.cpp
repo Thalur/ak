@@ -89,6 +89,15 @@ void InitLogFile(const std::string& aAppName, const std::string& aLogFile, ELogL
    }
 }
 
+void FinishLogger()
+{
+   if (loggerInitialized && (fileLogLevel < ELogLevel::ENONE)) {
+      CClock now;
+      *logFile << "*** Log file finished at " << now.GetDateLong() << " @[AK_log_end]@" << std::endl;
+      logFile->close();
+   }
+}
+
 inline const char* RemovePath(const char* path)
 {
    const char* pDelimeter = strrchr(path, '\\');
@@ -140,6 +149,23 @@ void LogAppend(ELogLevel aLogLevel, const char* aFile, const std::string& aFunc,
       }
 #endif
    }
+}
+
+CMethodLogger::CMethodLogger(const char* aFile, const char* aFunction, const std::string& aMessage, int aLine, ...)
+ : iFile(aFile), iFunction(aFunction), iLine(aLine)
+{
+   // Assemble the user-generated message
+   std::string msg = std::string(">> ENTRY: ") + aMessage;
+   char buffer[510];
+   va_list args;
+   va_start(args, aLine);
+#ifdef AK_SYSTEM_WINDOWS
+   vsnprintf_s(buffer, 500, _TRUNCATE, msg.c_str(), args);
+#else
+   vsnprintf(buffer, 500, msg.c_str(), args);
+#endif
+   va_end(args);
+   LogAppend(ELogLevel::EDEBUG, iFile, iFunction, buffer, iLine);
 }
 
 } // namespace NLogging
