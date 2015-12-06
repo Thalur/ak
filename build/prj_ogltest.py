@@ -53,7 +53,13 @@ class project_ogltest:
       for folder in os.listdir("."):
         if os.path.isdir(folder):
           print "Creating asset file " + folder + ".ak from folder " + folder + " ..."
-          exe = os.path.join("..", "..", "..", "..", "gen", "akcab", self.system, "debug", "AKCab")
+          if self.system == "android":
+            sys = "linux"
+          elif self.system == "ios":
+            sys = "osx"
+          else:
+            sys = self.system
+          exe = os.path.join("..", "..", "..", "..", "gen", "akcab", sys, "debug", "AKCab")
           cmd = exe + " " + folder + ".ak -add -recursive " + folder
           if call(cmd, shell=True) != 0:
             return False
