@@ -9,7 +9,7 @@ public class LoadLibraries extends NativeActivity
       Log.i("OGLtest", "Loading libraries...");
 
       // List of libraries to load in (e.g. "PLCore;PLMath" etc.)
-      String sharedLibrariesToLoad = "OGLtest";
+      String sharedLibrariesToLoad = "z";//;png16";
 
       // Load in all shared libraries
       String [] libraries = sharedLibrariesToLoad.split(";");

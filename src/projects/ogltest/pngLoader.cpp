@@ -164,5 +164,6 @@ TTexturePtr CTexture::LoadPNG(TFilePtr& aFile, const std::string& aLogdata, void
    // And send it over to OpenGL
    GLuint glIndex = CreateTexture(data, w, h, GetTextureType(color_type));
    delete[] data;
+   LOG_DEBUG("PNG file loaded: %s", aLogdata.c_str());
    return TTexturePtr(new CTexture(glIndex, w, h, w, h));
 }

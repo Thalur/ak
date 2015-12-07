@@ -8,8 +8,11 @@
 #include "common/cabinet/Cabinet.h"
 #include <chrono>
 #include <thread>
+
+#define GL_GLEXT_PROTOTYPES
 #include <EGL/egl.h>
 #include <GLES/gl.h>
+#include <GLES/glext.h>
 
 namespace {
 
@@ -98,9 +101,9 @@ void CAndroidApp::OnCreate(const void* aSavedState)
       TCabinetPtr cabinet = CCabinet::Open(asset);
       if (cabinet) {
          LOG_INFO("Cabinet successfully opened");
-         TFilePtr file = cabinet->ReadFileByName("icon.png");
+         TFilePtr file = cabinet->ReadFileByName("building148.png");
          if (file) {
-            texture = CTexture::LoadFromMemory(file, "icon.png");
+            texture = CTexture::LoadFromMemory(file, "building148.png");
          } else {
             LOG_ERROR("Could not read icon.png");
          }
@@ -186,10 +189,12 @@ void CAndroidApp::OnInitWindow(ANativeWindow* aNativeWindow)
    eglQuerySurface(iDisplay, iSurface, EGL_HEIGHT, &iHeight);
    iSurfaceCreated = true;
    LOG_INFO("OpenGL display created with %dx%d", iWidth, iHeight);
-   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
-   glEnable(GL_CULL_FACE);
-   glShadeModel(GL_SMOOTH);
-   //glDisable(GL_DEPTH_TEST);
+   glClearDepthf(1.0f);
+   glShadeModel(GL_FLAT);
+   //glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
+   //glEnable(GL_CULL_FACE);
+   //glShadeModel(GL_SMOOTH);
+   glDisable(GL_DEPTH_TEST);
 }
 
 void CAndroidApp::OnDestroyWindow()
@@ -290,6 +295,16 @@ void CAndroidApp::OnDrawFrame()
    }
    frame++;
 
+   glViewport(0, 0, iWidth, iHeight);
+   /*glMatrixMode(GL_PROJECTION);
+   glLoadIdentity();
+
+   glMatrixMode(GL_MODELVIEW);*/
+   glEnable(GL_TEXTURE_2D);
+   //glEnable(GL_BLEND);
+   //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+   //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE); // Just copy the textures
+
    // Clear Color and Depth Buffers
    glClearColor(angle/360.0f, angle/360.0f, angle/360.0f, 1);
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -316,8 +331,19 @@ void CAndroidApp::OnDrawFrame()
    //glColor3f(1, 1, 1);
    //renderBitmapString(-1, 1, GLUT_BITMAP_TIMES_ROMAN_24, std::to_string(fps));
 
+   if (texture) {
+//      glLoadIdentity();
+//      glEnable(GL_TEXTURE_2D);
+//      glTranslatef(0.0, 0.0, -5.0);
+      blit(texture->ID(), 0, 0, 0.5, 0.5, 1.0f, 1.0f);
+//      glDisable(GL_TEXTURE_2D);
+   }
+
    // Actual Drawing:
    //OnDraw(fps);
+
+   glDisable(GL_TEXTURE_2D);
+   //glDisable(GL_BLEND);
 
    if (frame == 3) {
       drawTimeUs = CClock::GetCurrentTicksUs() - timeUs;
@@ -325,4 +351,18 @@ void CAndroidApp::OnDrawFrame()
    eglSwapBuffers(iDisplay, iSurface);
 }
 
+void CAndroidApp::blit(int32_t texID, float x1, float y1, float dx, float dy, float cropX, float cropY)
+{
+   LOG_METHOD();
+   glBindTexture(GL_TEXTURE_2D, texID);
+   // Set the cropping rectangle to only draw part of the source bitmap
+   int32_t crop[4];
+   crop[0] = 0;
+   crop[1] = 32;
+   crop[2] = 32; // width
+   crop[3] = -32; // -height
+   glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_CROP_RECT_OES, crop);
+   glDrawTexiOES(100, 100, 0, 64, 64);
+   //glDrawTexiOES(x1,screenHeight-y1-dy,0,dx,dy);
+}
 

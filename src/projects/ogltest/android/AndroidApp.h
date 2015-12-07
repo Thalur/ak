@@ -39,6 +39,7 @@ public:
 
 private:
    void OnDrawFrame();
+   void blit(int32_t texID, float x1, float y1, float dx, float dy, float cropX, float cropY);
 
    ANativeActivity* iNativeActivity;
    ANativeWindow* iNativeWindow;

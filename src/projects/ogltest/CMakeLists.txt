@@ -13,9 +13,9 @@ ELSE ()
 ENDIF ()
 set (ZLIB_INCLUDE_DIR "../../../lib/zlib-1.2.5/include")
 #set (PNG_LIB_TARGETS "PNG_STATIC")
-set (PNG_STATIC ON)
-set (PNG_SHARED ON)
-add_subdirectory ("../../../lib/lpng1619" ${CMAKE_CURRENT_BINARY_DIR}/libpng)
+#set (PNG_STATIC ON)
+#set (PNG_SHARED ON)
+#add_subdirectory ("../../../lib/lpng1619" ${CMAKE_CURRENT_BINARY_DIR}/libpng)
 
 
 IF ("${AK_TARGET}" STREQUAL "WIN64")
@@ -39,7 +39,15 @@ ELSEIF ("${AK_TARGET}" STREQUAL "ANDROID")
   add_library (OGLtest SHARED android/main.cpp android/android_native_app_glue.c android/AndroidApp.cpp pngLoader.cpp)
   target_link_libraries (OGLtest Common.Log Common.Util Common.Cabinet)
   target_link_libraries (OGLtest log android)
-  target_link_libraries (OGLtest png16 z EGL GLESv1_CM)
+  target_link_libraries (OGLtest akpng z EGL GLESv1_CM)
+  set_target_properties (OGLtest PROPERTIES COMPILE_DEFINITIONS "ANDROID")
+
+  add_library (akpng STATIC ../../../lib/lpng1619/png.c ../../../lib/lpng1619/pngerror.c ../../../lib/lpng1619/pngget.c
+               ../../../lib/lpng1619/pngmem.c ../../../lib/lpng1619/pngpread.c ../../../lib/lpng1619/pngread.c
+               ../../../lib/lpng1619/pngrio.c ../../../lib/lpng1619/pngrtran.c ../../../lib/lpng1619/pngrutil.c
+               ../../../lib/lpng1619/pngset.c ../../../lib/lpng1619/pngtrans.c ../../../lib/lpng1619/pngwio.c
+               ../../../lib/lpng1619/pngwrite.c ../../../lib/lpng1619/pngwtran.c ../../../lib/lpng1619/pngwutil.c)
+  target_link_libraries (OGLtest android z)
   set_target_properties (OGLtest PROPERTIES COMPILE_DEFINITIONS "ANDROID")
 
 ELSE()
