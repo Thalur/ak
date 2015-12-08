@@ -37,6 +37,8 @@ endif()
 # Global include paths
 include_directories ("./")
 include_directories ("../lib/boost_1_59_0")
+include_directories ("../lib/lpng1619")
+include_directories ("../lib/zlib-1.2.5/include")
 
 # Boost settings
 add_definitions (-DBOOST_ALL_NO_LIB)
@@ -44,6 +46,15 @@ set (Boost_USE_STATIC_LIBS ON)
 set (Boost_USE_MULTITHREADED ON)
 set (Boost_USE_STATIC_RUNTIME OFF)
 add_subdirectory (../lib/boost_1_59_0 ${CMAKE_CURRENT_BINARY_DIR}/boost)
+
+# zlib and libpng
+IF ("${AK_TARGET}" STREQUAL "WIN64")
+  set (ZLIB_LIBRARY "C:/git/ak/lib/zlib-1.2.5/lib/libz.lib")
+ELSE ()
+  set (ZLIB_LIBRARY z)
+ENDIF ()
+set (ZLIB_INCLUDE_DIR "../lib/zlib-1.2.5/include")
+add_subdirectory (../lib/lpng1619 ${CMAKE_CURRENT_BINARY_DIR}/libpng)
 
 # Targets
 add_subdirectory(common)

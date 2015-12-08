@@ -1,29 +1,15 @@
 project (OGLtest)
 
-message(STATUS "Adding LIBPNG")
 include_directories (".")
-include_directories ("../../../lib/lpng1619")
 include_directories ("../../../lib/freeglut/include")
 include_directories ("../../../lib/glew-1.12.0/include")
-include_directories ("../../../lib/zlib-1.2.5/include")
-IF ("${AK_TARGET}" STREQUAL "WIN64")
-  set (ZLIB_LIBRARY "C:/git/ak/lib/zlib-1.2.5/lib/libz.lib")
-ELSE ()
-  set (ZLIB_LIBRARY z)
-ENDIF ()
-set (ZLIB_INCLUDE_DIR "../../../lib/zlib-1.2.5/include")
-#set (PNG_LIB_TARGETS "PNG_STATIC")
-#set (PNG_STATIC ON)
-#set (PNG_SHARED ON)
-#add_subdirectory ("../../../lib/lpng1619" ${CMAKE_CURRENT_BINARY_DIR}/libpng)
-
 
 IF ("${AK_TARGET}" STREQUAL "WIN64")
 
   message(STATUS "Windows build")
   SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:mainCRTStartup /SUBSYSTEM:windows /MACHINE:X64")
   add_executable (OGLtest win/winmain.cpp win/wingl.cpp pngLoader.cpp win/multitest1.rc)
-  target_link_libraries (OGLtest Common.Log Common.Util Common.Cabinet png16)
+  target_link_libraries (OGLtest Common.Log Common.Util Common.Cabinet akpng)
   target_link_libraries (OGLtest opengl32.lib glu32.lib)
   target_link_libraries (OGLtest C:/git/ak/lib/zlib-1.2.5/lib/libz.lib)
   target_link_libraries (OGLtest C:/git/ak/lib/freeglut/lib/x64/freeglut.lib)
@@ -42,14 +28,6 @@ ELSEIF ("${AK_TARGET}" STREQUAL "ANDROID")
   target_link_libraries (OGLtest akpng z EGL GLESv1_CM)
   set_target_properties (OGLtest PROPERTIES COMPILE_DEFINITIONS "ANDROID")
 
-  add_library (akpng STATIC ../../../lib/lpng1619/png.c ../../../lib/lpng1619/pngerror.c ../../../lib/lpng1619/pngget.c
-               ../../../lib/lpng1619/pngmem.c ../../../lib/lpng1619/pngpread.c ../../../lib/lpng1619/pngread.c
-               ../../../lib/lpng1619/pngrio.c ../../../lib/lpng1619/pngrtran.c ../../../lib/lpng1619/pngrutil.c
-               ../../../lib/lpng1619/pngset.c ../../../lib/lpng1619/pngtrans.c ../../../lib/lpng1619/pngwio.c
-               ../../../lib/lpng1619/pngwrite.c ../../../lib/lpng1619/pngwtran.c ../../../lib/lpng1619/pngwutil.c)
-  target_link_libraries (OGLtest android z)
-  set_target_properties (OGLtest PROPERTIES COMPILE_DEFINITIONS "ANDROID")
-
 ELSE()
 
   message(STATUS "Linux/OSX build")
@@ -59,9 +37,9 @@ ELSE()
   ENDIF ()
 
   add_executable (OGLtest linux/main.cpp pngLoader.cpp)
-  target_link_libraries (OGLtest Common.Log Common.Util Common.Cabinet png16 z)
+  target_link_libraries (OGLtest Common.Log Common.Util Common.Cabinet akpng z)
   target_link_libraries (OGLtest ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
-  IF ("${AK_TARGET}" STREQUAL "LINUX")
+  IF ("${AK_TARGET}" STREQUAL "LINUX") # not required for OSX
     target_link_libraries (OGLtest "libglut.so")
     target_link_libraries (OGLtest "libGLEW.so")
   ENDIF ()
