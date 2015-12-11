@@ -261,9 +261,9 @@ void RunApplication()
    if (cabFile) {
       TCabinetPtr cabinet = CCabinet::Open(cabFile);
       if (cabinet) {
-         TFilePtr file = cabinet->ReadFileByName("icon.png");
+         TFilePtr file = cabinet->ReadFileByName("building148.png");
          if (file) {
-            texture = CTexture::LoadFromMemory(file, "icon.png");
+            texture = CTexture::LoadFromMemory(file, "building148.png");
          }
       }
    }

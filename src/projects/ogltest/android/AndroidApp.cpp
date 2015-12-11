@@ -297,13 +297,15 @@ void CAndroidApp::OnDrawFrame()
 
    glViewport(0, 0, iWidth, iHeight);
    /*glMatrixMode(GL_PROJECTION);
-   glLoadIdentity();
+   glLoadIdentity();*/
+   if (glGetError() != 0) LOG_ERROR("Error!");
 
-   glMatrixMode(GL_MODELVIEW);*/
+   glMatrixMode(GL_MODELVIEW);
    glEnable(GL_TEXTURE_2D);
-   //glEnable(GL_BLEND);
-   //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-   //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE); // Just copy the textures
+   /*glEnable(GL_BLEND);
+   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE); // Just copy the textures*/
+   if (glGetError() != 0) LOG_ERROR("Error!");
 
    // Clear Color and Depth Buffers
    glClearColor(angle/360.0f, angle/360.0f, angle/360.0f, 1);
@@ -344,6 +346,7 @@ void CAndroidApp::OnDrawFrame()
 
    glDisable(GL_TEXTURE_2D);
    //glDisable(GL_BLEND);
+   if (glGetError() != 0) LOG_ERROR("Error!");
 
    if (frame == 3) {
       drawTimeUs = CClock::GetCurrentTicksUs() - timeUs;
@@ -355,6 +358,7 @@ void CAndroidApp::blit(int32_t texID, float x1, float y1, float dx, float dy, fl
 {
    LOG_METHOD();
    glBindTexture(GL_TEXTURE_2D, texID);
+   if (glGetError() != 0) LOG_ERROR("Error!");
    // Set the cropping rectangle to only draw part of the source bitmap
    int32_t crop[4];
    crop[0] = 0;
@@ -362,7 +366,9 @@ void CAndroidApp::blit(int32_t texID, float x1, float y1, float dx, float dy, fl
    crop[2] = 32; // width
    crop[3] = -32; // -height
    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_CROP_RECT_OES, crop);
+   if (glGetError() != 0) LOG_ERROR("Error!");
    glDrawTexiOES(100, 100, 0, 64, 64);
+   if (glGetError() != 0) LOG_ERROR("Error!");
    //glDrawTexiOES(x1,screenHeight-y1-dy,0,dx,dy);
 }
 

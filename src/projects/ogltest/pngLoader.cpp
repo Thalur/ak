@@ -65,6 +65,7 @@ std::pair<GLenum, GLint> GetTextureType(int aColorType)
    case PNG_COLOR_TYPE_RGB_ALPHA:
       return std::make_pair(GL_RGBA, 4);
    default:
+      LOG_ERROR("Invalid color type: %d", aColorType);
       return std::make_pair(0, 0);
    }
 }
@@ -73,7 +74,9 @@ GLuint CreateTexture(char* aData, png_uint_32 aWidth, png_uint_32 aHeight, std::
 {
    GLuint id(0);
    glGenTextures(1, &id);
+   if (glGetError() != 0) LOG_ERROR("GLError lgGenTextures: %d", glGetError());
    glBindTexture (GL_TEXTURE_2D, id);
+   if (glGetError() != 0) LOG_ERROR("GLError glBindTexture: %d", glGetError());
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
    GLint alignment(0);
@@ -81,6 +84,7 @@ GLuint CreateTexture(char* aData, png_uint_32 aWidth, png_uint_32 aHeight, std::
    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
    //gluBuild2DMipmaps (GL_TEXTURE_2D, aType.second, aWidth, aHeight, aType.first, GL_UNSIGNED_BYTE, aData);
    glTexImage2D(GL_TEXTURE_2D, 0, aType.second, aWidth, aHeight, 0, aType.first, GL_UNSIGNED_BYTE, aData);
+   if (glGetError() != 0) LOG_ERROR("GLError glTexImage2D: %d", glGetError());
    glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
    return id;
 }
@@ -163,7 +167,8 @@ TTexturePtr CTexture::LoadPNG(TFilePtr& aFile, const std::string& aLogdata, void
 
    // And send it over to OpenGL
    GLuint glIndex = CreateTexture(data, w, h, GetTextureType(color_type));
+   //LOG_DEBUG("Data: %d %d %d %d %d %d %d %d", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
    delete[] data;
-   LOG_DEBUG("PNG file loaded: %s", aLogdata.c_str());
+   LOG_DEBUG("PNG file loaded: %s (%ux%u, bpp %d -> Bpp %d)", aLogdata.c_str(), w, h, bitdepth, GetTextureType(color_type).second);
    return TTexturePtr(new CTexture(glIndex, w, h, w, h));
 }
