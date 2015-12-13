@@ -8,6 +8,7 @@
 #include "../pngLoader.h"
 #include <chrono>
 #include <thread>
+#include <boost/filesystem.hpp>
 
 #define FREEGLUT_LIB_PRAGMAS 0
 #include "GL/glew.h"
@@ -17,6 +18,7 @@
 #include "OpenGL/glext.h"
 #endif
 
+namespace bfs = boost::filesystem;
 
 bool bWindowClosed = false;
 bool bVisible = false;
@@ -254,10 +256,10 @@ bool SetUpOGL(int argc, char** argv)
    return true;
 }
 
-void RunApplication()
+void RunApplication(const std::string& aPath)
 {
    LOG_METHOD();
-   TFilePtr cabFile = CPosixFile::OpenExistingFile("test.ak", false);
+   TFilePtr cabFile = CPosixFile::OpenExistingFile(aPath + "test.ak", false);
    if (cabFile) {
       TCabinetPtr cabinet = CCabinet::Open(cabFile);
       if (cabinet) {
@@ -274,12 +276,23 @@ void RunApplication()
    glutMainLoop();
 }
 
+std::string GetApplicationPath(const char* const argv0)
+{
+   boost::system::error_code ec;
+   const bfs::path path = bfs::initial_path(ec);
+   std::string executable = path.string() + std::string("/") + std::string(argv0);
+   const TSize pos = executable.find_last_of("\\/");
+   std::string appPath = executable.substr(0, pos+1);
+   LOG_INFO("Determined application path as %s", appPath.c_str());
+   return appPath;
+}
+
 int main(int argc, char** argv)
 {
    NLogging::InitLogFile("OpenGLtest by AK", "log.txt");
-   LOG_METHOD();
+   std::string path = GetApplicationPath(argv[0]);
    if (SetUpOGL(argc, argv)) {
-      RunApplication();
+      RunApplication(path);
    }
    NLogging::FinishLogger();
 }

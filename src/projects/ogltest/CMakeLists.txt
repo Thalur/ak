@@ -39,6 +39,7 @@ ELSE()
   add_executable (OGLtest linux/main.cpp pngLoader.cpp)
   target_link_libraries (OGLtest Common.Log Common.Util Common.Cabinet akpng z)
   target_link_libraries (OGLtest ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
+  target_link_libraries (OGLtest Boost.Filesystem)
   IF ("${AK_TARGET}" STREQUAL "LINUX") # not required for OSX
     target_link_libraries (OGLtest "libglut.so")
     target_link_libraries (OGLtest "libGLEW.so")
