@@ -74,18 +74,25 @@ GLuint CreateTexture(char* aData, png_uint_32 aWidth, png_uint_32 aHeight, std::
 {
    GLuint id(0);
    glGenTextures(1, &id);
-   if (glGetError() != 0) LOG_ERROR("GLError lgGenTextures: %d", glGetError());
-   glBindTexture (GL_TEXTURE_2D, id);
-   if (glGetError() != 0) LOG_ERROR("GLError glBindTexture: %d", glGetError());
+   CHECK_GL_ERROR("glGenTextures");
+   glBindTexture(GL_TEXTURE_2D, id);
+   CHECK_GL_ERROR("glBindTexture");
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+   CHECK_GL_ERROR("glTexParameteri@minFilter");
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-   GLint alignment(0);
+   CHECK_GL_ERROR("glTexParameteri@magFilter");
+   /*GLint alignment(0);
    glGetIntegerv(GL_UNPACK_ALIGNMENT, &alignment);
+   CHECK_GL_ERROR("glGetIntegerv@unpackAlignment");
    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+   CHECK_GL_ERROR("glPixelStorei@unpackAlignment");*/
    //gluBuild2DMipmaps (GL_TEXTURE_2D, aType.second, aWidth, aHeight, aType.first, GL_UNSIGNED_BYTE, aData);
-   glTexImage2D(GL_TEXTURE_2D, 0, aType.second, aWidth, aHeight, 0, aType.first, GL_UNSIGNED_BYTE, aData);
-   if (glGetError() != 0) LOG_ERROR("GLError glTexImage2D: %d", glGetError());
-   glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
+   LOG_DEBUG("Calling glTexImage2D: %d, %d, %d, %d", aType.second, aWidth, aHeight, aType.first);
+   //glTexImage2D(GL_TEXTURE_2D, 0, aType.second, aWidth, aHeight, 0, aType.first, GL_UNSIGNED_BYTE, aData);
+   glTexImage2D(GL_TEXTURE_2D, 0, aType.first, aWidth, aHeight, 0, aType.first, GL_UNSIGNED_BYTE, aData);
+   CHECK_GL_ERROR("glTexImage2D");
+   /*glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
+   CHECK_GL_ERROR("glPixelStorei@unpackAlignemt");*/
    return id;
 }
 
@@ -105,6 +112,30 @@ TTexturePtr CTexture::LoadFromMemory(TFilePtr& aFile, const std::string& aLogdat
    TTexturePtr result = LoadPNG(aFile, aLogdata, pngPtr);
    png_destroy_read_struct(&pngPtr, nullptr, nullptr);
    return result;
+}
+
+const char* CTexture::GetGLErrorText(int32_t aErrorCode)
+{
+   switch (aErrorCode) {
+   case GL_NO_ERROR:
+      return "GL_NO_ERROR";
+   case GL_INVALID_ENUM:
+      return "GL_INVALID_ENUM";
+   case GL_INVALID_VALUE:
+      return "GL_INVALID_VALUE";
+   case GL_INVALID_OPERATION:
+      return "GL_INVALID_OPERATION";
+   //case GL_INVALID_FRAMEBUFFER_OPERATION: // not in GL1
+   //   return "GL_INVALID_FRAMEBUFFER_OPERATION";
+   case GL_OUT_OF_MEMORY:
+      return "GL_OUT_OF_MEMORY";
+   case GL_STACK_UNDERFLOW:
+      return "GL_STACK_UNDERFLOW";
+   case GL_STACK_OVERFLOW:
+      return "GL_STACK_OVERFLOW";
+   default:
+      return "(unknown error)";
+   }
 }
 
 TTexturePtr CTexture::LoadPNG(TFilePtr& aFile, const std::string& aLogdata, void* aPngPtr)

@@ -9,6 +9,10 @@
 #include <memory>
 #include "common/cabinet/File.h"
 
+#define CHECK_GL_ERROR(msg) do { \
+      GLenum myGlError_ = glGetError(); \
+      if (myGlError_ != 0) LOG_ERROR("GLError %s: %s (%d)", msg, CTexture::GetGLErrorText(myGlError_), myGlError_); \
+   } while (false);
 
 class CTexture;
 typedef std::unique_ptr<CTexture> TTexturePtr;
@@ -21,6 +25,8 @@ public:
    int32_t ID() { return iGLindex; }
    uint16_t Width() { return iImageWidth; }
    uint16_t Height() { return iImageHeight; }
+
+   static const char* GetGLErrorText(int32_t aErrorCode);
 
 private:
    CTexture(int32_t aGLindex, uint16_t aTextureWidth, uint16_t aTextureHeight, uint16_t aImageWidth, uint16_t aImageHeight)

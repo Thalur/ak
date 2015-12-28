@@ -78,6 +78,10 @@ CAndroidApp::~CAndroidApp()
 void CAndroidApp::OnCreate(const void* aSavedState)
 {
    LOG_METHOD();
+   if (iWidth == 0) {
+      LOG_ERROR("OnCreate() called without initialized window");
+      return;
+   }
    /*AAssetManager* manager = iNativeActivity->assetManager;
    if (manager == nullptr) {
       LOG_ERROR("Asset manager is unavailable");
@@ -194,7 +198,14 @@ void CAndroidApp::OnInitWindow(ANativeWindow* aNativeWindow)
    //glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
    //glEnable(GL_CULL_FACE);
    //glShadeModel(GL_SMOOTH);
-   glDisable(GL_DEPTH_TEST);
+   //glDisable(GL_DEPTH_TEST);
+
+   glViewport(0, 0, iWidth, iHeight);
+   glMatrixMode(GL_PROJECTION);
+   glLoadIdentity();
+   if (glGetError() != 0) LOG_ERROR("Error!");
+
+   OnCreate(NULL);
 }
 
 void CAndroidApp::OnDestroyWindow()
@@ -295,16 +306,11 @@ void CAndroidApp::OnDrawFrame()
    }
    frame++;
 
-   glViewport(0, 0, iWidth, iHeight);
-   /*glMatrixMode(GL_PROJECTION);
-   glLoadIdentity();*/
-   if (glGetError() != 0) LOG_ERROR("Error!");
-
    glMatrixMode(GL_MODELVIEW);
    glEnable(GL_TEXTURE_2D);
-   /*glEnable(GL_BLEND);
-   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE); // Just copy the textures*/
+   //glEnable(GL_BLEND);
+   //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE); // Just copy the textures
    if (glGetError() != 0) LOG_ERROR("Error!");
 
    // Clear Color and Depth Buffers
@@ -356,18 +362,18 @@ void CAndroidApp::OnDrawFrame()
 
 void CAndroidApp::blit(int32_t texID, float x1, float y1, float dx, float dy, float cropX, float cropY)
 {
-   LOG_METHOD();
+   LOG_PARAMS("ID: %d", texID);
    glBindTexture(GL_TEXTURE_2D, texID);
    if (glGetError() != 0) LOG_ERROR("Error!");
    // Set the cropping rectangle to only draw part of the source bitmap
    int32_t crop[4];
    crop[0] = 0;
-   crop[1] = 32;
+   crop[1] = 0;
    crop[2] = 32; // width
-   crop[3] = -32; // -height
+   crop[3] = 32; // -height
    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_CROP_RECT_OES, crop);
    if (glGetError() != 0) LOG_ERROR("Error!");
-   glDrawTexiOES(100, 100, 0, 64, 64);
+   glDrawTexiOES(100, iHeight-100-64, 0, 64, 64);
    if (glGetError() != 0) LOG_ERROR("Error!");
    //glDrawTexiOES(x1,screenHeight-y1-dy,0,dx,dy);
 }
