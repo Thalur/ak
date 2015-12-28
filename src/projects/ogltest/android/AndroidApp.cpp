@@ -366,13 +366,13 @@ void CAndroidApp::blit(int32_t texID, float x1, float y1, float dx, float dy, fl
    glBindTexture(GL_TEXTURE_2D, texID);
    if (glGetError() != 0) LOG_ERROR("Error!");
    // Set the cropping rectangle to only draw part of the source bitmap
-   int32_t crop[4];
+   /*int32_t crop[4];
    crop[0] = 0;
    crop[1] = 0;
    crop[2] = 32; // width
    crop[3] = 32; // -height
    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_CROP_RECT_OES, crop);
-   if (glGetError() != 0) LOG_ERROR("Error!");
+   if (glGetError() != 0) LOG_ERROR("Error!");*/
    glDrawTexiOES(100, iHeight-100-64, 0, 64, 64);
    if (glGetError() != 0) LOG_ERROR("Error!");
    //glDrawTexiOES(x1,screenHeight-y1-dy,0,dx,dy);

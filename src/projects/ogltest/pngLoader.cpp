@@ -9,6 +9,10 @@
 #ifdef AK_SYSTEM_ANDROID
 #include <EGL/egl.h>
 #include <GLES/gl.h>
+#include <GLES/glext.h>
+#elif defined AK_SYSTEM_OSX
+#include "OpenGL/gl.h"
+#include "OpenGL/glext.h"
 #else
 #define FREEGLUT_LIB_PRAGMAS 0
 #include "GL/glew.h"
@@ -52,7 +56,7 @@ void userReadData(png_structp aPngPtr, png_bytep aData, png_size_t aLength)
 }
 
 // Return color type and format
-std::pair<GLenum, GLint> GetTextureType(int aColorType)
+/*std::pair<GLenum, GLint> GetTextureType(int aColorType)
 {
    switch (aColorType)
    {
@@ -68,38 +72,40 @@ std::pair<GLenum, GLint> GetTextureType(int aColorType)
       LOG_ERROR("Invalid color type: %d", aColorType);
       return std::make_pair(0, 0);
    }
-}
+}*/
 
-GLuint CreateTexture(char* aData, png_uint_32 aWidth, png_uint_32 aHeight, std::pair<GLenum, GLint> aType)
+int GetTextureType(int aColorType)
 {
-   GLuint id(0);
-   glGenTextures(1, &id);
-   CHECK_GL_ERROR("glGenTextures");
-   glBindTexture(GL_TEXTURE_2D, id);
-   CHECK_GL_ERROR("glBindTexture");
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-   CHECK_GL_ERROR("glTexParameteri@minFilter");
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-   CHECK_GL_ERROR("glTexParameteri@magFilter");
-   /*GLint alignment(0);
-   glGetIntegerv(GL_UNPACK_ALIGNMENT, &alignment);
-   CHECK_GL_ERROR("glGetIntegerv@unpackAlignment");
-   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-   CHECK_GL_ERROR("glPixelStorei@unpackAlignment");*/
-   //gluBuild2DMipmaps (GL_TEXTURE_2D, aType.second, aWidth, aHeight, aType.first, GL_UNSIGNED_BYTE, aData);
-   LOG_DEBUG("Calling glTexImage2D: %d, %d, %d, %d", aType.second, aWidth, aHeight, aType.first);
-   //glTexImage2D(GL_TEXTURE_2D, 0, aType.second, aWidth, aHeight, 0, aType.first, GL_UNSIGNED_BYTE, aData);
-   glTexImage2D(GL_TEXTURE_2D, 0, aType.first, aWidth, aHeight, 0, aType.first, GL_UNSIGNED_BYTE, aData);
-   CHECK_GL_ERROR("glTexImage2D");
-   /*glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
-   CHECK_GL_ERROR("glPixelStorei@unpackAlignemt");*/
-   return id;
+   switch (aColorType)
+   {
+   case PNG_COLOR_TYPE_GRAY:
+      return GL_LUMINANCE;
+   case PNG_COLOR_TYPE_GRAY_ALPHA:
+      return GL_LUMINANCE_ALPHA;
+   case PNG_COLOR_TYPE_RGB:
+      return GL_RGB;
+   case PNG_COLOR_TYPE_RGB_ALPHA:
+      return GL_RGBA;
+   default:
+      LOG_ERROR("Invalid color type: %d", aColorType);
+      return 0;
+   }
 }
 
+uint16_t Get2Fold(const uint16_t aFold)
+{
+   uint16_t ret = 2;
+   while (ret < aFold) {
+      ret *= 2;
+   }
+   return ret;
 }
+
+} // anonymous namespace
 
 TTexturePtr CTexture::LoadFromMemory(TFilePtr& aFile, const std::string& aLogdata)
 {
+   LOG_PARAMS(aLogdata.c_str());
    if (!ValidateFileHeader(aFile)) {
       LOG_ERROR("Could not load image %s: Invalid file header", aLogdata.c_str());
       return TTexturePtr();
@@ -140,6 +146,7 @@ const char* CTexture::GetGLErrorText(int32_t aErrorCode)
 
 TTexturePtr CTexture::LoadPNG(TFilePtr& aFile, const std::string& aLogdata, void* aPngPtr)
 {
+   LOG_PARAMS(aLogdata.c_str());
    png_structp pngPtr = (png_structp)aPngPtr;
    png_infop infoPtr = png_create_info_struct(pngPtr);
    if (infoPtr == nullptr) {
@@ -197,9 +204,49 @@ TTexturePtr CTexture::LoadPNG(TFilePtr& aFile, const std::string& aLogdata, void
    delete[] rowPtrs;
 
    // And send it over to OpenGL
-   GLuint glIndex = CreateTexture(data, w, h, GetTextureType(color_type));
+   TTexturePtr texture = CreateTexture(data, w, h, GetTextureType(color_type));
    //LOG_DEBUG("Data: %d %d %d %d %d %d %d %d", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
    delete[] data;
-   LOG_DEBUG("PNG file loaded: %s (%ux%u, bpp %d -> Bpp %d)", aLogdata.c_str(), w, h, bitdepth, GetTextureType(color_type).second);
-   return TTexturePtr(new CTexture(glIndex, w, h, w, h));
+   LOG_DEBUG("PNG file loaded: %s (%ux%u, bpp %d, type %d)", aLogdata.c_str(), w, h, bitdepth, GetTextureType(color_type));
+   return texture;
 }
+
+/**
+ * Create a OpenGL texture from the given image data and return the id of the new texture.
+ * Due to early Android version requirements, the underlying texture always has dimensions
+ * of powers of two.
+ */
+TTexturePtr CTexture::CreateTexture(char* aData, uint16_t aWidth, uint16_t aHeight, int aType)
+{
+   LOG_PARAMS("aWidth=%d, aHeight=%d", aWidth, aHeight);
+   GLuint id(0);
+   glGenTextures(1, &id);
+   CHECK_GL_ERROR("glGenTextures");
+   glBindTexture(GL_TEXTURE_2D, id);
+   CHECK_GL_ERROR("glBindTexture");
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+   CHECK_GL_ERROR("glTexParameteri@minFilter");
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+   CHECK_GL_ERROR("glTexParameteri@magFilter");
+
+   uint16_t texWidth = Get2Fold(aWidth);
+   uint16_t texHeight = Get2Fold(aHeight);
+   //gluBuild2DMipmaps (GL_TEXTURE_2D, aType.second, aWidth, aHeight, aType.first, GL_UNSIGNED_BYTE, aData);
+   //LOG_DEBUG("Calling glTexImage2D: %d x %d, type %d", texWidth, texHeight, aType);
+   //glTexImage2D(GL_TEXTURE_2D, 0, aType.second, aWidth, aHeight, 0, aType.first, GL_UNSIGNED_BYTE, aData);
+   glTexImage2D(GL_TEXTURE_2D, 0, aType, texWidth, texHeight, 0, aType, GL_UNSIGNED_BYTE, aData);
+   CHECK_GL_ERROR("glTexImage2D");
+
+#ifdef AK_SYSTEM_ANDROID
+   // Cropping is required only on Android
+   int32_t crop[4];
+   crop[0] = 0;
+   crop[1] = 0;
+   crop[2] = texWidth; // width
+   crop[3] = texHeight; // -height
+   glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_CROP_RECT_OES, crop);
+   CHECK_GL_ERROR("glTexParameteriv@textureCrop");
+#endif
+   return TTexturePtr(new CTexture(id, texWidth, texHeight, aWidth, aHeight));
+}
+

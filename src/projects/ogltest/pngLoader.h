@@ -35,6 +35,7 @@ private:
    {}
 
    static TTexturePtr LoadPNG(TFilePtr& aFile, const std::string& aLogdata, void* aPngPtr);
+   static TTexturePtr CreateTexture(char* aData, uint16_t aWidth, uint16_t aHeight, int aType);
 
    int32_t iGLindex;
    uint16_t iTextureWidth;
