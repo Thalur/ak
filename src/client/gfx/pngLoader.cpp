@@ -4,21 +4,17 @@
 #include "pngLoader.h"
 #include "common/log/log.h"
 #include "png.h"
+#include "oglincludes.h"
 #include <cstring>
 
-#ifdef AK_SYSTEM_ANDROID
-#include <EGL/egl.h>
-#include <GLES/gl.h>
-#include <GLES/glext.h>
-#elif defined AK_SYSTEM_OSX
-#include "OpenGL/gl.h"
-#include "OpenGL/glext.h"
-#else
-#define FREEGLUT_LIB_PRAGMAS 0
-#include "GL/glew.h"
-#include "GL/freeglut.h"
-#endif
 
+#define CHECK_GL_ERROR(msg) do { \
+      GLenum myGlError_ = glGetError(); \
+      if (myGlError_ != 0) LOG_ERROR("GLError %s: %s (%d)", msg, GetGLErrorText(myGlError_), myGlError_); \
+   } while (false);
+
+namespace Client
+{
 
 namespace {
 
@@ -55,29 +51,9 @@ void userReadData(png_structp aPngPtr, png_bytep aData, png_size_t aLength)
    }
 }
 
-// Return color type and format
-/*std::pair<GLenum, GLint> GetTextureType(int aColorType)
-{
-   switch (aColorType)
-   {
-   case PNG_COLOR_TYPE_GRAY:
-      return std::make_pair(GL_LUMINANCE, 1);
-   case PNG_COLOR_TYPE_GRAY_ALPHA:
-      return std::make_pair(GL_LUMINANCE_ALPHA, 2);
-   case PNG_COLOR_TYPE_RGB:
-      return std::make_pair(GL_RGB, 3);
-   case PNG_COLOR_TYPE_RGB_ALPHA:
-      return std::make_pair(GL_RGBA, 4);
-   default:
-      LOG_ERROR("Invalid color type: %d", aColorType);
-      return std::make_pair(0, 0);
-   }
-}*/
-
 int GetTextureType(int aColorType)
 {
-   switch (aColorType)
-   {
+   switch (aColorType) {
    case PNG_COLOR_TYPE_GRAY:
       return GL_LUMINANCE;
    case PNG_COLOR_TYPE_GRAY_ALPHA:
@@ -92,6 +68,19 @@ int GetTextureType(int aColorType)
    }
 }
 
+int GetBytesPerPixel(int aTextureType)
+{
+   switch (aTextureType) {
+   case GL_LUMINANCE: return 1;
+   case GL_LUMINANCE_ALPHA: return 2;
+   case GL_RGB: return 3;
+   case GL_RGBA: return 4;
+   default:
+      LOG_ERROR("Invalid texture type: %d", aTextureType);
+      return 0;
+   }
+}
+
 uint16_t Get2Fold(const uint16_t aFold)
 {
    uint16_t ret = 2;
@@ -101,26 +90,8 @@ uint16_t Get2Fold(const uint16_t aFold)
    return ret;
 }
 
-} // anonymous namespace
-
-TTexturePtr CTexture::LoadFromMemory(TFilePtr& aFile, const std::string& aLogdata)
-{
-   LOG_PARAMS(aLogdata.c_str());
-   if (!ValidateFileHeader(aFile)) {
-      LOG_ERROR("Could not load image %s: Invalid file header", aLogdata.c_str());
-      return TTexturePtr();
-   }
-   png_structp pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-   if (pngPtr == nullptr) {
-      LOG_ERROR("Could not initialize png read struct for %s", aLogdata.c_str());
-      return TTexturePtr();
-   }
-   TTexturePtr result = LoadPNG(aFile, aLogdata, pngPtr);
-   png_destroy_read_struct(&pngPtr, nullptr, nullptr);
-   return result;
-}
-
-const char* CTexture::GetGLErrorText(int32_t aErrorCode)
+// ToDo: move to OpenGL Engine implementation
+const char* GetGLErrorText(int32_t aErrorCode)
 {
    switch (aErrorCode) {
    case GL_NO_ERROR:
@@ -131,8 +102,6 @@ const char* CTexture::GetGLErrorText(int32_t aErrorCode)
       return "GL_INVALID_VALUE";
    case GL_INVALID_OPERATION:
       return "GL_INVALID_OPERATION";
-   //case GL_INVALID_FRAMEBUFFER_OPERATION: // not in GL1
-   //   return "GL_INVALID_FRAMEBUFFER_OPERATION";
    case GL_OUT_OF_MEMORY:
       return "GL_OUT_OF_MEMORY";
    case GL_STACK_UNDERFLOW:
@@ -144,13 +113,73 @@ const char* CTexture::GetGLErrorText(int32_t aErrorCode)
    }
 }
 
-TTexturePtr CTexture::LoadPNG(TFilePtr& aFile, const std::string& aLogdata, void* aPngPtr)
+/**
+ * Re-align the bitmap data to match the new (2-fold) texture size.
+ */
+void ReorderData(char*& aData, uint16_t aOrgWidth, uint16_t aOrgHeight, int aType, uint16_t aNewWidth, uint16_t aNewHeight)
 {
-   LOG_PARAMS(aLogdata.c_str());
+   int bpp = GetBytesPerPixel(aType);
+   char* newData = new char[aNewWidth * aNewHeight * bpp];
+   char* src = aData;
+   char* dst = newData;
+   for (int i = 0; i < aOrgHeight; i++) {
+      std::memcpy(dst, src, aOrgWidth * bpp);
+      src += aOrgWidth * bpp;
+      dst += aNewWidth * bpp;
+   }
+   delete[] aData;
+   aData = newData;
+}
+
+/**
+ * Create a OpenGL texture from the given image data and return the id of the new texture.
+ * Due to early Android version requirements, the underlying texture always has dimensions
+ * of powers of two.
+ */
+TTexturePtr CreateTexture(char*& aData, uint16_t aWidth, uint16_t aHeight, int aType)
+{
+   LOG_PARAMS("aWidth=%d, aHeight=%d", aWidth, aHeight);
+   GLuint id(0);
+   glGenTextures(1, &id);
+   CHECK_GL_ERROR("glGenTextures");
+   glBindTexture(GL_TEXTURE_2D, id);
+   CHECK_GL_ERROR("glBindTexture");
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+   CHECK_GL_ERROR("glTexParameteri@minFilter");
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+   CHECK_GL_ERROR("glTexParameteri@magFilter");
+
+   uint16_t texWidth = Get2Fold(aWidth);
+   uint16_t texHeight = Get2Fold(aHeight);
+   if ((texWidth != aWidth) || (texHeight != aHeight)) {
+      ReorderData(aData, aWidth, aHeight, aType, texWidth, texHeight);
+   }
+   //LOG_DEBUG("Calling glTexImage2D: %d x %d, type %d", texWidth, texHeight, aType);
+   glTexImage2D(GL_TEXTURE_2D, 0, aType, texWidth, texHeight, 0, aType, GL_UNSIGNED_BYTE, aData);
+   CHECK_GL_ERROR("glTexImage2D");
+
+#ifdef AK_SYSTEM_ANDROID
+   // Cropping is required only on Android
+   int32_t crop[4];
+   crop[0] = 0;
+   crop[1] = 0;
+   crop[2] = texWidth; // width
+   crop[3] = texHeight; // -height
+   glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_CROP_RECT_OES, crop);
+   CHECK_GL_ERROR("glTexParameteriv@textureCrop");
+#endif
+   return TTexturePtr(new CTexture(id, aWidth, aHeight,
+      static_cast<float>(aWidth) / static_cast<float>(texWidth),
+      static_cast<float>(aHeight) / static_cast<float>(texHeight)));
+}
+
+TTexturePtr LoadPNG(TFilePtr& aFile, const char* aLogdata, void* aPngPtr)
+{
+   LOG_PARAMS(aLogdata);
    png_structp pngPtr = (png_structp)aPngPtr;
    png_infop infoPtr = png_create_info_struct(pngPtr);
    if (infoPtr == nullptr) {
-      LOG_ERROR("Could not initialize png info struct for %s", aLogdata.c_str());
+      LOG_ERROR("Could not initialize png info struct for %s", aLogdata);
       return TTexturePtr();
    }
 
@@ -158,7 +187,7 @@ TTexturePtr CTexture::LoadPNG(TFilePtr& aFile, const std::string& aLogdata, void
    png_bytep* rowPtrs = nullptr;
    char* data = nullptr;
    if (setjmp(png_jmpbuf(pngPtr))) {
-      LOG_ERROR("An error occurred while reading PNG file %s", aLogdata.c_str());
+      LOG_ERROR("An error occurred while reading PNG file %s", aLogdata);
       if (rowPtrs != nullptr) delete[] rowPtrs;
       if (data != nullptr) delete[] data;
       return TTexturePtr();
@@ -207,46 +236,27 @@ TTexturePtr CTexture::LoadPNG(TFilePtr& aFile, const std::string& aLogdata, void
    TTexturePtr texture = CreateTexture(data, w, h, GetTextureType(color_type));
    //LOG_DEBUG("Data: %d %d %d %d %d %d %d %d", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
    delete[] data;
-   LOG_DEBUG("PNG file loaded: %s (%ux%u, bpp %d, type %d)", aLogdata.c_str(), w, h, bitdepth, GetTextureType(color_type));
+   LOG_DEBUG("PNG file loaded: %s (%ux%u, bpp %d, type %d)", aLogdata, w, h, bitdepth, GetTextureType(color_type));
    return texture;
 }
 
-/**
- * Create a OpenGL texture from the given image data and return the id of the new texture.
- * Due to early Android version requirements, the underlying texture always has dimensions
- * of powers of two.
- */
-TTexturePtr CTexture::CreateTexture(char* aData, uint16_t aWidth, uint16_t aHeight, int aType)
+} // anonymous namespace
+
+TTexturePtr LoadFromMemory(TFilePtr& aFile, const char* aLogdata)
 {
-   LOG_PARAMS("aWidth=%d, aHeight=%d", aWidth, aHeight);
-   GLuint id(0);
-   glGenTextures(1, &id);
-   CHECK_GL_ERROR("glGenTextures");
-   glBindTexture(GL_TEXTURE_2D, id);
-   CHECK_GL_ERROR("glBindTexture");
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-   CHECK_GL_ERROR("glTexParameteri@minFilter");
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-   CHECK_GL_ERROR("glTexParameteri@magFilter");
-
-   uint16_t texWidth = Get2Fold(aWidth);
-   uint16_t texHeight = Get2Fold(aHeight);
-   //gluBuild2DMipmaps (GL_TEXTURE_2D, aType.second, aWidth, aHeight, aType.first, GL_UNSIGNED_BYTE, aData);
-   //LOG_DEBUG("Calling glTexImage2D: %d x %d, type %d", texWidth, texHeight, aType);
-   //glTexImage2D(GL_TEXTURE_2D, 0, aType.second, aWidth, aHeight, 0, aType.first, GL_UNSIGNED_BYTE, aData);
-   glTexImage2D(GL_TEXTURE_2D, 0, aType, texWidth, texHeight, 0, aType, GL_UNSIGNED_BYTE, aData);
-   CHECK_GL_ERROR("glTexImage2D");
-
-#ifdef AK_SYSTEM_ANDROID
-   // Cropping is required only on Android
-   int32_t crop[4];
-   crop[0] = 0;
-   crop[1] = 0;
-   crop[2] = texWidth; // width
-   crop[3] = texHeight; // -height
-   glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_CROP_RECT_OES, crop);
-   CHECK_GL_ERROR("glTexParameteriv@textureCrop");
-#endif
-   return TTexturePtr(new CTexture(id, texWidth, texHeight, aWidth, aHeight));
+   LOG_PARAMS(aLogdata);
+   if (!ValidateFileHeader(aFile)) {
+      LOG_ERROR("Could not load image %s: Invalid file header", aLogdata);
+      return TTexturePtr();
+   }
+   png_structp pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+   if (pngPtr == nullptr) {
+      LOG_ERROR("Could not initialize png read struct for %s", aLogdata);
+      return TTexturePtr();
+   }
+   TTexturePtr result = LoadPNG(aFile, aLogdata, pngPtr);
+   png_destroy_read_struct(&pngPtr, nullptr, nullptr);
+   return result;
 }
 
+} // namespace Client

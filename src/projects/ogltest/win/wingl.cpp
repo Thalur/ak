@@ -6,7 +6,7 @@
 #include "common/log/log.h"
 #include "common/util/clock.h"
 #include "wingl.h"
-#include "../pngLoader.h"
+#include "client/gfx/pngLoader.h"
 
 #define FREEGLUT_LIB_PRAGMAS 0
 #include "GL/glew.h"
@@ -29,6 +29,7 @@ int64_t nextTick = 0;
 
 float angle = 0.0f;
 TTexturePtr texture;
+float windowX, windowY;
 
 
 std::string GetGlewErrorString(const std::string& aMessage, int aErrorCode)
@@ -65,16 +66,22 @@ void renderBitmapString(float x, float y, void *font, const std::string& text)
 
 void blit(int32_t texID, float x1, float y1, float dx, float dy, float cropX, float cropY)
 {
+   float left = x1 * 2 / windowX - 1;
+   float top = y1 * 2 / windowY - 1;
+   float right = (x1 + dx) * 2 / windowX - 1;
+   float bottom = (y1 + dy) * 2 / windowY - 1;
+   LOG_PARAMS("x1=%f, y1=%f, dx=%f, dy=%f, cropX=%f, cropY=%f, left=%f, top=%f, right=%f, bottom=%f",
+      x1,  y1, dx, dy, cropX, cropY, left, top, right, bottom);
    glBindTexture(GL_TEXTURE_2D, texID);
    glBegin(GL_QUADS);
    glTexCoord2f(0, 0);
-   glVertex2f(x1, y1);
+   glVertex2f(left, top);
    glTexCoord2f(cropX, 0);
-   glVertex2f(x1 + dx, y1);
+   glVertex2f(right, top);
    glTexCoord2f(cropX, cropY);
-   glVertex2f(x1 + dx, y1 + dy);
+   glVertex2f(right, bottom);
    glTexCoord2f(0, cropY);
-   glVertex2f(x1, y1 + dy);
+   glVertex2f(left, bottom);
    glEnd();
 }
 
@@ -98,7 +105,7 @@ void OnRenderScene(void)
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
    // Reset transformations and set the camera
-   glLoadIdentity();
+   /*glLoadIdentity();
    gluLookAt(0.0f, 0.0f, 10.0f,
              0.0f, 0.0f,  0.0f,
              0.0f, 1.0f,  0.0f);
@@ -112,7 +119,7 @@ void OnRenderScene(void)
    glVertex3f(0.5,0.0,0.0);
    glVertex3f(0.0,0.5,0.0);
    glEnd();
-   glPopMatrix();
+   glPopMatrix();*/
 
    angle += 1.0f;
    glColor3f(1, 1, 1);
@@ -123,7 +130,7 @@ void OnRenderScene(void)
    glLoadIdentity();
    glEnable(GL_TEXTURE_2D);
    glTranslatef(0.0, 0.0, -5.0);
-   blit(texture->ID(), 0, 0, 0.5, 0.5, 1.0f, 1.0f);
+   blit(texture->ID(), 0, 0, 64, 64, texture->CropX(), texture->CropY());
    glDisable(GL_TEXTURE_2D);
    //blit(texture->ID(), 0, 0, texture->Width(), texture->Height(), 1.0f, 1.0f);
 
@@ -156,6 +163,8 @@ void OnChangeSize(int width, int height)
    // (you cant make a window of zero width).
    if (height == 0) height = 1;
    float ratio = 1.0f * (float)width / (float)height;
+   windowX = (float)width;
+   windowY = (float)height;
 
    // Use the Projection Matrix
    glMatrixMode(GL_PROJECTION);
@@ -289,9 +298,9 @@ void RunGame(TCabinetPtr& aCabinet)
    //nextTick = frameStartUs = CClock::GetCurrentTicksUs();
    //OnInit();
    if (aCabinet) {
-      TFilePtr file = aCabinet->ReadFileByName("icon.png");
+      TFilePtr file = aCabinet->ReadFileByName("index32x32.png");
       if (file) {
-         texture = CTexture::LoadFromMemory(file, "icon.png");
+         texture = PNGLoader::LoadFromMemory(file, "index32x32.png");
       }
    }
    LOG_INFO("Starting the main OpenGL loop");

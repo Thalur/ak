@@ -1,0 +1,191 @@
+*** AK Cabinet Creation tool v0.1 alpha log file started at Wednesday, 2015-12-30 01:45:02.979
+*** Windows system detected as 64 bit
+01:45:02.984 DEBUG PosixFile.cpp(33): CPosixFile::OpenExistingFile - >> ENTRY: aFilename=test.ak, aAllowWrite=0
+01:45:02.984 DEBUG PosixFile.cpp(12): `anonymous-namespace'::FileExists - >> ENTRY
+01:45:02.984 DEBUG PosixFile.cpp(12): `anonymous-namespace'::FileExists - << EXIT
+01:45:02.984 ERROR PosixFile.cpp(41): CPosixFile::OpenExistingFile - File not found: test.ak
+01:45:02.987 DEBUG PosixFile.cpp(33): CPosixFile::OpenExistingFile - << EXIT
+01:45:02.988 DEBUG PosixFile.cpp(48): CPosixFile::CreateEmptyFile - >> ENTRY: aFilename=test.ak, aOverwrite=1
+01:45:02.988 DEBUG PosixFile.cpp(21): CPosixFile::MakeFile - >> ENTRY: aFilename=test.ak, aMode=51, aAllowWrite=1
+01:45:02.989 DEBUG PosixFile.cpp(78): CPosixFile::CPosixFile - >> ENTRY: aFilename=test.ak
+01:45:02.989 DEBUG PosixFile.cpp(89): CPosixFile::Open - >> ENTRY
+01:45:02.989 DEBUG PosixFile.cpp(89): CPosixFile::Open - << EXIT
+01:45:02.989 DEBUG PosixFile.cpp(78): CPosixFile::CPosixFile - << EXIT
+01:45:02.989 DEBUG PosixFile.cpp(21): CPosixFile::MakeFile - << EXIT
+01:45:02.989 DEBUG PosixFile.cpp(48): CPosixFile::CreateEmptyFile - << EXIT
+01:45:02.989 DEBUG CreateCabinet.cpp(44): CCreateCabinet::CCreateCabinet - >> ENTRY
+01:45:02.989 DEBUG CreateCabinet.cpp(44): CCreateCabinet::CCreateCabinet - << EXIT
+01:45:03.001 DEBUG PosixFile.cpp(33): CPosixFile::OpenExistingFile - >> ENTRY: aFilename=C:/git/ak/src/projects/ogltest/data/test/alpha320x200.png, aAllowWrite=0
+01:45:03.001 DEBUG PosixFile.cpp(12): `anonymous-namespace'::FileExists - >> ENTRY
+01:45:03.002 DEBUG PosixFile.cpp(12): `anonymous-namespace'::FileExists - << EXIT
+01:45:03.002 DEBUG PosixFile.cpp(21): CPosixFile::MakeFile - >> ENTRY: aFilename=C:/git/ak/src/projects/ogltest/data/test/alpha320x200.png, aMode=33, aAllowWrite=0
+01:45:03.002 DEBUG PosixFile.cpp(78): CPosixFile::CPosixFile - >> ENTRY: aFilename=C:/git/ak/src/projects/ogltest/data/test/alpha320x200.png
+01:45:03.002 DEBUG PosixFile.cpp(89): CPosixFile::Open - >> ENTRY
+01:45:03.002 DEBUG PosixFile.cpp(89): CPosixFile::Open - << EXIT
+01:45:03.002 DEBUG PosixFile.cpp(78): CPosixFile::CPosixFile - << EXIT
+01:45:03.002 DEBUG PosixFile.cpp(21): CPosixFile::MakeFile - << EXIT
+01:45:03.002 DEBUG PosixFile.cpp(33): CPosixFile::OpenExistingFile - << EXIT
+01:45:03.002 DEBUG CreateCabinet.cpp(93): CCreateCabinet::RemoveFile - >> ENTRY
+01:45:03.002 DEBUG CreateCabinet.cpp(63): CCreateCabinet::FindEntryByName - >> ENTRY
+01:45:03.002 DEBUG CreateCabinet.cpp(63): CCreateCabinet::FindEntryByName - << EXIT
+01:45:03.002 DEBUG CreateCabinet.cpp(93): CCreateCabinet::RemoveFile - << EXIT
+01:45:03.002 DEBUG CreateCabinet.cpp(63): CCreateCabinet::FindEntryByName - >> ENTRY
+01:45:03.002 DEBUG CreateCabinet.cpp(63): CCreateCabinet::FindEntryByName - << EXIT
+01:45:03.002 DEBUG CreateCabinet.cpp(105): CCreateCabinet::AddFile - Adding file alpha320x200.png
+01:45:03.014 DEBUG PosixFile.cpp(33): CPosixFile::OpenExistingFile - >> ENTRY: aFilename=C:/git/ak/src/projects/ogltest/data/test/alpha32x32.png, aAllowWrite=0
+01:45:03.014 DEBUG PosixFile.cpp(12): `anonymous-namespace'::FileExists - >> ENTRY
+01:45:03.015 DEBUG PosixFile.cpp(12): `anonymous-namespace'::FileExists - << EXIT
+01:45:03.015 DEBUG PosixFile.cpp(21): CPosixFile::MakeFile - >> ENTRY: aFilename=C:/git/ak/src/projects/ogltest/data/test/alpha32x32.png, aMode=33, aAllowWrite=0
+01:45:03.015 DEBUG PosixFile.cpp(78): CPosixFile::CPosixFile - >> ENTRY: aFilename=C:/git/ak/src/projects/ogltest/data/test/alpha32x32.png
+01:45:03.015 DEBUG PosixFile.cpp(89): CPosixFile::Open - >> ENTRY
+01:45:03.015 DEBUG PosixFile.cpp(89): CPosixFile::Open - << EXIT
+01:45:03.015 DEBUG PosixFile.cpp(78): CPosixFile::CPosixFile - << EXIT
+01:45:03.015 DEBUG PosixFile.cpp(21): CPosixFile::MakeFile - << EXIT
+01:45:03.015 DEBUG PosixFile.cpp(33): CPosixFile::OpenExistingFile - << EXIT
+01:45:03.015 DEBUG CreateCabinet.cpp(93): CCreateCabinet::RemoveFile - >> ENTRY
+01:45:03.015 DEBUG CreateCabinet.cpp(63): CCreateCabinet::FindEntryByName - >> ENTRY
+01:45:03.015 DEBUG CreateCabinet.cpp(63): CCreateCabinet::FindEntryByName - << EXIT
+01:45:03.015 DEBUG CreateCabinet.cpp(93): CCreateCabinet::RemoveFile - << EXIT
+01:45:03.015 DEBUG CreateCabinet.cpp(63): CCreateCabinet::FindEntryByName - >> ENTRY
+01:45:03.015 DEBUG CreateCabinet.cpp(63): CCreateCabinet::FindEntryByName - << EXIT
+01:45:03.015 DEBUG CreateCabinet.cpp(105): CCreateCabinet::AddFile - Adding file alpha32x32.png
+01:45:03.026 DEBUG PosixFile.cpp(33): CPosixFile::OpenExistingFile - >> ENTRY: aFilename=C:/git/ak/src/projects/ogltest/data/test/icon.png, aAllowWrite=0
+01:45:03.026 DEBUG PosixFile.cpp(12): `anonymous-namespace'::FileExists - >> ENTRY
+01:45:03.026 DEBUG PosixFile.cpp(12): `anonymous-namespace'::FileExists - << EXIT
+01:45:03.026 DEBUG PosixFile.cpp(21): CPosixFile::MakeFile - >> ENTRY: aFilename=C:/git/ak/src/projects/ogltest/data/test/icon.png, aMode=33, aAllowWrite=0
+01:45:03.026 DEBUG PosixFile.cpp(78): CPosixFile::CPosixFile - >> ENTRY: aFilename=C:/git/ak/src/projects/ogltest/data/test/icon.png
+01:45:03.026 DEBUG PosixFile.cpp(89): CPosixFile::Open - >> ENTRY
+01:45:03.026 DEBUG PosixFile.cpp(89): CPosixFile::Open - << EXIT
+01:45:03.026 DEBUG PosixFile.cpp(78): CPosixFile::CPosixFile - << EXIT
+01:45:03.026 DEBUG PosixFile.cpp(21): CPosixFile::MakeFile - << EXIT
+01:45:03.026 DEBUG PosixFile.cpp(33): CPosixFile::OpenExistingFile - << EXIT
+01:45:03.026 DEBUG CreateCabinet.cpp(93): CCreateCabinet::RemoveFile - >> ENTRY
+01:45:03.026 DEBUG CreateCabinet.cpp(63): CCreateCabinet::FindEntryByName - >> ENTRY
+01:45:03.026 DEBUG CreateCabinet.cpp(63): CCreateCabinet::FindEntryByName - << EXIT
+01:45:03.026 DEBUG CreateCabinet.cpp(93): CCreateCabinet::RemoveFile - << EXIT
+01:45:03.026 DEBUG CreateCabinet.cpp(63): CCreateCabinet::FindEntryByName - >> ENTRY
+01:45:03.026 DEBUG CreateCabinet.cpp(63): CCreateCabinet::FindEntryByName - << EXIT
+01:45:03.026 DEBUG CreateCabinet.cpp(105): CCreateCabinet::AddFile - Adding file icon.png
+01:45:03.036 DEBUG PosixFile.cpp(33): CPosixFile::OpenExistingFile - >> ENTRY: aFilename=C:/git/ak/src/projects/ogltest/data/test/index184x112.png, aAllowWrite=0
+01:45:03.036 DEBUG PosixFile.cpp(12): `anonymous-namespace'::FileExists - >> ENTRY
+01:45:03.036 DEBUG PosixFile.cpp(12): `anonymous-namespace'::FileExists - << EXIT
+01:45:03.036 DEBUG PosixFile.cpp(21): CPosixFile::MakeFile - >> ENTRY: aFilename=C:/git/ak/src/projects/ogltest/data/test/index184x112.png, aMode=33, aAllowWrite=0
+01:45:03.036 DEBUG PosixFile.cpp(78): CPosixFile::CPosixFile - >> ENTRY: aFilename=C:/git/ak/src/projects/ogltest/data/test/index184x112.png
+01:45:03.037 DEBUG PosixFile.cpp(89): CPosixFile::Open - >> ENTRY
+01:45:03.037 DEBUG PosixFile.cpp(89): CPosixFile::Open - << EXIT
+01:45:03.037 DEBUG PosixFile.cpp(78): CPosixFile::CPosixFile - << EXIT
+01:45:03.037 DEBUG PosixFile.cpp(21): CPosixFile::MakeFile - << EXIT
+01:45:03.037 DEBUG PosixFile.cpp(33): CPosixFile::OpenExistingFile - << EXIT
+01:45:03.037 DEBUG CreateCabinet.cpp(93): CCreateCabinet::RemoveFile - >> ENTRY
+01:45:03.037 DEBUG CreateCabinet.cpp(63): CCreateCabinet::FindEntryByName - >> ENTRY
+01:45:03.037 DEBUG CreateCabinet.cpp(63): CCreateCabinet::FindEntryByName - << EXIT
+01:45:03.037 DEBUG CreateCabinet.cpp(93): CCreateCabinet::RemoveFile - << EXIT
+01:45:03.037 DEBUG CreateCabinet.cpp(63): CCreateCabinet::FindEntryByName - >> ENTRY
+01:45:03.037 DEBUG CreateCabinet.cpp(63): CCreateCabinet::FindEntryByName - << EXIT
+01:45:03.037 DEBUG CreateCabinet.cpp(105): CCreateCabinet::AddFile - Adding file index184x112.png
+01:45:03.050 DEBUG PosixFile.cpp(33): CPosixFile::OpenExistingFile - >> ENTRY: aFilename=C:/git/ak/src/projects/ogltest/data/test/index32x32.png, aAllowWrite=0
+01:45:03.050 DEBUG PosixFile.cpp(12): `anonymous-namespace'::FileExists - >> ENTRY
+01:45:03.050 DEBUG PosixFile.cpp(12): `anonymous-namespace'::FileExists - << EXIT
+01:45:03.050 DEBUG PosixFile.cpp(21): CPosixFile::MakeFile - >> ENTRY: aFilename=C:/git/ak/src/projects/ogltest/data/test/index32x32.png, aMode=33, aAllowWrite=0
+01:45:03.050 DEBUG PosixFile.cpp(78): CPosixFile::CPosixFile - >> ENTRY: aFilename=C:/git/ak/src/projects/ogltest/data/test/index32x32.png
+01:45:03.050 DEBUG PosixFile.cpp(89): CPosixFile::Open - >> ENTRY
+01:45:03.050 DEBUG PosixFile.cpp(89): CPosixFile::Open - << EXIT
+01:45:03.050 DEBUG PosixFile.cpp(78): CPosixFile::CPosixFile - << EXIT
+01:45:03.050 DEBUG PosixFile.cpp(21): CPosixFile::MakeFile - << EXIT
+01:45:03.051 DEBUG PosixFile.cpp(33): CPosixFile::OpenExistingFile - << EXIT
+01:45:03.051 DEBUG CreateCabinet.cpp(93): CCreateCabinet::RemoveFile - >> ENTRY
+01:45:03.051 DEBUG CreateCabinet.cpp(63): CCreateCabinet::FindEntryByName - >> ENTRY
+01:45:03.051 DEBUG CreateCabinet.cpp(63): CCreateCabinet::FindEntryByName - << EXIT
+01:45:03.051 DEBUG CreateCabinet.cpp(93): CCreateCabinet::RemoveFile - << EXIT
+01:45:03.051 DEBUG CreateCabinet.cpp(63): CCreateCabinet::FindEntryByName - >> ENTRY
+01:45:03.051 DEBUG CreateCabinet.cpp(63): CCreateCabinet::FindEntryByName - << EXIT
+01:45:03.051 DEBUG CreateCabinet.cpp(105): CCreateCabinet::AddFile - Adding file index32x32.png
+01:45:03.063 DEBUG PosixFile.cpp(33): CPosixFile::OpenExistingFile - >> ENTRY: aFilename=C:/git/ak/src/projects/ogltest/data/test/index64x48.png, aAllowWrite=0
+01:45:03.063 DEBUG PosixFile.cpp(12): `anonymous-namespace'::FileExists - >> ENTRY
+01:45:03.063 DEBUG PosixFile.cpp(12): `anonymous-namespace'::FileExists - << EXIT
+01:45:03.063 DEBUG PosixFile.cpp(21): CPosixFile::MakeFile - >> ENTRY: aFilename=C:/git/ak/src/projects/ogltest/data/test/index64x48.png, aMode=33, aAllowWrite=0
+01:45:03.063 DEBUG PosixFile.cpp(78): CPosixFile::CPosixFile - >> ENTRY: aFilename=C:/git/ak/src/projects/ogltest/data/test/index64x48.png
+01:45:03.063 DEBUG PosixFile.cpp(89): CPosixFile::Open - >> ENTRY
+01:45:03.063 DEBUG PosixFile.cpp(89): CPosixFile::Open - << EXIT
+01:45:03.063 DEBUG PosixFile.cpp(78): CPosixFile::CPosixFile - << EXIT
+01:45:03.063 DEBUG PosixFile.cpp(21): CPosixFile::MakeFile - << EXIT
+01:45:03.063 DEBUG PosixFile.cpp(33): CPosixFile::OpenExistingFile - << EXIT
+01:45:03.063 DEBUG CreateCabinet.cpp(93): CCreateCabinet::RemoveFile - >> ENTRY
+01:45:03.063 DEBUG CreateCabinet.cpp(63): CCreateCabinet::FindEntryByName - >> ENTRY
+01:45:03.063 DEBUG CreateCabinet.cpp(63): CCreateCabinet::FindEntryByName - << EXIT
+01:45:03.063 DEBUG CreateCabinet.cpp(93): CCreateCabinet::RemoveFile - << EXIT
+01:45:03.063 DEBUG CreateCabinet.cpp(63): CCreateCabinet::FindEntryByName - >> ENTRY
+01:45:03.063 DEBUG CreateCabinet.cpp(63): CCreateCabinet::FindEntryByName - << EXIT
+01:45:03.063 DEBUG CreateCabinet.cpp(105): CCreateCabinet::AddFile - Adding file index64x48.png
+01:45:03.063 DEBUG CreateCabinet.cpp(163): CCreateCabinet::WriteToDisk - >> ENTRY
+01:45:03.063 DEBUG PosixFile.cpp(89): CPosixFile::Open - >> ENTRY
+01:45:03.063 DEBUG PosixFile.cpp(89): CPosixFile::Open - << EXIT
+01:45:03.063 DEBUG PosixFile.cpp(191): CPosixFile::Clear - >> ENTRY
+01:45:03.063 DEBUG PosixFile.cpp(104): CPosixFile::Close - >> ENTRY
+01:45:03.064 DEBUG PosixFile.cpp(104): CPosixFile::Close - << EXIT
+01:45:03.064 DEBUG PosixFile.cpp(191): CPosixFile::Clear - << EXIT
+01:45:03.064 DEBUG CreateCabinet.cpp(178): CCreateCabinet::WriteToDisk - Writing content part to disk
+01:45:03.064 DEBUG PosixFile.cpp(110): CPosixFile::Read - >> ENTRY: aPosition=0, aSize=12114
+01:45:03.064 DEBUG PosixFile.cpp(110): CPosixFile::Read - << EXIT
+01:45:03.064 DEBUG PosixFile.cpp(136): CPosixFile::Insert - >> ENTRY: aFileOffset=0, aDataOffset=0, aDataSize=0
+01:45:03.064 DEBUG PosixFile.cpp(167): CPosixFile::Overwrite - >> ENTRY: aFileOffset=0, aDataOffset=0, aDataSize=12114
+01:45:03.064 DEBUG PosixFile.cpp(167): CPosixFile::Overwrite - << EXIT
+01:45:03.064 DEBUG PosixFile.cpp(136): CPosixFile::Insert - << EXIT
+01:45:03.064 DEBUG PosixFile.cpp(110): CPosixFile::Read - >> ENTRY: aPosition=0, aSize=214
+01:45:03.064 DEBUG PosixFile.cpp(110): CPosixFile::Read - << EXIT
+01:45:03.064 DEBUG PosixFile.cpp(136): CPosixFile::Insert - >> ENTRY: aFileOffset=12114, aDataOffset=0, aDataSize=0
+01:45:03.065 DEBUG PosixFile.cpp(167): CPosixFile::Overwrite - >> ENTRY: aFileOffset=12114, aDataOffset=0, aDataSize=214
+01:45:03.065 DEBUG PosixFile.cpp(167): CPosixFile::Overwrite - << EXIT
+01:45:03.065 DEBUG PosixFile.cpp(136): CPosixFile::Insert - << EXIT
+01:45:03.065 DEBUG PosixFile.cpp(110): CPosixFile::Read - >> ENTRY: aPosition=0, aSize=8692
+01:45:03.065 DEBUG PosixFile.cpp(110): CPosixFile::Read - << EXIT
+01:45:03.065 DEBUG PosixFile.cpp(136): CPosixFile::Insert - >> ENTRY: aFileOffset=12328, aDataOffset=0, aDataSize=0
+01:45:03.065 DEBUG PosixFile.cpp(167): CPosixFile::Overwrite - >> ENTRY: aFileOffset=12328, aDataOffset=0, aDataSize=8692
+01:45:03.065 DEBUG PosixFile.cpp(167): CPosixFile::Overwrite - << EXIT
+01:45:03.065 DEBUG PosixFile.cpp(136): CPosixFile::Insert - << EXIT
+01:45:03.065 DEBUG PosixFile.cpp(110): CPosixFile::Read - >> ENTRY: aPosition=0, aSize=3917
+01:45:03.065 DEBUG PosixFile.cpp(110): CPosixFile::Read - << EXIT
+01:45:03.065 DEBUG PosixFile.cpp(136): CPosixFile::Insert - >> ENTRY: aFileOffset=21020, aDataOffset=0, aDataSize=0
+01:45:03.065 DEBUG PosixFile.cpp(167): CPosixFile::Overwrite - >> ENTRY: aFileOffset=21020, aDataOffset=0, aDataSize=3917
+01:45:03.065 DEBUG PosixFile.cpp(167): CPosixFile::Overwrite - << EXIT
+01:45:03.065 DEBUG PosixFile.cpp(136): CPosixFile::Insert - << EXIT
+01:45:03.065 DEBUG PosixFile.cpp(110): CPosixFile::Read - >> ENTRY: aPosition=0, aSize=370
+01:45:03.065 DEBUG PosixFile.cpp(110): CPosixFile::Read - << EXIT
+01:45:03.065 DEBUG PosixFile.cpp(136): CPosixFile::Insert - >> ENTRY: aFileOffset=24937, aDataOffset=0, aDataSize=0
+01:45:03.065 DEBUG PosixFile.cpp(167): CPosixFile::Overwrite - >> ENTRY: aFileOffset=24937, aDataOffset=0, aDataSize=370
+01:45:03.065 DEBUG PosixFile.cpp(167): CPosixFile::Overwrite - << EXIT
+01:45:03.065 DEBUG PosixFile.cpp(136): CPosixFile::Insert - << EXIT
+01:45:03.065 DEBUG PosixFile.cpp(110): CPosixFile::Read - >> ENTRY: aPosition=0, aSize=1127
+01:45:03.065 DEBUG PosixFile.cpp(110): CPosixFile::Read - << EXIT
+01:45:03.065 DEBUG PosixFile.cpp(136): CPosixFile::Insert - >> ENTRY: aFileOffset=25307, aDataOffset=0, aDataSize=0
+01:45:03.065 DEBUG PosixFile.cpp(167): CPosixFile::Overwrite - >> ENTRY: aFileOffset=25307, aDataOffset=0, aDataSize=1127
+01:45:03.065 DEBUG PosixFile.cpp(167): CPosixFile::Overwrite - << EXIT
+01:45:03.065 DEBUG PosixFile.cpp(136): CPosixFile::Insert - << EXIT
+01:45:03.066 DEBUG CreateCabinet.cpp(227): CCreateCabinet::WriteToDisk - Writing cabinet header section
+01:45:03.066 DEBUG PosixFile.cpp(136): CPosixFile::Insert - >> ENTRY: aFileOffset=0, aDataOffset=0, aDataSize=0
+01:45:03.066 DEBUG PosixFile.cpp(210): CPosixFile::MoveChunk - >> ENTRY
+01:45:03.066 DEBUG PosixFile.cpp(110): CPosixFile::Read - >> ENTRY: aPosition=0, aSize=26434
+01:45:03.066 DEBUG PosixFile.cpp(110): CPosixFile::Read - << EXIT
+01:45:03.066 DEBUG PosixFile.cpp(167): CPosixFile::Overwrite - >> ENTRY: aFileOffset=166, aDataOffset=0, aDataSize=26434
+01:45:03.066 DEBUG PosixFile.cpp(167): CPosixFile::Overwrite - << EXIT
+01:45:03.066 DEBUG PosixFile.cpp(210): CPosixFile::MoveChunk - << EXIT
+01:45:03.066 DEBUG PosixFile.cpp(167): CPosixFile::Overwrite - >> ENTRY: aFileOffset=0, aDataOffset=0, aDataSize=166
+01:45:03.066 DEBUG PosixFile.cpp(167): CPosixFile::Overwrite - << EXIT
+01:45:03.066 DEBUG PosixFile.cpp(136): CPosixFile::Insert - << EXIT
+01:45:03.066 DEBUG PosixFile.cpp(136): CPosixFile::Insert - >> ENTRY: aFileOffset=0, aDataOffset=0, aDataSize=0
+01:45:03.066 DEBUG PosixFile.cpp(210): CPosixFile::MoveChunk - >> ENTRY
+01:45:03.066 DEBUG PosixFile.cpp(110): CPosixFile::Read - >> ENTRY: aPosition=0, aSize=26600
+01:45:03.066 DEBUG PosixFile.cpp(110): CPosixFile::Read - << EXIT
+01:45:03.066 DEBUG PosixFile.cpp(167): CPosixFile::Overwrite - >> ENTRY: aFileOffset=24, aDataOffset=0, aDataSize=26600
+01:45:03.066 DEBUG PosixFile.cpp(167): CPosixFile::Overwrite - << EXIT
+01:45:03.066 DEBUG PosixFile.cpp(210): CPosixFile::MoveChunk - << EXIT
+01:45:03.066 DEBUG PosixFile.cpp(167): CPosixFile::Overwrite - >> ENTRY: aFileOffset=0, aDataOffset=0, aDataSize=24
+01:45:03.066 DEBUG PosixFile.cpp(167): CPosixFile::Overwrite - << EXIT
+01:45:03.066 DEBUG PosixFile.cpp(136): CPosixFile::Insert - << EXIT
+01:45:03.066 DEBUG PosixFile.cpp(104): CPosixFile::Close - >> ENTRY
+01:45:03.066 DEBUG PosixFile.cpp(104): CPosixFile::Close - << EXIT
+01:45:03.066 DEBUG CreateCabinet.cpp(249): CCreateCabinet::WriteToDisk - Written cabinet to disk. File size: 26624, written 26624
+01:45:03.066 DEBUG CreateCabinet.cpp(163): CCreateCabinet::WriteToDisk - << EXIT
+01:45:03.067 DEBUG PosixFile.cpp(104): CPosixFile::Close - >> ENTRY
+01:45:03.067 DEBUG PosixFile.cpp(104): CPosixFile::Close - << EXIT
+*** Log file finished at Wednesday, 2015-12-30 01:45:03.067 @[AK_log_end]@

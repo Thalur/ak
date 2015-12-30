@@ -21,7 +21,7 @@ class project_ogltest:
     self.mode = mode
     self.install = install
     self.config = "-D_AK_PROJECT=OGLTEST"
-    self.client = "-D_AK_CLIENT=0"
+    self.client = "-D_AK_CLIENT=1"
 
   def get_supported_systems(self):
     return [ "win", "linux", "osx", "android", "ios" ]

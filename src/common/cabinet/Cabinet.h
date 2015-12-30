@@ -8,18 +8,18 @@
  * The files are expected to be sorted by filename.
  * HEADER (24 bytes) - all numbers are unsigned and stored as big-endian
  *  4 - (4*char) AK File prefix ( ?? 'A' 'K' ?? )
- *  2 - (TUint16) patch cycle (basically: 2 bytes user data)
- *  2 - (TUint16) cabinet version (currently supported: 2..3)
- *  4 - (TUint32) header size (size of FILEHEADERS section)
- *  1 - (TUint8)  encryption method (0: no encryption, or ENCRYPT_*)
- *  6 - (TUint48) file size (to detect corrupted archives), max: 256 TB
- *  1 - (TUint8)  compression method (0: no compression; or COMPRESS_*)
- *  4 - (TUint32) number of files (max: 2^31-1 for Java compatibility)
+ *  2 - (uint16) patch cycle (basically: 2 bytes user data)
+ *  2 - (uint16) cabinet version (currently supported: 2..3)
+ *  4 - (uint32) header size (size of FILEHEADERS section)
+ *  1 - (uint8)  encryption method (0: no encryption, or ENCRYPT_*)
+ *  6 - (uint48) file size (to detect corrupted archives), max: 256 TB
+ *  1 - (uint8)  compression method (0: no compression; or COMPRESS_*)
+ *  4 - (uint32) number of files (max: 2^31-1 for Java compatibility)
  * FILEHEADERS ((12 + name) bytes per file) -- compression and encryption starts here
- *  X - (TUint16+x*char) file name (java style storage: 2 bytes length + string)
- *  6 - (TUint48) file data offset in the cabinet (after headers, so 0 for first file)
- *  5 - (TUint40) file data size (max: 1 TB; files > 2 GB cannot be compressed, encrypted, or opened as MemoryFile)
- *  1 - (TUint8)  storage flags (compressed,encrypted)
+ *  X - (uint16+x*char) file name (java style storage: 2 bytes length + string)
+ *  6 - (uint48) file data offset in the cabinet (after headers, so 0 for first file)
+ *  5 - (uint40) file data size (max: 1 TB; files > 2 GB cannot be compressed, encrypted, or opened as MemoryFile)
+ *  1 - (uint8)  storage flags (compressed,encrypted)
  * BINARY DATA
  *  Y - file data size bytes
  *      (for compressed files, the first 4 bytes are the uncompressed file size)</pre>
