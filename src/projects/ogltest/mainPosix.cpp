@@ -6,15 +6,13 @@
 
 namespace Client
 {
-
 extern void Run(TAppPtr aAppPtr, int argc, char** argv);
-extern TAppPtr CreateApplication();
-
 }
+extern Client::TAppPtr CreateApplication();
 
 int main(int argc, char** argv)
 {
-   TAppPtr app = CreateApplication();
+   Client::TAppPtr app = CreateApplication();
    NLogging::InitLogFile(app->AppName(), "log.txt");
    Client::Run(app, argc, argv);
    NLogging::FinishLogger();

@@ -51,10 +51,15 @@ void CEngine::OnInitWindow(int32_t aWidth, int32_t aHeight)
    glMatrixMode(GL_MODELVIEW);
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
+#ifdef AK_SYSTEM_ANDROID
    glOrthof(0, iWidth, iHeight, 0, 1, -1);
+#else // For some reason, glOrthof() crashes on Windows
+   glOrtho(0, iWidth, iHeight, 0, 1, -1);
+#endif
    glMatrixMode(GL_MODELVIEW);
 
    // ... (load graphics for splash screen)
+   LOG_DEBUG("Loading image files...");
    TFilePtr file = iCabinet->ReadFileByName("index32x32.png");
    TTexturePtr texture = LoadFromMemory(file, "index32x32.png");
    iTextures.push_back(std::move(texture));
