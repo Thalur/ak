@@ -29,19 +29,19 @@ class project_ogltest:
   def pre_build_actions(self):
     # Android only needs the app resources for compilation, the assets can be created later
     if self.system in ["android", "ios"]:
-      android_platform = os.environ['ANDROID_PLATFORM']
-      print "Detected Android Platform as " + android_platform
-      # Build Java stuff and the native android resources to R.java
-      if os.path.exists("class"):
-        shutil.rmtree("class")
-      os.makedirs("class")
-      print green("Building the Java project...");
-      buildCmd = "javac -cp "+android_platform+"/android.jar -d class ../../../../src/projects/ogltest/android/LoadLibraries.java"
-      if call(buildCmd, shell=True) != 0:
-        return False
-      buildCmd = "dx --dex --output=classes.dex class/"
-      if call(buildCmd, shell=True) != 0:
-        return False
+      #android_platform = os.environ['ANDROID_PLATFORM']
+      #print "Detected Android Platform as " + android_platform
+      ## Build Java stuff and the native android resources to R.java
+      #if os.path.exists("class"):
+      #  shutil.rmtree("class")
+      #os.makedirs("class")
+      #print green("Building the Java project...");
+      #buildCmd = "javac -cp "+android_platform+"/android.jar -d class ../../../../src/projects/ogltest/android/LoadLibraries.java"
+      #if call(buildCmd, shell=True) != 0:
+      #  return False
+      #buildCmd = "dx --dex --output=classes.dex class/"
+      #if call(buildCmd, shell=True) != 0:
+      #  return False
       # ToDo
       # aapt package -m -J gen/ -M ./AndroidManifest.xml -S res1/ -S res2 ... -I android.jar
       return True
@@ -99,7 +99,7 @@ class project_ogltest:
     with build.cd(apkDir):
 
       # Copy everything we need into the apk directory
-      shutil.copy2("../classes.dex", "./")
+      #shutil.copy2("../classes.dex", "./")
       build.copy_files("../projects/ogltest/*.so", "lib/armeabi/")
       #shutil.copy2("../projects/ogltest/libpng/libpng16d.so", "lib/armeabi/libpng16.so")
       shutil.copy2("../../../../../src/projects/ogltest/android/AndroidManifest.xml", "./")
@@ -109,7 +109,8 @@ class project_ogltest:
       buildCmd = "aapt package -f -M ./AndroidManifest.xml -S res/ -A assets/ -I " + android_platform + "/android.jar -F OGLtest.apk.unaligned"
       if call(buildCmd, shell=True) != 0:
         return False
-      buildCmd = "aapt add -f OGLtest.apk.unaligned classes.dex lib/armeabi/*"
+      #buildCmd = "aapt add -f OGLtest.apk.unaligned classes.dex lib/armeabi/*"
+      buildCmd = "aapt add -f OGLtest.apk.unaligned lib/armeabi/*"
       if call(buildCmd, shell=True) != 0:
         return False
 

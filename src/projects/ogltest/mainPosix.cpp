@@ -8,12 +8,13 @@ namespace Client
 {
 
 extern void Run(TAppPtr aAppPtr, int argc, char** argv);
+extern TAppPtr CreateApplication();
 
 }
 
 int main(int argc, char** argv)
 {
-   std::shared_ptr<COGLTest> app = std::make_shared<COGLTest>();
+   TAppPtr app = CreateApplication();
    NLogging::InitLogFile(app->AppName(), "log.txt");
    Client::Run(app, argc, argv);
    NLogging::FinishLogger();

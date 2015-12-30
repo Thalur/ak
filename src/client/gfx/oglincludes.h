@@ -1,4 +1,5 @@
 #ifdef AK_SYSTEM_ANDROID
+#define GL_GLEXT_PROTOTYPES
 #include <EGL/egl.h>
 #include <GLES/gl.h>
 #include <GLES/glext.h>

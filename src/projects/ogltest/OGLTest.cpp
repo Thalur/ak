@@ -5,6 +5,11 @@
 
 const std::string COGLTest::iAppName = "OGLTest by AK";
 
+Client::TAppPtr CreateApplication()
+{
+   return std::make_shared<COGLTest>();
+}
+
 COGLTest::TNames COGLTest::InternalFiles()
 {
    TNames names;

@@ -5,7 +5,7 @@ include_directories ("../../../lib/glew-1.12.0/include")
 
 IF ("${AK_TARGET}" STREQUAL "ANDROID")
 
-message(FATAL_ERROR "Android main is not implemented yet")
+add_library(Client.Main android_native_app_glue.c appAndroid.cpp NativeAndroid.cpp)
 
 ELSEIF ("${AK_TARGET}" STREQUAL "IOS")
 

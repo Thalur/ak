@@ -4,7 +4,6 @@
 #ifndef AK_TEXTURE_H_INCLUDED
 #define AK_TEXTURE_H_INCLUDED
 
-#include <cmath>
 #include <memory>
 
 namespace Client
@@ -23,8 +22,9 @@ public:
    int32_t ID() { return iGLindex; }
    uint16_t Width() { return iWidth; }
    uint16_t Height() { return iHeight; }
-   uint16_t TexWidth() { return static_cast<uint16_t>(std::lround(static_cast<float>(iWidth) / iCropX)); }
-   uint16_t TexHeight() { return static_cast<uint16_t>(std::lround(static_cast<float>(iHeight) / iCropY)); }
+   // cmath rounding functions are not available in Android NDK
+   uint16_t TexWidth() { return static_cast<uint16_t>(static_cast<float>(iWidth) / iCropX + 0.5); }
+   uint16_t TexHeight() { return static_cast<uint16_t>(static_cast<float>(iHeight) / iCropY + 0.5); }
    float CropX() { return iCropX; }
    float CropY() { return iCropY; }
 

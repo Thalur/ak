@@ -163,8 +163,8 @@ TTexturePtr CreateTexture(char*& aData, uint16_t aWidth, uint16_t aHeight, int a
    int32_t crop[4];
    crop[0] = 0;
    crop[1] = 0;
-   crop[2] = texWidth; // width
-   crop[3] = texHeight; // -height
+   crop[2] = aWidth; // width
+   crop[3] = aHeight; // -height
    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_CROP_RECT_OES, crop);
    CHECK_GL_ERROR("glTexParameteriv@textureCrop");
 #endif
