@@ -145,13 +145,20 @@ void RunApplication()
    glutMainLoop();
 }
 
+/**
+ * Get the absolute path where the executable resides.
+ * If argv[0] contains an absolute path, we use that, otherwise build it with boost.
+ */
 std::string GetApplicationPath(const char* const argv0)
 {
-   boost::system::error_code ec;
-   const boost::filesystem::path path = boost::filesystem::initial_path(ec);
-   std::string executable = path.string() + std::string("/") + std::string(argv0);
-   const TSize pos = executable.find_last_of("\\/");
-   std::string appPath = executable.substr(0, pos+1);
+   std::string appPath(argv0);
+   if ((appPath[0] != '/') && ((appPath[1] != ':') || (appPath[2] != '\\'))) {
+      boost::system::error_code ec;
+      const boost::filesystem::path path = boost::filesystem::initial_path(ec);
+      appPath = path.string() + std::string("/") + appPath;
+   }
+   const TSize pos = appPath.find_last_of("\\/");
+   appPath = appPath.substr(0, pos+1);
    LOG_INFO("Determined application path as %s", appPath.c_str());
    return appPath;
 }
