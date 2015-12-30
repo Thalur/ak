@@ -4,6 +4,7 @@
 #include "NativePosix.h"
 #include "common/log/log.h"
 #include "client/gfx/oglincludes.h"
+#include <boost/filesystem.hpp>
 
 namespace Client
 {
@@ -144,6 +145,17 @@ void RunApplication()
    glutMainLoop();
 }
 
+std::string GetApplicationPath(const char* const argv0)
+{
+   boost::system::error_code ec;
+   const boost::filesystem::path path = boost::filesystem::initial_path(ec);
+   std::string executable = path.string() + std::string("/") + std::string(argv0);
+   const TSize pos = executable.find_last_of("\\/");
+   std::string appPath = executable.substr(0, pos+1);
+   LOG_INFO("Determined application path as %s", appPath.c_str());
+   return appPath;
+}
+
 } // anonymous namespace
 
 /**
@@ -153,7 +165,8 @@ void RunApplication()
 void Run(TAppPtr aAppPtr, int argc, char** argv)
 {
    LOG_METHOD();
-   TNativePtr native = std::make_shared<CNativePosix>();
+   std::string path = GetApplicationPath(argv[0]);
+   TNativePtr native = std::make_shared<CNativePosix>(std::move(path));
    engine = IEngine::CreateEngine(native, aAppPtr);
    if (SetupOpenGL(argc, argv, aAppPtr->AppName())) {
       if (engine->OnCreate(nullptr)) {

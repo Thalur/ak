@@ -15,7 +15,6 @@ int main(int argc, char** argv)
 {
    std::shared_ptr<COGLTest> app = std::make_shared<COGLTest>();
    NLogging::InitLogFile(app->AppName(), "log.txt");
-   LOG_METHOD();
    Client::Run(app, argc, argv);
    NLogging::FinishLogger();
 }

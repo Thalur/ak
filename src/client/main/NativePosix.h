@@ -13,6 +13,8 @@ namespace Client
 class CNativePosix : public INativeCallback
 {
 public:
+   CNativePosix(std::string&& aAppPath) : iAppPath(std::move(aAppPath))
+   {}
    virtual ~CNativePosix() {}
 
    // INativeCallback implementation
@@ -22,6 +24,8 @@ public:
    // Run the main app loop
    void RunGame();
 
+private:
+   std::string iAppPath;
 };
 
 } // namespace Client

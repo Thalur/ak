@@ -4,6 +4,7 @@
 #include "NativePosix.h"
 #include "common/log/log.h"
 #include "common/cabinet/MemoryFile.h"
+#include "common/cabinet/PosixFile.h"
 
 #ifdef AK_SYSTEM_WINDOWS
 #define UNICODE
@@ -17,7 +18,7 @@ namespace Client
 /**
  * WINDOWS VERSION
  * Load a resource file from the executable.
- * This does not support filenames, so we just make sure it's correct
+ * This does not support filenames, so we just make sure it's correct.
  */
 TFilePtr CNativePosix::GetInternalFile(const std::string& aFilename)
 {
@@ -46,14 +47,14 @@ TFilePtr CNativePosix::GetInternalFile(const std::string& aFilename)
 #else
 TFilePtr CNativePosix::GetInternalFile(const std::string& aFilename)
 {
+   // ToDo: emplace resource file into executable on Linux/OSX
    return GetResourceFile(aFilename);
 }
 #endif
 
 TFilePtr CNativePosix::GetResourceFile(const std::string& aFilename)
 {
-   // ...
-   return TFilePtr();
+   return CPosixFile::OpenExistingFile(iAppPath + aFilename, false);
 }
 
 } // namespace Client

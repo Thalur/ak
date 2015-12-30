@@ -54,4 +54,4 @@ public:
 
 } // namespace Client
 
-#endif AK_IAPPINTERFACE_H_INCLUDED
+#endif // AK_IAPPINTERFACE_H_INCLUDED
