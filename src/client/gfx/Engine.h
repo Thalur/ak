@@ -38,13 +38,17 @@ public:
    virtual bool OnTouchEvent(const CTouchEvent& aEvent);
 
 private:
-   void blit(int32_t texID, float x1, float y1, float dx, float dy, float cropX, float cropY);
+   void DrawTexture(const CTexture& aTexture, int32_t x, int32_t y);
+   void DrawTexture(const CTexture& aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight);
+   void DrawTexture(const CTexture& aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight, int32_t aTexWidth, int32_t aTexHeight);
 
    TNativePtr iNativePtr;
    TAppPtr iAppPtr;
 
    int32_t iWidth = 0;
    int32_t iHeight = 0;
+   int32_t iCurrentTexture = -1;
+   bool iBlending = false;
 
    int32_t fps = 0;
    int32_t frame = 0;

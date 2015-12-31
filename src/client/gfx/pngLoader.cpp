@@ -81,6 +81,11 @@ int GetBytesPerPixel(int aTextureType)
    }
 }
 
+bool HasTransparency(int aTextureType)
+{
+   return (aTextureType == GL_RGBA) || (aTextureType == GL_LUMINANCE_ALPHA);
+}
+
 uint16_t Get2Fold(const uint16_t aFold)
 {
    uint16_t ret = 2;
@@ -158,7 +163,7 @@ TTexturePtr CreateTexture(char*& aData, uint16_t aWidth, uint16_t aHeight, int a
    glTexImage2D(GL_TEXTURE_2D, 0, aType, texWidth, texHeight, 0, aType, GL_UNSIGNED_BYTE, aData);
    CHECK_GL_ERROR("glTexImage2D");
 
-#ifdef AK_SYSTEM_ANDROID
+/*#ifdef AK_SYSTEM_ANDROID
    // Cropping is required only on Android
    int32_t crop[4];
    crop[0] = 0;
@@ -167,10 +172,11 @@ TTexturePtr CreateTexture(char*& aData, uint16_t aWidth, uint16_t aHeight, int a
    crop[3] = aHeight; // -height
    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_CROP_RECT_OES, crop);
    CHECK_GL_ERROR("glTexParameteriv@textureCrop");
-#endif
+#endif*/
    return TTexturePtr(new CTexture(id, aWidth, aHeight,
       static_cast<float>(aWidth) / static_cast<float>(texWidth),
-      static_cast<float>(aHeight) / static_cast<float>(texHeight)));
+      static_cast<float>(aHeight) / static_cast<float>(texHeight),
+      HasTransparency(aType)));
 }
 
 TTexturePtr LoadPNG(TFilePtr& aFile, const char* aLogdata, void* aPngPtr)
@@ -233,7 +239,7 @@ TTexturePtr LoadPNG(TFilePtr& aFile, const char* aLogdata, void* aPngPtr)
    delete[] rowPtrs;
 
    // And send it over to OpenGL
-   TTexturePtr texture = CreateTexture(data, w, h, GetTextureType(color_type));
+   TTexturePtr texture { CreateTexture(data, w, h, GetTextureType(color_type)) };
    //LOG_DEBUG("Data: %d %d %d %d %d %d %d %d", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
    delete[] data;
    LOG_DEBUG("PNG file loaded: %s (%ux%u, bpp %d, type %d)", aLogdata, w, h, bitdepth, GetTextureType(color_type));

@@ -15,18 +15,19 @@ typedef std::unique_ptr<CTexture> TTexturePtr;
 class CTexture
 {
 public:
-   CTexture(int32_t aGLindex, uint16_t aWidth, uint16_t aHeight, float aCropX, float aCropY)
-    : iGLindex(aGLindex), iWidth(aWidth), iHeight(aHeight), iCropX(aCropX), iCropY(aCropY)
+   CTexture(int32_t aGLindex, uint16_t aWidth, uint16_t aHeight, float aCropX, float aCropY, bool aTransparent)
+    : iGLindex(aGLindex), iWidth(aWidth), iHeight(aHeight), iCropX(aCropX), iCropY(aCropY), iTransparent(aTransparent)
    {}
 
-   int32_t ID() { return iGLindex; }
-   uint16_t Width() { return iWidth; }
-   uint16_t Height() { return iHeight; }
+   int32_t ID() const { return iGLindex; }
+   uint16_t Width() const { return iWidth; }
+   uint16_t Height() const { return iHeight; }
    // cmath rounding functions are not available in Android NDK
-   uint16_t TexWidth() { return static_cast<uint16_t>(static_cast<float>(iWidth) / iCropX + 0.5); }
-   uint16_t TexHeight() { return static_cast<uint16_t>(static_cast<float>(iHeight) / iCropY + 0.5); }
-   float CropX() { return iCropX; }
-   float CropY() { return iCropY; }
+   uint16_t TexWidth() const { return static_cast<uint16_t>(static_cast<float>(iWidth) / iCropX + 0.5f); }
+   uint16_t TexHeight() const { return static_cast<uint16_t>(static_cast<float>(iHeight) / iCropY + 0.5f); }
+   float CropX() const { return iCropX; }
+   float CropY() const { return iCropY; }
+   bool HasTransparency() const { return iTransparent; }
 
 private:
    int32_t iGLindex;
@@ -34,6 +35,7 @@ private:
    uint16_t iHeight;
    float iCropX; // cropped part of the image defined by iWidth [0,1]
    float iCropY;
+   bool iTransparent; // Texture has an alpha component
 };
 
 } // namespace Client
