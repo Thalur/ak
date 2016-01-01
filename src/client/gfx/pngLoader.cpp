@@ -168,15 +168,12 @@ TTexturePtr CreateTexture(char*& aData, uint16_t aWidth, uint16_t aHeight, int a
    int32_t crop[4];
    crop[0] = 0;
    crop[1] = 0;
-   crop[2] = aWidth; // width
-   crop[3] = aHeight; // -height
+   crop[2] = aWidth;
+   crop[3] = aHeight;
    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_CROP_RECT_OES, crop);
    CHECK_GL_ERROR("glTexParameteriv@textureCrop");
 #endif
-   return TTexturePtr(new CTexture(id, aWidth, aHeight,
-      static_cast<float>(aWidth) / static_cast<float>(texWidth),
-      static_cast<float>(aHeight) / static_cast<float>(texHeight),
-      HasTransparency(aType)));
+   return TTexturePtr(new CTexture(id, aWidth, aHeight, texWidth, texHeight, HasTransparency(aType)));
 }
 
 TTexturePtr LoadPNG(TFilePtr& aFile, const char* aLogdata, void* aPngPtr)

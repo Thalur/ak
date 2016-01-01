@@ -21,13 +21,13 @@ void Crop(int32_t aLeft, int32_t aTop, int32_t aRight, int32_t aBottom)
    int32_t crop[4];
    crop[0] = aLeft;
    crop[1] = aTop;
-   crop[2] = aRight;
-   crop[3] = aBottom;
+   crop[2] = aRight - aLeft;
+   crop[3] = aBottom - aTop;
    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_CROP_RECT_OES, crop);
    if (glGetError() != 0) LOG_ERROR("Error!");
 }
-void NativeBlit(int32_t x, int32_t y, int32_t aWidth, int32_t aHeight,
-                int32_t cropLeft, int32_t cropTop, int32_t cropRight, int32_t cropBottom, int32_t orgWidth int32_t orgHeight)
+void NativeBlitAndroid(int32_t x, int32_t y, int32_t aWidth, int32_t aHeight,
+    int32_t cropLeft, int32_t cropTop, int32_t cropRight, int32_t cropBottom, int32_t orgWidth, int32_t orgHeight)
 {
    bool bCrop = (cropLeft != 0) || (cropTop != 0) || (cropRight != orgWidth) || (cropBottom != orgHeight);
    if (bCrop) {
@@ -39,16 +39,15 @@ void NativeBlit(int32_t x, int32_t y, int32_t aWidth, int32_t aHeight,
       Crop(0, 0, orgWidth, orgHeight);
    }
 }
-void NativeBlit(int32_t x, int32_t y, int32_t aWidth, int32_t aHeight)
+void NativeBlitAndroid(int32_t x, int32_t y, int32_t aWidth, int32_t aHeight)
 {
    glDrawTexiOES(x, y, 0, aWidth, aHeight);
    if (glGetError() != 0) LOG_ERROR("Error!");
 }
 #else
-void NativeBlit(float x, float y, float aWidth, float aHeight,
-                float cropLeft, float cropTop, float cropRight, float cropBottom)
+void NativeBlitPosix(float x, float y, float aWidth, float aHeight,
+    float cropLeft, float cropTop, float cropRight, float cropBottom)
 {
-   //LOG_DEBUG("x=%f, y=%f, width=%f, height=%f, cropLeft=%f, cropTop=%f, cropRight=%f, cropBottom=%f", x, y, aWidth, aHeight, cropLeft, cropTop, cropRight, cropBottom);
    float right = x + aWidth;
    float bottom = y + aHeight;
    glBegin(GL_QUADS);
@@ -98,7 +97,6 @@ void CEngine::OnInitWindow(int32_t aWidth, int32_t aHeight)
    // Initialize OpenGL drawing parameters
    glEnable(GL_TEXTURE_2D);              
    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);         
-   glEnable(GL_BLEND);
    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
    glViewport(0, 0, iWidth, iHeight);
@@ -184,13 +182,6 @@ void CEngine::OnDrawFrame()
    glClear(GL_COLOR_BUFFER_BIT);
    iCurrentTexture = -1;
 
-   /*glDisable(GL_BLEND);
-   blit(iTextures[0]->ID(), 0, 0, 64, 64, iTextures[0]->CropX(), iTextures[0]->CropY());
-   blit(iTextures[1]->ID(), 140, 100, 128, 96, iTextures[1]->CropX(), iTextures[1]->CropY());
-   blit(iTextures[4]->ID(), 432, 256, 368, 224, iTextures[4]->CropX(), iTextures[4]->CropY());
-   glEnable(GL_BLEND);
-   blit(iTextures[3]->ID(), 20, 20, 320, 200, iTextures[3]->CropX(), iTextures[3]->CropY());
-   blit(iTextures[2]->ID(), 450, 400, 64, 64, iTextures[2]->CropX(), iTextures[2]->CropY());*/
    DrawTexture(*iTextures[0], 0, 0, 64, 64);
    DrawTexture(*iTextures[1], 140, 100, 128, 96);
    DrawTexture(*iTextures[4], 432, 256, 368, 224);
@@ -278,9 +269,9 @@ void CEngine::DrawTexture(const CTexture& aTexture, int32_t x, int32_t y, int32_
 {
    BindTexture(aTexture);
 #ifdef AK_SYSTEM_ANDROID
-   NativeBlit(x, iHeight-y-aHeight, aWidth, aHeight);
+   NativeBlitAndroid(x, iHeight-y-aHeight, aWidth, aHeight);
 #else
-   NativeBlit(static_cast<float>(x), static_cast<float>(y), static_cast<float>(aWidth), static_cast<float>(aHeight),
+   NativeBlitPosix(static_cast<float>(x), static_cast<float>(y), static_cast<float>(aWidth), static_cast<float>(aHeight),
       0, 0, aTexture.CropX(), aTexture.CropY());
 #endif
 }
@@ -289,13 +280,13 @@ void CEngine::DrawTexturePart(const CTexture& aTexture, int32_t x, int32_t y, in
                               int32_t aTexLeft, int32_t aTexTop, int32_t aTexRight, int32_t aTexBottom)
 {
    BindTexture(aTexture);
+   float texHeight = static_cast<float>(aTexture.TexHeight());
 #ifdef AK_SYSTEM_ANDROID
-   NativeBlit(x, iHeight-y-aHeight, aWidth, aHeight, aTexLeft, aTexTop,
-              aTexRight, aTexBottom, aTexture.TexWidth(), aTexture.TexHeight());
+   NativeBlitAndroid(x, iHeight-y-aHeight, aWidth, aHeight, aTexLeft, texHeight - aTexBottom,
+                     aTexRight, texHeight - aTexTop, aTexture.Width(), aTexture.Height());
 #else
    float texWidth = static_cast<float>(aTexture.TexWidth());
-   float texHeight = static_cast<float>(aTexture.TexHeight());
-   NativeBlit(static_cast<float>(x), static_cast<float>(y), static_cast<float>(aWidth), static_cast<float>(aHeight),
+   NativeBlitPosix(static_cast<float>(x), static_cast<float>(y), static_cast<float>(aWidth), static_cast<float>(aHeight),
       static_cast<float>(aTexLeft) / texWidth, (texHeight - static_cast<float>(aTexBottom)) / texHeight,
       static_cast<float>(aTexRight) / texWidth, (texHeight - static_cast<float>(aTexTop)) / texHeight);
 #endif
