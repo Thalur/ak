@@ -17,6 +17,8 @@ Client::TEnginePtr engine;
 bool bVisible = false;
 bool bWindowClosed = false;
 
+void ExitApplication();
+
 /**
  * Get a string description of a GLU error from OpenGL.
  */
@@ -55,9 +57,7 @@ void OnNormalKeydown(unsigned char key, int mouseX, int mouseY)
 {
    if (key == 27) {
       if (engine->OnBackKey()) {
-#ifndef AK_SYSTEM_OSX
-         glutLeaveMainLoop();
-#endif
+         ExitApplication();
       }
    } else {
       int mod = glutGetModifiers();
@@ -86,6 +86,7 @@ void OnMouseMoved(int x, int y)
 
 void OnWindowClosed()
 {
+   LOG_METHOD();
    engine->OnSaveState();
    engine->OnPause();
    engine->OnStop();
@@ -102,6 +103,21 @@ void OnIdle()
    if (bVisible) glutPostRedisplay();
 }
 
+
+void ExitApplication()
+{
+   LOG_METHOD();
+#ifndef AK_SYSTEM_OSX
+   glutLeaveMainLoop();
+#else
+   // On OSX, we cannot leave the main loop so first clean up and then destroy the application
+   OnWindowClosed();
+   engine->OnDestroy();
+   NLogging::FinishLogger();
+   std::exit(0);
+#endif
+   //engine->OnDestroy();
+}
 
 /**
  * Initialize GLUT, create the main window, and register the callback functions.
@@ -140,10 +156,26 @@ void RunApplication()
    LOG_METHOD();
    LOG_INFO("Starting the main OpenGL loop");
 #ifndef AK_SYSTEM_OSX
+   // This is not available on OSX
    glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
 #endif
    glutMainLoop();
 }
+
+#if defined(AK_SYSTEM_LINUX) || defined(AK_SYSTEM_OSX)
+#include <signal.h>
+void SignalHandler(int signum)
+{
+   char* pSignalString = strsignal(signum);
+   LOG_INFO("SIGNAL received: %s (%d)", (pSignalString != nullptr ? pSignalString : "?"), signum);
+   signal(SIGTERM, NULL);
+   signal(SIGQUIT, NULL);
+   signal(SIGINT, NULL);
+   signal(SIGHUP, NULL);
+   signal(SIGABRT, NULL);
+   ExitApplication();
+}
+#endif
 
 /**
  * Get the absolute path where the executable resides.
@@ -176,6 +208,13 @@ void Run(TAppPtr aAppPtr, int argc, char** argv)
    TNativePtr native = std::make_shared<CNativePosix>(std::move(path));
    engine = IEngine::CreateEngine(native, aAppPtr);
    if (SetupOpenGL(argc, argv, aAppPtr->AppName())) {
+#if defined(AK_SYSTEM_LINUX) || defined(AK_SYSTEM_OSX)
+      signal(SIGTERM, &SignalHandler);
+      signal(SIGQUIT, &SignalHandler);
+      signal(SIGINT, &SignalHandler);
+      signal(SIGHUP, &SignalHandler);
+      signal(SIGABRT, &SignalHandler);
+#endif
       if (engine->OnCreate(nullptr)) {
          engine->OnStart();
          engine->OnResume();
