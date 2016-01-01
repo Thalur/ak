@@ -24,7 +24,7 @@ const std::string internal_cabinet_name { "test.ak" };
 #ifdef AK_SYSTEM_WINDOWS
 extern const int internal_cabinet_resource_id;
 const int internal_cabinet_resource_id = 9999;
-#elseif defined(AK_SYSTEM_LINUX)
+#elif defined(AK_SYSTEM_LINUX)
 extern char _binary_test_ak_start;
 extern char _binary_test_ak_end;
 extern const char* internal_cabinet_start_ptr;

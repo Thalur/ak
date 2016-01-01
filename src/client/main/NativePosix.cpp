@@ -11,7 +11,7 @@
 #define UNICODE
 #include <windows.h>
 extern const int internal_cabinet_resource_id;
-#elseif defined(AK_SYSTEM_LINUX)
+#elif defined(AK_SYSTEM_LINUX)
 extern const char* internal_cabinet_start_ptr;
 extern const char* internal_cabinet_end_ptr;
 #else // OSX
@@ -53,7 +53,7 @@ TFilePtr CNativePosix::GetInternalFile(const std::string& aFilename)
    LOG_ERROR("Could not load internal resource file %s.", aFilename.c_str());
    return TFilePtr();
 }
-#elseif defined(AK_SYSTEM_LINUX)
+#elif defined(AK_SYSTEM_LINUX)
 /**
  * LINUX VERSION
  * Load an embedded object resource from the executable.
