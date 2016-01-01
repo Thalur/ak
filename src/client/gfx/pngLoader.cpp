@@ -163,7 +163,7 @@ TTexturePtr CreateTexture(char*& aData, uint16_t aWidth, uint16_t aHeight, int a
    glTexImage2D(GL_TEXTURE_2D, 0, aType, texWidth, texHeight, 0, aType, GL_UNSIGNED_BYTE, aData);
    CHECK_GL_ERROR("glTexImage2D");
 
-/*#ifdef AK_SYSTEM_ANDROID
+#ifdef AK_SYSTEM_ANDROID
    // Cropping is required only on Android
    int32_t crop[4];
    crop[0] = 0;
@@ -172,7 +172,7 @@ TTexturePtr CreateTexture(char*& aData, uint16_t aWidth, uint16_t aHeight, int a
    crop[3] = aHeight; // -height
    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_CROP_RECT_OES, crop);
    CHECK_GL_ERROR("glTexParameteriv@textureCrop");
-#endif*/
+#endif
    return TTexturePtr(new CTexture(id, aWidth, aHeight,
       static_cast<float>(aWidth) / static_cast<float>(texWidth),
       static_cast<float>(aHeight) / static_cast<float>(texHeight),

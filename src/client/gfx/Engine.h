@@ -40,7 +40,9 @@ public:
 private:
    void DrawTexture(const CTexture& aTexture, int32_t x, int32_t y);
    void DrawTexture(const CTexture& aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight);
-   void DrawTexture(const CTexture& aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight, int32_t aTexWidth, int32_t aTexHeight);
+   void DrawTexturePart(const CTexture& aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight,
+                        int32_t aTexLeft, int32_t aTexTop, int32_t aTexRight, int32_t aTexBottom);
+   void BindTexture(const CTexture& aTexture);
 
    TNativePtr iNativePtr;
    TAppPtr iAppPtr;

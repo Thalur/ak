@@ -15,33 +15,51 @@ namespace Client
 namespace {
 
 #ifdef AK_SYSTEM_ANDROID
-void NativeBlit(int32_t x, int32_t y, int32_t dx, int32_t dy, int32_t cropX, int32_t cropY)
+void Crop(int32_t aLeft, int32_t aTop, int32_t aRight, int32_t aBottom)
 {
    // Set the cropping rectangle to only draw part of the source bitmap
    int32_t crop[4];
-   crop[0] = 0;
-   crop[1] = 0;
-   crop[2] = cropX; // width
-   crop[3] = cropY; // height
+   crop[0] = aLeft;
+   crop[1] = aTop;
+   crop[2] = aRight;
+   crop[3] = aBottom;
    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_CROP_RECT_OES, crop);
    if (glGetError() != 0) LOG_ERROR("Error!");
-   glDrawTexiOES(x, y, 0, dx, dy);
+}
+void NativeBlit(int32_t x, int32_t y, int32_t aWidth, int32_t aHeight,
+                int32_t cropLeft, int32_t cropTop, int32_t cropRight, int32_t cropBottom, int32_t orgWidth int32_t orgHeight)
+{
+   bool bCrop = (cropLeft != 0) || (cropTop != 0) || (cropRight != orgWidth) || (cropBottom != orgHeight);
+   if (bCrop) {
+      Crop(cropLeft, cropTop, cropRight, cropBottom);
+   }
+   glDrawTexiOES(x, y, 0, aWidth, aHeight);
+   if (glGetError() != 0) LOG_ERROR("Error!");
+   if (bCrop) {
+      Crop(0, 0, orgWidth, orgHeight);
+   }
+}
+void NativeBlit(int32_t x, int32_t y, int32_t aWidth, int32_t aHeight)
+{
+   glDrawTexiOES(x, y, 0, aWidth, aHeight);
    if (glGetError() != 0) LOG_ERROR("Error!");
 }
 #else
-void NativeBlit(float x1, float y1, float dx, float dy, float cropX, float cropY)
+void NativeBlit(float x, float y, float aWidth, float aHeight,
+                float cropLeft, float cropTop, float cropRight, float cropBottom)
 {
-   float right = x1 + dx;
-   float bottom = y1 + dy;
+   //LOG_DEBUG("x=%f, y=%f, width=%f, height=%f, cropLeft=%f, cropTop=%f, cropRight=%f, cropBottom=%f", x, y, aWidth, aHeight, cropLeft, cropTop, cropRight, cropBottom);
+   float right = x + aWidth;
+   float bottom = y + aHeight;
    glBegin(GL_QUADS);
-   glTexCoord2f(0, cropY);
-   glVertex2f(x1, y1);
-   glTexCoord2f(cropX, cropY);
-   glVertex2f(right, y1);
-   glTexCoord2f(cropX, 0);
+   glTexCoord2f(cropLeft, cropBottom);
+   glVertex2f(x, y);
+   glTexCoord2f(cropRight, cropBottom);
+   glVertex2f(right, y);
+   glTexCoord2f(cropRight, cropTop);
    glVertex2f(right, bottom);
-   glTexCoord2f(0, 0);
-   glVertex2f(x1, bottom);
+   glTexCoord2f(cropLeft, cropTop);
+   glVertex2f(x, bottom);
    glEnd();
 }
 #endif
@@ -178,6 +196,7 @@ void CEngine::OnDrawFrame()
    DrawTexture(*iTextures[4], 432, 256, 368, 224);
    DrawTexture(*iTextures[3], 20, 20);
    DrawTexture(*iTextures[2], 450, 400, 64, 64);
+   DrawTexturePart(*iTextures[4], 500, 10, 200, 200, 50, 50, 100, 100);
 
    if (frame == 3) {
       drawTimeUs = CClock::GetCurrentTicksUs() - timeUs;
@@ -252,15 +271,37 @@ bool CEngine::OnTouchEvent(const CTouchEvent& aEvent)
 
 void CEngine::DrawTexture(const CTexture& aTexture, int32_t x, int32_t y)
 {
-   DrawTexture(aTexture, x, y, aTexture.Width(), aTexture.Height(), aTexture.Width(), aTexture.Height());
+   DrawTexture(aTexture, x, y, aTexture.Width(), aTexture.Height());
 }
 
 void CEngine::DrawTexture(const CTexture& aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight)
 {
-   DrawTexture(aTexture, x, y, aWidth, aHeight, aTexture.Width(), aTexture.Height());
+   BindTexture(aTexture);
+#ifdef AK_SYSTEM_ANDROID
+   NativeBlit(x, iHeight-y-aHeight, aWidth, aHeight);
+#else
+   NativeBlit(static_cast<float>(x), static_cast<float>(y), static_cast<float>(aWidth), static_cast<float>(aHeight),
+      0, 0, aTexture.CropX(), aTexture.CropY());
+#endif
 }
 
-void CEngine::DrawTexture(const CTexture& aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight, int32_t aTexWidth, int32_t aTexHeight)
+void CEngine::DrawTexturePart(const CTexture& aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight,
+                              int32_t aTexLeft, int32_t aTexTop, int32_t aTexRight, int32_t aTexBottom)
+{
+   BindTexture(aTexture);
+#ifdef AK_SYSTEM_ANDROID
+   NativeBlit(x, iHeight-y-aHeight, aWidth, aHeight, aTexLeft, aTexTop,
+              aTexRight, aTexBottom, aTexture.TexWidth(), aTexture.TexHeight());
+#else
+   float texWidth = static_cast<float>(aTexture.TexWidth());
+   float texHeight = static_cast<float>(aTexture.TexHeight());
+   NativeBlit(static_cast<float>(x), static_cast<float>(y), static_cast<float>(aWidth), static_cast<float>(aHeight),
+      static_cast<float>(aTexLeft) / texWidth, (texHeight - static_cast<float>(aTexBottom)) / texHeight,
+      static_cast<float>(aTexRight) / texWidth, (texHeight - static_cast<float>(aTexTop)) / texHeight);
+#endif
+}
+
+void CEngine::BindTexture(const CTexture& aTexture)
 {
    if (iCurrentTexture != aTexture.ID()) {
       iCurrentTexture = aTexture.ID();
@@ -274,13 +315,6 @@ void CEngine::DrawTexture(const CTexture& aTexture, int32_t x, int32_t y, int32_
          }
       }
    }
-#ifdef AK_SYSTEM_ANDROID
-   NativeBlit(x, iHeight-y-aHeight, aWidth, aHeight, aTexWidth, aTexHeight);
-#else
-   NativeBlit(static_cast<float>(x), static_cast<float>(y), static_cast<float>(aWidth), static_cast<float>(aHeight),
-      static_cast<float>(aTexWidth) / static_cast<float>(aTexture.TexWidth()),
-      static_cast<float>(aTexHeight) / static_cast<float>(aTexture.TexHeight()));
-#endif
 }
 
 } // namespace Client
