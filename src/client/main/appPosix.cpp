@@ -87,11 +87,15 @@ void OnMouseMoved(int x, int y)
 void OnWindowClosed()
 {
    LOG_METHOD();
+   bWindowClosed = true;
+#ifdef AK_SYSTEM_OSX
+   ExitApplication();
+#else
    engine->OnSaveState();
    engine->OnPause();
    engine->OnStop();
    engine->OnDestroyWindow();
-   bWindowClosed = true;
+#endif
 }
 
 void OnIdle()
@@ -111,12 +115,15 @@ void ExitApplication()
    glutLeaveMainLoop();
 #else
    // On OSX, we cannot leave the main loop so first clean up and then destroy the application
-   OnWindowClosed();
+   bWindowClosed = true;
+   engine->OnSaveState();
+   engine->OnPause();
+   engine->OnStop();
+   engine->OnDestroyWindow();
    engine->OnDestroy();
    NLogging::FinishLogger();
    std::exit(0);
 #endif
-   //engine->OnDestroy();
 }
 
 /**
