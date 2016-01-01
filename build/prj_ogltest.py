@@ -69,22 +69,24 @@ class project_ogltest:
     build.copy_files("../../../../src/projects/ogltest/data/*.ak", binDir)
     return True
 
+  def copy_assets(self, binDir):
+    #build.copy_files("*.ak", binDir)
+    return True
+
   def post_build_actions_win(self, binDir):
     build.copy_files("projects/ogltest/" + self.mode + "/*.exe", binDir)
     build.copy_files("projects/ogltest/" + self.mode + "/*.pdb", binDir)
     shutil.copy2("../../../../lib/freeglut/bin/x64/freeglut.dll", binDir)
     shutil.copy2("../../../../lib/glew-1.12.0/bin/Release/x64/glew32.dll", binDir)
-    return True
+    return self.copy_assets(binDir)
 
   def post_build_actions_linux(self, binDir):
     shutil.copy2("projects/ogltest/OGLtest", binDir)
-    build.copy_files("*.ak", binDir)
-    return True
+    return self.copy_assets(binDir)
 
   def post_build_actions_osx(self, binDir):
     shutil.copy2("projects/ogltest/OGLtest", binDir)
-    build.copy_files("*.ak", binDir)
-    return True
+    return self.copy_assets(binDir)
 
   def post_build_actions_android(self, binDir):
     android_platform = os.environ['ANDROID_PLATFORM']

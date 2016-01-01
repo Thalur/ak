@@ -23,7 +23,6 @@ ELSEIF ("${AK_TARGET}" STREQUAL "ANDROID")
   else()
     message(ERROR "NOT ANDROID")
   endif()
-  #add_library (OGLtest SHARED android/main.cpp android/android_native_app_glue.c android/AndroidApp.cpp)
   add_library (OGLtest SHARED mainAndroid.cpp OGLTest.cpp)
   target_link_libraries (OGLtest Client.Main Client.Gfx)
   target_link_libraries (OGLtest Common.Log Common.Util Common.Cabinet)
@@ -39,8 +38,16 @@ ELSE()
     find_package (GLUT REQUIRED)
   ENDIF ()
 
+  # Add the core resource file into the executable
+  add_custom_command(OUTPUT oglres.o
+      COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR}/data && ld -r -b binary -o ${CMAKE_CURRENT_BINARY_DIR}/oglres.o test.ak
+      COMMAND objcopy --rename-section .data=.rodata,alloc,load,readonly,data,contents ${CMAKE_CURRENT_BINARY_DIR}/oglres.o ${CMAKE_CURRENT_BINARY_DIR}/oglres.o)
+  add_library(oglres STATIC oglres.o)
+  SET_SOURCE_FILES_PROPERTIES(oglres.o PROPERTIES EXTERNAL_OBJECT true GENERATED true)
+  SET_TARGET_PROPERTIES(oglres PROPERTIES LINKER_LANGUAGE C)
+
   add_executable (OGLtest mainPosix.cpp OGLTest.cpp)
-  target_link_libraries (OGLtest Client.Main Client.Gfx)
+  target_link_libraries (OGLtest oglres Client.Main Client.Gfx)
   target_link_libraries (OGLtest Common.Log Common.Util Common.Cabinet akpng z)
   target_link_libraries (OGLtest ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
   target_link_libraries (OGLtest Boost.Filesystem)

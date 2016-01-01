@@ -17,3 +17,14 @@ int main(int argc, char** argv)
    Client::Run(app, argc, argv);
    NLogging::FinishLogger();
 }
+
+// Propagate access to the internal resources to the client implementation
+const char* internal_cabinet_name = "test.ak";
+#ifdef AK_SYSTEM_WINDOWS
+const int internal_cabinet_resource_id = 9999;
+#else
+extern char _binary_test_ak_start;
+extern char _binary_test_ak_end;
+const char* internal_cabinet_start_ptr = &_binary_test_ak_start;
+const char* internal_cabinet_end_ptr = &_binary_test_ak_end;
+#endif

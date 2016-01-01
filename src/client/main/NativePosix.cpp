@@ -6,10 +6,16 @@
 #include "common/cabinet/MemoryFile.h"
 #include "common/cabinet/PosixFile.h"
 
+// Internal resource parameters supplied by the main app
 #ifdef AK_SYSTEM_WINDOWS
 #define UNICODE
 #include <windows.h>
+extern const int internal_cabinet_resource_id;
+#else
+extern const char* internal_cabinet_start_ptr;
+extern const char* internal_cabinet_end_ptr;
 #endif
+extern const char* internal_cabinet_name;
 
 namespace Client
 {
@@ -18,15 +24,16 @@ namespace Client
 /**
  * WINDOWS VERSION
  * Load a resource file from the executable.
- * This does not support filenames, so we just make sure it's correct.
+ * The supplied filename must match the supported resource file from the application.
  */
 TFilePtr CNativePosix::GetInternalFile(const std::string& aFilename)
 {
-   if (aFilename != "test.ak") {
+   LOG_METHOD();
+   if (aFilename != std::string(internal_cabinet_name)) {
       LOG_ERROR("Unknown resource file %s", aFilename.c_str());
       return TFilePtr();
    }
-   HRSRC rc = ::FindResource(NULL, MAKEINTRESOURCE(9999), RT_RCDATA);
+   HRSRC rc = ::FindResource(NULL, MAKEINTRESOURCE(internal_cabinet_resource_id), RT_RCDATA);
    if (rc != NULL) {
       HGLOBAL rcData = ::LoadResource(NULL, rc);
       if (rcData != NULL) {
@@ -45,10 +52,23 @@ TFilePtr CNativePosix::GetInternalFile(const std::string& aFilename)
    return TFilePtr();
 }
 #else
+/**
+ * LINUX/OSX VERSION
+ * Load an embedded object resource from the executable.
+ * The supplied filename must match the supported resource file from the application.
+ */
 TFilePtr CNativePosix::GetInternalFile(const std::string& aFilename)
 {
-   // ToDo: emplace resource file into executable on Linux/OSX
-   return GetResourceFile(aFilename);
+   LOG_METHOD();
+   if (aFilename != std::string(internal_cabinet_name)) {
+      LOG_ERROR("Unknown resource file %s", aFilename.c_str());
+      return TFilePtr();
+   }
+   TFileData fileData;
+   for (const char* data = internal_cabinet_start_ptr; data != internal_cabinet_end_ptr; data++) {
+      fileData.push_back(*data);
+   }
+   return std::make_shared<CMemoryFile>(std::move(fileData));
 }
 #endif
 
