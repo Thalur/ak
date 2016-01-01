@@ -19,12 +19,19 @@ int main(int argc, char** argv)
 }
 
 // Propagate access to the internal resources to the client implementation
-extern const std::string internal_cabinet_name { "test.ak" };
+extern const std::string internal_cabinet_name;
+const std::string internal_cabinet_name { "test.ak" };
 #ifdef AK_SYSTEM_WINDOWS
-extern const int internal_cabinet_resource_id = 9999;
-#else
+extern const int internal_cabinet_resource_id;
+const int internal_cabinet_resource_id = 9999;
+#elseif defined(AK_SYSTEM_LINUX)
 extern char _binary_test_ak_start;
 extern char _binary_test_ak_end;
-extern const char* internal_cabinet_start_ptr = &_binary_test_ak_start;
-extern const char* internal_cabinet_end_ptr = &_binary_test_ak_end;
+extern const char* internal_cabinet_start_ptr;
+extern const char* internal_cabinet_start_ptr;
+const char* internal_cabinet_start_ptr = &_binary_test_ak_start;
+const char* internal_cabinet_end_ptr = &_binary_test_ak_end;
+#else // OSX
+extern const char* internal_cabinet_section_name;
+const char* internal_cabinet_section_name = "core_resources";
 #endif

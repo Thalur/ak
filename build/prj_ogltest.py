@@ -70,7 +70,7 @@ class project_ogltest:
     return True
 
   def copy_assets(self, binDir):
-    #build.copy_files("*.ak", binDir)
+    build.copy_files("*.ak", binDir)
     return True
 
   def post_build_actions_win(self, binDir):
