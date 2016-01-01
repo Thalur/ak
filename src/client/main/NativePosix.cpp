@@ -15,7 +15,7 @@ extern const int internal_cabinet_resource_id;
 extern const char* internal_cabinet_start_ptr;
 extern const char* internal_cabinet_end_ptr;
 #endif
-extern const char* internal_cabinet_name;
+extern const std::string internal_cabinet_name;
 
 namespace Client
 {
@@ -29,7 +29,7 @@ namespace Client
 TFilePtr CNativePosix::GetInternalFile(const std::string& aFilename)
 {
    LOG_METHOD();
-   if (aFilename != std::string(internal_cabinet_name)) {
+   if (aFilename != internal_cabinet_name) {
       LOG_ERROR("Unknown resource file %s", aFilename.c_str());
       return TFilePtr();
    }
@@ -60,7 +60,7 @@ TFilePtr CNativePosix::GetInternalFile(const std::string& aFilename)
 TFilePtr CNativePosix::GetInternalFile(const std::string& aFilename)
 {
    LOG_METHOD();
-   if (aFilename != std::string(internal_cabinet_name)) {
+   if (aFilename != internal_cabinet_name) {
       LOG_ERROR("Unknown resource file %s", aFilename.c_str());
       return TFilePtr();
    }
