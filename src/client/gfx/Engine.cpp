@@ -142,9 +142,9 @@ void CEngine::OnResume()
 
 void CEngine::OnIdle()
 {
-   int64_t timeUs = CClock::GetCurrentTicksUs();
+   const int64_t timeUs = CClock::GetCurrentTicksUs();
    if (timeUs+1000 < nextTick) {
-      int32_t sleepTime = static_cast<int32_t>((nextTick-timeUs)/1000);
+      const int32_t sleepTime = static_cast<int32_t>((nextTick-timeUs)/1000);
       LOG_DEBUG("Spleeping for %d ms (diff: %" PRId64 ")", sleepTime, (nextTick-timeUs));
       std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
    } else if (nextTick+500000 < timeUs) {
@@ -155,16 +155,16 @@ void CEngine::OnIdle()
    // Execute ticks and schedule the next tick according to the set tick rate
    do {
       //LOG_DEBUG("Tick");
-      int32_t tickRate = 60;//GetTickRate();
-      int64_t tickIntervalUs = (1000000 + tickRate/2) / tickRate;
+      const int32_t tickRate = 60;//GetTickRate();
+      const int64_t tickIntervalUs = (1000000 + tickRate/2) / tickRate;
       nextTick += tickIntervalUs;
    } while (CClock::GetCurrentTicksUs()+100 >= nextTick);
 }
 
 void CEngine::OnDrawFrame()
 {
-   int64_t timeUs = CClock::GetCurrentTicksUs();
-   int64_t frametimeUs = timeUs - frameStartUs;
+   const int64_t timeUs = CClock::GetCurrentTicksUs();
+   const int64_t frametimeUs = timeUs - frameStartUs;
    //LOG_DEBUG("time: %" PRId64 " start: %" PRId64 " frametime: %" PRId64, timeUs, frameStartUs, frametimeUs);
    if (frametimeUs >= 999900) {
       fps = frame;
@@ -172,9 +172,10 @@ void CEngine::OnDrawFrame()
       if (frameStartUs + 900000 < timeUs) {
          LOG_DEBUG("Resetting fps timer (difference was %" PRId64 " ms)", (timeUs-frameStartUs+500)/1000);
          frameStartUs = timeUs;
+      } else {
+         LOG_DEBUG("FPS: %2d (drawTime: %4" PRId64 " µs)", fps, drawTimeUs);
       }
       frame = 0;
-      LOG_DEBUG("FPS: %2d (drawTime: %4" PRId64 " µs)", fps, drawTimeUs);
    }
    frame++;
 
@@ -189,7 +190,7 @@ void CEngine::OnDrawFrame()
    DrawTexture(*iTextures[2], 450, 400, 64, 64);
    DrawTexturePart(*iTextures[4], 500, 10, 200, 200, 50, 50, 100, 100);
 
-   if (frame == 3) {
+   if (frame == 3) { // Record drawing duration once per second
       drawTimeUs = CClock::GetCurrentTicksUs() - timeUs;
    }
 }
