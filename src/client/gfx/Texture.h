@@ -9,9 +9,6 @@
 namespace Client
 {
 
-class CTexture;
-typedef std::unique_ptr<CTexture> TTexturePtr;
-
 class CTexture
 {
 public:
@@ -36,6 +33,8 @@ private:
    uint16_t iTexHeight;
    bool iTransparent; // Texture has an alpha component
 };
+
+typedef std::unique_ptr<CTexture> TTexturePtr;
 
 } // namespace Client
 

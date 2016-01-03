@@ -4,18 +4,16 @@
 #ifndef AK_IAPPINTERFACE_H_INCLUDED
 #define AK_IAPPINTERFACE_H_INCLUDED
 
+#include "IGameState.h"
 #include "common/cabinet/File.h"
 #include <vector>
 #include <string>
-
-class IGameState;
 
 namespace Client
 {
 
 class IAppInterface;
 typedef std::shared_ptr<IAppInterface> TAppPtr;
-typedef std::shared_ptr<IGameState> TGameStatePtr;
 
 /**
  * This interface provides the Engine with access to application-specific information.

@@ -5,6 +5,7 @@
 #define AK_IENGINE_H_INCLUDED
 
 #include "common/types.h"
+#include "client/main/INativeInterface.h"
 #include "client/main/IAppInterface.h"
 
 namespace Client
@@ -13,34 +14,6 @@ namespace Client
 // Shared pointer definitions
 class IEngine;
 typedef std::shared_ptr<IEngine> TEnginePtr;
-class INativeCallback;
-typedef std::shared_ptr<INativeCallback> TNativePtr;
-
-/**
- * Touch event structure with codes from android/input.h
- */
-struct CTouchEvent
-{
-   int32_t action; // AMOTION_EVENT_ACTION_ (ToDo: make own enum for platform-independent impl)
-   int32_t pointerId; // For multi-touch events (mobile only)
-   int32_t x;
-   int32_t y;
-};
-
-/**
- * Interface for platform-dependent operations required by the Engine.
- */
-class INativeCallback
-{
-public:
-   virtual ~INativeCallback() {}
-
-   // An internal file is located inside the binaries (except for mobile)
-   virtual TFilePtr GetInternalFile(const std::string& aFilename) = 0;
-
-   // Resource files are located in the package (mobile) or in the app folder (posix)
-   virtual TFilePtr GetResourceFile(const std::string& aFilename) = 0;
-};
 
 /**
  * Interface for all events that go from Android to the application.
@@ -93,7 +66,7 @@ public:
    virtual bool OnMenuKey() = 0;
    virtual bool OnKeyDown(int32_t aKeyCode, int32_t aScanCode, int32_t aFlags) = 0;
    virtual bool OnKeyUp(int32_t aKeyCode, int32_t aScanCode, int32_t aFlags) = 0;
-   virtual bool OnTouchEvent(const CTouchEvent& aEvent) = 0;
+   virtual bool OnTouchEvent(const TTouchEvent& aEvent) = 0;
 
 };
 

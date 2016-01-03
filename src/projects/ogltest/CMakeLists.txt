@@ -8,7 +8,7 @@ IF ("${AK_TARGET}" STREQUAL "WIN64")
 
   message(STATUS "Windows build")
   SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:mainCRTStartup /SUBSYSTEM:windows /MACHINE:X64")
-  add_executable (OGLtest mainPosix.cpp OGLTest.cpp win/multitest1.rc)
+  add_executable (OGLtest mainPosix.cpp OGLTest.cpp multitest1.rc)
   target_link_libraries (OGLtest Client.Main Client.Gfx)
   target_link_libraries (OGLtest Common.Log Common.Util Common.Cabinet akpng)
   target_link_libraries (OGLtest opengl32.lib glu32.lib Boost.Filesystem)

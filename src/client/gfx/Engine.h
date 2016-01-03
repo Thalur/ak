@@ -35,7 +35,7 @@ public:
    virtual bool OnMenuKey();
    virtual bool OnKeyDown(int32_t aKeyCode, int32_t aScanCode, int32_t aFlags);
    virtual bool OnKeyUp(int32_t aKeyCode, int32_t aScanCode, int32_t aFlags);
-   virtual bool OnTouchEvent(const CTouchEvent& aEvent);
+   virtual bool OnTouchEvent(const TTouchEvent& aEvent);
 
 private:
    void DrawTexture(const CTexture& aTexture, int32_t x, int32_t y);

@@ -254,7 +254,7 @@ bool CEngine::OnKeyUp(int32_t aKeyCode, int32_t aScanCode, int32_t aFlags)
    return true;
 }
 
-bool CEngine::OnTouchEvent(const CTouchEvent& aEvent)
+bool CEngine::OnTouchEvent(const TTouchEvent& aEvent)
 {
    LOG_METHOD();
    // ...

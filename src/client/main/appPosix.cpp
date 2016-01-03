@@ -2,6 +2,7 @@
  * Main entry point for the application on Windows, Linux and OSX.
  */
 #include "NativePosix.h"
+#include "client/gfx/IEngine.h"
 #include "common/log/log.h"
 #include "client/gfx/oglincludes.h"
 #include <boost/filesystem.hpp>

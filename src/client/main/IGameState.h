@@ -1,36 +1,48 @@
 /**
  * Abstract base class for all game states.
  */
-#ifndef AK_GAMESTATE_H_INCLUDED
-#define AK_GAMESTATE_H_INCLUDED
+#ifndef AK_IGAMESTATE_H_INCLUDED
+#define AK_IGAMESTATE_H_INCLUDED
 
 #include "common/types.h"
 #include "client/resources.h"
 #include <memory>
 
-class CGameState;
 
-typedef std::shared_ptr<CGameState> CGameStatePtr;
+// Possible actions for the touch input (and mouse input)
+enum class ETouchAction {
+   TOUCH_DOWN, TOUCH_POINTER_DOWN, TOUCH_MOVE, TOUCH_UP, TOUCH_POINTER_UP, TOUCH_CANCEL
+};
 
-class CGameState
+enum class EDialogButton {
+   BUTTON_NONE, BUTTON_OK, BUTTON_YES, BUTTON_NO, BUTTON_CANCEL
+};
+
+/**
+ * Touch event structure with codes from android/input.h
+ */
+struct TTouchEvent
+{
+   ETouchAction action;
+   int32_t pointerId; // For multi-touch events (mobile only)
+   int32_t x;
+   int32_t y;
+};
+
+class IGameState;
+
+typedef std::shared_ptr<IGameState> TGameStatePtr;
+
+class IGameState
 {
 public:
    // Callback interface to let the game control know when to switch game states
    class IStateSwitchCallback
    {
-      virtual void SwitchGameState(const CGameStatePtr& aNewState) = 0;
+      virtual void SwitchGameState(const TGameStatePtr& aNewState) = 0;
    };
 
-   // Possible actions for the touch input (and mouse input)
-   enum ETouchAction {
-      TOUCH_DOWN, TOUCH_POINTER_DOWN, TOUCH_MOVE, TOUCH_UP, TOUCH_POINTER_UP, TOUCH_CANCEL
-   };
-
-   enum EDialogButton {
-      BUTTON_NONE, BUTTON_OK, BUTTON_YES, BUTTON_NO, BUTTON_CANCEL
-   };
-
-   virtual ~CGameState() {}
+   virtual ~IGameState() {}
 
    // If the game state needs to do some time-consuming work, this is the place
    virtual void OnLoadData() = 0;
@@ -56,7 +68,7 @@ public:
 	 * @arg x X coordinate of the touch or mouse action.
 	 * @arg y Y coordinate of the touch or mouse action.
 	 */
-	virtual void OnTouch(int32_t aEventID, ETouchAction aAction, int32_t aX, int32_t aY) = 0;
+	virtual void OnTouch(const TTouchEvent& aEvent) = 0;
 
    // ToDo
    virtual void OnKeyDown(int32_t aKeyCode)
@@ -87,31 +99,30 @@ public:
 
    virtual bool GetDesiredFrameRate(int32_t& aTicksPerSecond, int32_t aFramesPerSecond) = 0;
 
-   // Returns a shared pointer to the base state of the state provided as parameter
-   static CGameStatePtr GetBaseState(CGameStatePtr aCurrentState)
-   {
-      CGameStatePtr baseState = aCurrentState->GetParentState();
-      while (baseState) {
-         aCurrentState = baseState;
-         baseState = aCurrentState->GetParentState();
-      }
-      return aCurrentState;
-   }
-
 protected:
-   CGameState(IStateSwitchCallback* aStateSwitchCallback) : iStateSwitchCallback(aStateSwitchCallback)
+   IGameState(IStateSwitchCallback* aStateSwitchCallback) : iStateSwitchCallback(aStateSwitchCallback)
    {}
 
    // Execute a tick while another window has focus (usually do nothing)
 	virtual void OnBackgroundTick() { }
 
    // Return the parent state of the this state, or empty if this is the base state
-   virtual CGameStatePtr GetParentState()
+   virtual TGameStatePtr GetParentState()
 	{
-		return CGameStatePtr(); // Default: no parent state
+		return TGameStatePtr(); // Default: no parent state
 	}
+
+   // Return the base state of the current state (if the current state is the base state, it returns itself)
+   IGameState& GetBaseState()
+   {
+      TGameStatePtr parent = GetParentState();
+      if (parent) {
+         return parent->GetBaseState();
+      }
+      return *this;
+   }
 
    IStateSwitchCallback* iStateSwitchCallback;
 };
 
-#endif // AK_GAMESTATE_H_INCLUDED
+#endif // AK_IGAMESTATE_H_INCLUDED

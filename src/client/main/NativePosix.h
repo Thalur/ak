@@ -4,25 +4,21 @@
 #ifndef AK_NATIVE_POSIX_H_INCLUDED
 #define AK_NATIVE_POSIX_H_INCLUDED
 
-#include "client/gfx/IEngine.h"
-#include "IAppInterface.h"
+#include "INativeInterface.h"
 
 namespace Client
 {
 
-class CNativePosix : public INativeCallback
+class CNativePosix : public INativeInterface
 {
 public:
    CNativePosix(std::string&& aAppPath) : iAppPath(std::move(aAppPath))
    {}
    virtual ~CNativePosix() {}
 
-   // INativeCallback implementation
+   // INativeInterface implementation
    virtual TFilePtr GetInternalFile(const std::string& aFilename);
    virtual TFilePtr GetResourceFile(const std::string& aFilename);
-
-   // Run the main app loop
-   void RunGame();
 
 private:
    std::string iAppPath;
