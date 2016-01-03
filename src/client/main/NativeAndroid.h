@@ -12,7 +12,7 @@
 namespace Client
 {
 
-class CNativeAndroid : public INativeCallback
+class CNativeAndroid : public INativeInterface
 {
 public:
    CNativeAndroid(ANativeActivity* aNativeActivity);

@@ -104,8 +104,8 @@ class project_ogltest:
       #shutil.copy2("../classes.dex", "./")
       build.copy_files("../projects/ogltest/*.so", "lib/armeabi/")
       #shutil.copy2("../projects/ogltest/libpng/libpng16d.so", "lib/armeabi/libpng16.so")
-      shutil.copy2("../../../../../src/projects/ogltest/android/AndroidManifest.xml", "./")
-      shutil.copytree("../../../../../src/projects/ogltest/android/res", "res")
+      shutil.copy2("../../../../../src/projects/ogltest/AndroidManifest.xml", "./")
+      shutil.copytree("../../../../../src/projects/ogltest/res", "res")
 
       # Create the APK
       buildCmd = "aapt package -f -M ./AndroidManifest.xml -S res/ -A assets/ -I " + android_platform + "/android.jar -F OGLtest.apk.unaligned"

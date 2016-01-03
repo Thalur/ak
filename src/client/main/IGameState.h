@@ -39,6 +39,8 @@ public:
    // Callback interface to let the game control know when to switch game states
    class IStateSwitchCallback
    {
+      virtual ~IStateSwitchCallback() {}
+
       virtual void SwitchGameState(const TGameStatePtr& aNewState) = 0;
    };
 
