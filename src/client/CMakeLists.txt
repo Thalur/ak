@@ -1,11 +1,10 @@
-project (Client)
+project (Client.Common)
 
 SET (CLIENT_FILES
     ResourceManager.cpp
     ResourceManager.h)
 
-add_library(Client ${CLIENT_FILES})
-target_link_libraries (Client Client.Main Client.Gfx)
+add_library(Client.Common ${CLIENT_FILES})
 
 add_subdirectory (main)
 add_subdirectory (gfx)
