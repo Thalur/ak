@@ -4,7 +4,7 @@
 #ifndef AK_RESOURCELIST_H_INCLUDED
 #define AK_RESOURCELIST_H_INCLUDED
 
-#include "client/ResourceManager.h"
+#include "client/main/ResourceManager.h"
 
 /**
  * The resource categories. Game states can require any combination of

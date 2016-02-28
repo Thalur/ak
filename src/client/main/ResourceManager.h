@@ -9,6 +9,7 @@
 #include <string>
 #include <map>
 #include <bitset>
+#include <list>
 
 namespace Client
 {
@@ -51,15 +52,27 @@ using TCategoryContent = std::map<TResourceCategory, std::vector<TResourceFileId
 class CResourceManager
 {
 public:
-   CResourceManager(TResourceFiles aKnownFiles, TCategoryContent aCategoryContent);
+   CResourceManager(TResourceFiles aKnownFiles, TCategoryContent aCategoryContent)
+    : iFiles(std::move(aKnownFiles))
+    , iCategories(std::move(aCategoryContent))
+    , iCategoryCached(GetMaxIndex(iCategories))
+   {}
 
-   TResourceFiles GetResourceFiles(const TRequiredResources aCategories);
+   static TSize GetMaxIndex(const TCategoryContent& aCategoryContent)
+   {
+      if (aCategoryContent.empty()) {
+         return 0;
+      }
+      return aCategoryContent.rbegin()->first + 1;
+   }
 
-   // Convenience functions
-   static bool IsResourceSubset(const TRequiredResources aSubset, const TRequiredResources aSuperset);
+   TResourceFiles GetResourceFiles(TRequiredResources aCategories);
+
+   // Convenience method
+   bool IsResourceSubset(TRequiredResources aSubset, TRequiredResources aSuperset);
 
 private:
-   //std::list<TResourceFileId> GetFileList(const TRequiredResources aCategories);
+   std::list<TResourceFileId> GetFileList(TRequiredResources aCategories);
 
    TResourceFiles iFiles;
    TCategoryContent iCategories;

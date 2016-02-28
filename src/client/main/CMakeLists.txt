@@ -6,7 +6,9 @@ include_directories ("../../../lib/glew-1.12.0/include")
 SET (CLIENT_MAIN_FILES
     IAppInterface.h
     IGameState.h
-    INativeInterface.h)
+    INativeInterface.h
+    ResourceManager.cpp
+    ResourceManager.h)
 
 IF ("${AK_TARGET}" STREQUAL "ANDROID")
 

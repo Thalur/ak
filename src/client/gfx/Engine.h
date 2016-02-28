@@ -5,7 +5,7 @@
 #define AK_ENGINE_H_INCLUDED
 
 #include "IEngine.h"
-#include "common/cabinet/Cabinet.h"
+#include "common/cabinet/CabManager.h"
 #include "Texture.h"
 
 namespace Client
@@ -15,7 +15,10 @@ class CEngine : public IEngine
 {
 public:
    CEngine(TNativePtr aNativePtr, TAppPtr aAppPtr)
-    : iNativePtr(aNativePtr), iAppPtr(aAppPtr)
+    : iNativePtr(aNativePtr)
+    , iAppPtr(aAppPtr)
+    , iResourceManager(aAppPtr->GetResourceFiles(), aAppPtr->GetCategoryContent())
+    , iCabinetManager()
    {}
    virtual ~CEngine() {}
 
@@ -44,8 +47,11 @@ private:
                         int32_t aTexLeft, int32_t aTexTop, int32_t aTexRight, int32_t aTexBottom);
    void BindTexture(const CTexture& aTexture);
 
+   // Game engines
    TNativePtr iNativePtr;
    TAppPtr iAppPtr;
+   CResourceManager iResourceManager;
+   CCabManager iCabinetManager;
 
    int32_t iWidth = 0;
    int32_t iHeight = 0;
@@ -58,6 +64,7 @@ private:
    int64_t drawTimeUs = 0;
    int64_t nextTick = 0;
 
+   // This needs to go away:
    TCabinetPtr iCabinet;
    std::vector<TTexturePtr> iTextures;
 };
