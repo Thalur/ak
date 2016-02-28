@@ -6,30 +6,39 @@
 
 #include <vector>
 #include <string>
+#include <map>
 
-// Resource categories that can be specified as required by game states
-enum EResourceCategory {
-   GFXCAT_NONE, GFXCAT_DEFAULT, GFXCAT_INTRO, GFXCAT_MENU
-};
-
+/**
+ * File type specification so we do not depend on file name suffixes
+ */
 enum EFileType {
-   FT_TEXT, FT_GFX, FT_SFX, FT_MUSIC, FT_OTHER
+   FT_UNKNOWN, // unspecified - do not use
+   FT_TEXT, // normal text file, will not be loaded
+   FT_FONT, // font definition file, will load the font (and the specified font image file)
+   FT_GFX, // image file, will be loaded
+   FT_SFX, // sound file, will be loaded
+   FT_MUSIC, // music file, will not be loaded (to be streamed)
+   FT_OTHER, // none of the above, will not be loaded
 };
 
-// All files present in resources to be used directly in the code
-enum EResourceFile {
-   FILE_FONTWHATEVER,
-   FILE_UNIT257,
+/**
+ * A resource file definition consists of an integer ID used to refer to the file
+ * in the source code, the file type, and the string file name in the data cabinets.
+ */
+using TResourceFile = std::tuple<uint32_t, EFileType, std::string>;
+using TResourceFiles = std::vector<TResourceFile>;
 
-   NUM_RESOURCE_FILES
-};
+/**
+ * A resource category is a collection of files that need to be loaded.
+ * A game state may require one or more categories to work.
+ * This is a bit field, allowing up to 32 resource categories.
+ */
+using TRequiredResources = uint32_t;
+using TCategoryContent = std::map<uint32_t, std::vector<uint32_t>>;
 
-typedef std::vector<EResourceCategory> TRequiredResources;
-typedef std::tuple<EResourceFile, EFileType, std::string> TResourceFile;
-typedef std::vector<TResourceFile> TResourceFiles;
 
-bool IsResourceSubset(const TRequiredResources& aSubset, const TRequiredResources& aSuperset);
+// Convenience functions
+//bool IsResourceSubset(const TRequiredResources& aSubset, const TRequiredResources& aSuperset);
 
-TResourceFiles GetResourceFiles(const TRequiredResources& aCategories);
 
 #endif // AK_RESOURCES_H_INCLUDED

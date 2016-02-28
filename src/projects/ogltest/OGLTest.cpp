@@ -3,6 +3,7 @@
  */
 #include "OGLTest.h"
 #include "state/GameStateDialog.h"
+#include "common/log/log.h"
 
 const std::string COGLTest::iAppName = "OGLTest by AK";
 
@@ -31,4 +32,12 @@ COGLTest::TNames COGLTest::ResourceFiles()
 TGameStatePtr COGLTest::GameState()
 {
    return TGameStatePtr();
+}
+
+void COGLTest::SwitchGameState(const TGameStatePtr& aNewState)
+{
+   if (iNextGameState) {
+      LOG_WARN("Overriding previously set next game state");
+   }
+   iNextGameState = aNewState;
 }

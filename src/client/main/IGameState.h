@@ -39,8 +39,8 @@ public:
    // Callback interface to let the game control know when to switch game states
    class IStateSwitchCallback
    {
+   public:
       virtual ~IStateSwitchCallback() {}
-
       virtual void SwitchGameState(const TGameStatePtr& aNewState) = 0;
    };
 
@@ -60,7 +60,7 @@ public:
 	virtual bool OnTick() = 0;
 
    // Return the required graphics for this state
-   virtual TRequiredResources GetRequiredResources() = 0;
+   virtual TRequiredResources GetRequiredResources() const = 0;
 
    /**
 	 * Handle an input action from the touch screen or mouse.
@@ -99,17 +99,18 @@ public:
 		// do nothing
 	}
 
-   virtual bool GetDesiredFrameRate(int32_t& aTicksPerSecond, int32_t aFramesPerSecond) = 0;
+   // Get the currently desired FPS (ticks per second are fixed at 60)
+   virtual int32_t GetDesiredFrameRate() const = 0;
 
 protected:
-   IGameState(IStateSwitchCallback* aStateSwitchCallback) : iStateSwitchCallback(aStateSwitchCallback)
+   explicit IGameState(IStateSwitchCallback* aStateSwitchCallback) : iStateSwitchCallback(aStateSwitchCallback)
    {}
 
    // Execute a tick while another window has focus (usually do nothing)
-	virtual void OnBackgroundTick() { }
+	virtual void OnBackgroundTick() {}
 
    // Return the parent state of the this state, or empty if this is the base state
-   virtual TGameStatePtr GetParentState()
+   virtual TGameStatePtr GetParentState() const
 	{
 		return TGameStatePtr(); // Default: no parent state
 	}
