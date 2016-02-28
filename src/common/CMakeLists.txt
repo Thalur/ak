@@ -1,6 +1,7 @@
 project (Common)
 
 SET (COMMON_FILES
+    empty.cpp
     types.h)
 
 add_library(Common ${COMMON_FILES})
