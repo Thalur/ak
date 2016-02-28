@@ -5,7 +5,7 @@
 #define AK_IGAMESTATE_H_INCLUDED
 
 #include "common/types.h"
-#include "client/resources.h"
+#include "client/ResourceManager.h"
 #include <memory>
 
 
@@ -60,7 +60,7 @@ public:
 	virtual bool OnTick() = 0;
 
    // Return the required graphics for this state
-   virtual TRequiredResources GetRequiredResources() const = 0;
+   virtual Client::TRequiredResources GetRequiredResources() const = 0;
 
    /**
 	 * Handle an input action from the touch screen or mouse.

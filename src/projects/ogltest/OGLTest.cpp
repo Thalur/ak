@@ -2,6 +2,7 @@
  *
  */
 #include "OGLTest.h"
+#include "resourcelist.h"
 #include "state/GameStateDialog.h"
 #include "common/log/log.h"
 
@@ -15,18 +16,6 @@ Client::TAppPtr CreateApplication()
 COGLTest::COGLTest()
 {
    //iGameState = std::make_shared<CGameStateDialog>();
-}
-
-COGLTest::TNames COGLTest::InternalFiles()
-{
-   TNames names;
-   names.push_back("test.ak");
-   return names;
-}
-
-COGLTest::TNames COGLTest::ResourceFiles()
-{
-   return TNames();
 }
 
 TGameStatePtr COGLTest::GameState()

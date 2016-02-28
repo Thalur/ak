@@ -1,5 +1,8 @@
 project (Common.Log)
 
-add_library(Common.Log log.cpp)
-target_link_libraries (Common.Log Common.Util)
+SET (COMMON_LOG_FILES
+    log.cpp
+    log.h)
 
+add_library(Common.Log ${COMMON_LOG_FILES})
+target_link_libraries (Common.Log Common.Util)

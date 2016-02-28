@@ -74,7 +74,7 @@ bool CEngine::OnCreate(const void* aSavedState)
 {
    LOG_METHOD();
    // Open the required internal cabinets
-   for (auto fName : iAppPtr->InternalFiles()) {
+   for (auto fName : iAppPtr->InternalCabinets()) {
       TFilePtr file = iNativePtr->GetInternalFile(fName);
       if (!file) {
          return false;

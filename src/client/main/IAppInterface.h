@@ -36,11 +36,17 @@ public:
 
    /// Files and data
 
-   // Get a list of internal files to be loaded immediately on startup
-   virtual TNames InternalFiles() = 0;
+   // Get a list of internal cabinet files to be loaded immediately on startup
+   virtual TNames InternalCabinets() = 0;
 
    // Get a list of resource files, including wirldcard names for patches
-   virtual TNames ResourceFiles() = 0;
+   virtual TNames ResourceCabinets() = 0;
+
+   // Get a list and properties of all files that can be referenced in the code
+   virtual TResourceFiles GetResourceFiles() = 0;
+
+   // Get a mapping of categories to required resource files per category
+   virtual TCategoryContent GetCategoryContent() = 0;
 
 
    /// Running the application

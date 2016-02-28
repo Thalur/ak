@@ -11,6 +11,7 @@
 
 #if defined(AK_SYSTEM_WINDOWS)
 #define AK_PLATFORM_NAME "Windows"
+#define constexpr
 #elif defined(AK_SYSTEM_LINUX)
 #define AK_PLATFORM_NAME "Linux"
 #elif defined(AK_SYSTEM_ANDROID)

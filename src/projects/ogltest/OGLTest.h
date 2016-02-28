@@ -16,8 +16,10 @@ public:
 
    // IAppInterface implementation
    virtual std::string AppName() { return iAppName; }
-   virtual TNames InternalFiles();
-   virtual TNames ResourceFiles();
+   virtual TNames InternalCabinets();
+   virtual TNames ResourceCabinets();
+   virtual Client::TResourceFiles GetResourceFiles();
+   virtual Client::TCategoryContent GetCategoryContent();
    virtual TGameStatePtr GameState();
 
    // IStateSwitchCallback implementation

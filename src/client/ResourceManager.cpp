@@ -1,14 +1,14 @@
 /**
  *
  */
-#include "client/resources.h"
+#include "client/ResourceManager.h"
 #include <tuple>
 #include <list>
 
 namespace {
 
 // List of all known resource files
-const TResourceFiles resourceFiles {
+/*const TResourceFiles resourceFiles {
    std::make_tuple(FILE_FONTWHATEVER, FT_GFX, "gfx/fonts/fontwhatever"),
    std::make_tuple(FILE_UNIT257, FT_GFX, "gfx/units/unit257")
 };
@@ -22,22 +22,22 @@ const std::vector<std::vector<EResourceFile>> categoryFiles {
    { FILE_UNIT257 },
    // GFXCAT_MENU:
    {}
-};
+};*/
 
-std::list<EResourceFile> GetFileList(const TRequiredResources& aCategories)
+/*std::list<uint32_t> GetFileList(const TRequiredResources& aCategories)
 {
-   std::list<EResourceFile> files;
+   std::list<uint32_t> files;
    for (EResourceCategory cat : aCategories) {
       files.insert(files.begin(), categoryFiles[cat].begin(), categoryFiles[cat].end());
    }
    files.sort();
    files.unique();
    return files;
-}
+}*/
 
 } // namespace
 
-bool IsResourceSubset(const TRequiredResources& aSubset, const TRequiredResources& aSuperset)
+/*bool IsResourceSubset(const TRequiredResources& aSubset, const TRequiredResources& aSuperset)
 {
    std::list<EResourceFile> subset = GetFileList(aSubset);
    if (subset.empty()) return true;
@@ -57,11 +57,11 @@ bool IsResourceSubset(const TRequiredResources& aSubset, const TRequiredResource
    }
    return false;
 
-   /*auto ContainedInSuperset = [&](const EResourceFile& value) { 
-      return std::find(superset.begin(), superset.end(), value) != superset.end();
-   };
-   subset.remove_if(ContainedInSuperset);
-   return subset.empty();*/
+   //auto ContainedInSuperset = [&](const EResourceFile& value) {
+   //   return std::find(superset.begin(), superset.end(), value) != superset.end();
+   //};
+   //subset.remove_if(ContainedInSuperset);
+   //return subset.empty();
 }
 
 TResourceFiles GetResourceFiles(const TRequiredResources& aCategories)
@@ -72,4 +72,4 @@ TResourceFiles GetResourceFiles(const TRequiredResources& aCategories)
       result.push_back(resourceFiles[file]);
    }
    return result;
-}
+}*/
