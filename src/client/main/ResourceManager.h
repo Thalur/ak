@@ -74,7 +74,7 @@ public:
    bool IsResourceSubset(TRequiredResources aSubset, TRequiredResources aSuperset);
 
 private:
-   std::list<TResourceFileId> GetFileList(TRequiredResources aCategories);
+   std::list<TResourceFileId> GetListForResource(TRequiredResources aCategories);
 
    TResourceFiles iFiles;
    TCategoryContent iCategories;

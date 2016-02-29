@@ -6,12 +6,12 @@
 
 namespace Client {
 
-std::list<TResourceFileId> CResourceManager::GetFileList(const TRequiredResources aCategories)
+std::list<TResourceFileId> CResourceManager::GetListForResource(const TRequiredResources aCategories)
 {
    LOG_METHOD();
    std::list<TResourceFileId> result;
    for (TResourceCategory cat = 0; cat < aCategories.size(); cat++) {
-      if (aCategories.at(cat)) {
+      if (aCategories[cat]) {
          if (!iCategoryCached[cat]) {
             // ... (add referenced files from animation or font files)
          }
@@ -26,11 +26,11 @@ std::list<TResourceFileId> CResourceManager::GetFileList(const TRequiredResource
 
 bool CResourceManager::IsResourceSubset(const TRequiredResources aSubset, const TRequiredResources aSuperset)
 {
-   const std::list<TResourceFileId> subset = GetFileList(aSubset);
+   const std::list<TResourceFileId> subset = GetListForResource(aSubset);
    if (subset.empty()) {
       return true;
    }
-   const std::list<TResourceFileId> superset = GetFileList(aSuperset);
+   const std::list<TResourceFileId> superset = GetListForResource(aSuperset);
    auto subEnd = subset.end();
    auto superEnd = superset.end();
    for (auto subIt = subset.begin(), superIt = superset.begin(); superIt != superEnd ; ) {
@@ -58,7 +58,7 @@ bool CResourceManager::IsResourceSubset(const TRequiredResources aSubset, const 
 TResourceFiles CResourceManager::GetResourceFiles(const TRequiredResources aCategories)
 {
    LOG_PARAMS("%u", aCategories.to_ulong());
-   const std::list<TResourceFileId> files = GetFileList(aCategories);
+   const std::list<TResourceFileId> files = GetListForResource(aCategories);
    TResourceFiles result;
    for (TResourceFileId fileId : files) {
       result.push_back(iFiles[fileId]);
@@ -68,6 +68,7 @@ TResourceFiles CResourceManager::GetResourceFiles(const TRequiredResources aCate
 
 std::vector<std::pair<TSize, std::string>> CResourceManager::GetFileList() const
 {
+   LOG_METHOD();
    std::vector<std::pair<TSize, std::string>> result;
    for (const TResourceFile& file : iFiles) {
       result.emplace_back(std::get<0>(file), std::get<2>(file));
