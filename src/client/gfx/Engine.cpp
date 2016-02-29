@@ -72,19 +72,24 @@ TEnginePtr IEngine::CreateEngine(TNativePtr aNativePtr, TAppPtr aAppPtr)
 
 bool CEngine::OnCreate(const void* aSavedState)
 {
-   LOG_METHOD();
+   LOG_PARAMS(aSavedState != nullptr ? "with saved state" : "NULL");
+
    // Open the required internal cabinets
-   for (auto fName : iAppPtr->InternalCabinets()) {
+   const IAppInterface::TNames cabinetNames = iAppPtr->InternalCabinets();
+   std::vector<TCabinetPtr> cabinets;
+   for (const auto& fName : cabinetNames) {
       TFilePtr file = iNativePtr->GetInternalFile(fName);
       if (!file) {
          return false;
       }
-      iCabinet = CCabinet::Open(file);
-      if (!iCabinet) {
+      const TCabinetPtr cabinet = CCabinet::Open(file);
+      if (!cabinet) {
          LOG_ERROR("Could not open cabinet %s", fName.c_str());
          return false;
       }
+      cabinets.emplace_back(std::move(cabinet));
    }
+   iCabinetManager.Init(cabinets, iResourceManager.GetFileList());
    return true;
 }
 
@@ -110,23 +115,17 @@ void CEngine::OnInitWindow(int32_t aWidth, int32_t aHeight)
 #endif
    glMatrixMode(GL_MODELVIEW);
 
-   // ... (load graphics for splash screen)
+   // Load graphics for splash screen
    LOG_DEBUG("Loading image files...");
-   TFilePtr file = iCabinet->ReadFileByName("index32x32.png");
-   TTexturePtr texture = LoadFromMemory(file, "index32x32.png");
-   iTextures.push_back(std::move(texture));
-   file = iCabinet->ReadFileByName("index64x48.png");
-   texture = LoadFromMemory(file, "index64x48.png");
-   iTextures.push_back(std::move(texture));
-   file = iCabinet->ReadFileByName("alpha32x32.png");
-   texture = LoadFromMemory(file, "alpha32x32.png");
-   iTextures.push_back(std::move(texture));
-   file = iCabinet->ReadFileByName("alpha320x200.png");
-   texture = LoadFromMemory(file, "alpha320x200.png");
-   iTextures.push_back(std::move(texture));
-   file = iCabinet->ReadFileByName("index184x112.png");
-   texture = LoadFromMemory(file, "index184x112.png");
-   iTextures.push_back(std::move(texture));
+   for (const TResourceFile& filename : iResourceManager.GetResourceFiles(TRequiredResources(1))) {
+      if (std::get<1>(filename) == EFileType::GFX) {
+         TFilePtr file = iCabinetManager.GetFile(std::get<0>(filename));
+         TTexturePtr texture = LoadFromMemory(file, std::get<2>(filename).c_str());
+         iTextures.push_back(std::move(texture));
+      } else {
+         LOG_ERROR("File type %d not supported yet.", std::get<1>(filename));
+      }
+   }
 }
 
 void CEngine::OnStart()
@@ -183,12 +182,12 @@ void CEngine::OnDrawFrame()
    glClear(GL_COLOR_BUFFER_BIT);
    iCurrentTexture = -1;
 
-   DrawTexture(*iTextures[0], 0, 0, 64, 64);
-   DrawTexture(*iTextures[1], 140, 100, 128, 96);
-   DrawTexture(*iTextures[4], 432, 256, 368, 224);
-   DrawTexture(*iTextures[3], 20, 20);
-   DrawTexture(*iTextures[2], 450, 400, 64, 64);
-   DrawTexturePart(*iTextures[4], 500, 10, 200, 200, 50, 50, 100, 100);
+   DrawTexture(*iTextures[3], 0, 0, 64, 64);
+   DrawTexture(*iTextures[4], 140, 100, 128, 96);
+   DrawTexture(*iTextures[5], 432, 256, 368, 224);
+   DrawTexture(*iTextures[0], 20, 20);
+   DrawTexture(*iTextures[1], 450, 400, 64, 64);
+   DrawTexturePart(*iTextures[5], 500, 10, 200, 200, 50, 50, 100, 100);
 
    if (frame == 3) { // Record drawing duration once per second
       drawTimeUs = CClock::GetCurrentTicksUs() - timeUs;

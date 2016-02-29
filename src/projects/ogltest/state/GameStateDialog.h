@@ -9,7 +9,8 @@
 class CGameStateDialog : public IGameState
 {
 public:
-   CGameStateDialog(TGameStatePtr aParentState, std::string aTitle, std::string aText, const TDialogButtons& aButtons);
+   CGameStateDialog(IStateSwitchCallback* aStateSwitchCallback, TGameStatePtr aParentState,
+                    std::string aTitle, const std::string& aText, TDialogButtons aButtons);
    virtual ~CGameStateDialog() {}
 
    // IGameState implementation
@@ -24,7 +25,13 @@ public:
    virtual int32_t GetDesiredFrameRate() const;
 
 private:
+   const TGameStatePtr iParentState;
+   const std::string iTitle;
+   const std::vector<std::string> iText;
+   const TDialogButtons iButtons;
    const Client::TRequiredResources iRequiredResources;
+
+   // ...
 };
 
 #endif // AK_GAME_STATE_DIALOG_H_INCLUDED

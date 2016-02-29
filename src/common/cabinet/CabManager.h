@@ -17,7 +17,7 @@ public:
    // Filename cannot be const ref when using insert()
    typedef std::tuple<std::string, uint8_t, TSize> TFileEntry;
 
-   bool Init(std::vector<TCabinetPtr> aCabinets, const TIndexData& aIndexValues, TSize aMaxIndex);
+   bool Init(std::vector<TCabinetPtr> aCabinets, const TIndexData& aIndexValues);
 
    TMemoryFilePtr GetFile(TSize aIndex) const;
    TMemoryFilePtr GetFile(const std::string& aFilePrefix) const;

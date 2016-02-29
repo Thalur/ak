@@ -11,7 +11,7 @@
  * categories as their data. STARTUP and COMMON are always included.
  */
 enum ECategory {
-   CAT_STARTUP, // Resources required for the splash screen and loading status
+   CAT_STARTUP, // Resources required for the splash screen and loading status (must be 0)
    CAT_COMMON,  // Files used by all game states (in addition to startup files)
    CAT_TEST,    // OGLTest main state files
    CAT_NUM_CATEGORIES

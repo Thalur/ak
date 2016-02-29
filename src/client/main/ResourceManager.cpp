@@ -2,18 +2,22 @@
  *
  */
 #include "client/main/ResourceManager.h"
+#include "common/log/log.h"
 
 namespace Client {
 
 std::list<TResourceFileId> CResourceManager::GetFileList(const TRequiredResources aCategories)
 {
+   LOG_METHOD();
    std::list<TResourceFileId> result;
    for (TResourceCategory cat = 0; cat < aCategories.size(); cat++) {
-      if (!iCategoryCached[cat]) {
-         // ... (add referenced files from animation or font files)
+      if (aCategories.at(cat)) {
+         if (!iCategoryCached[cat]) {
+            // ... (add referenced files from animation or font files)
+         }
+         const std::vector<TResourceFileId>& files = iCategories[cat];
+         result.insert(result.begin(), files.begin(), files.end());
       }
-      const auto& files = iCategories[cat];
-      result.insert(result.begin(), files.begin(), files.end());
    }
    result.sort();
    result.unique();
@@ -53,10 +57,20 @@ bool CResourceManager::IsResourceSubset(const TRequiredResources aSubset, const 
 
 TResourceFiles CResourceManager::GetResourceFiles(const TRequiredResources aCategories)
 {
+   LOG_PARAMS("%u", aCategories.to_ulong());
    const std::list<TResourceFileId> files = GetFileList(aCategories);
    TResourceFiles result;
    for (TResourceFileId fileId : files) {
       result.push_back(iFiles[fileId]);
+   }
+   return result;
+}
+
+std::vector<std::pair<TSize, std::string>> CResourceManager::GetFileList() const
+{
+   std::vector<std::pair<TSize, std::string>> result;
+   for (const TResourceFile& file : iFiles) {
+      result.emplace_back(std::get<0>(file), std::get<2>(file));
    }
    return result;
 }

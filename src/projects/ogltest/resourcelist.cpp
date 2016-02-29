@@ -44,12 +44,12 @@ Client::TCategoryContent COGLTest::GetCategoryContent()
 {
    const Client::TCategoryContent categoryContent = {
       { CAT_STARTUP, { // Splash screen and loading progress
-           F_ICON
+           F_ALPHA32X32, F_ALPHA320X200, F_ICON, F_INDEX32X32, F_INDEX64_48, F_INDEX184x112
       } },
       { CAT_COMMON, { // For all categories
       } },
       { CAT_TEST, { // OGLTest just needs this one main data category
-           F_ALPHA320X200, F_ALPHA32X32, F_INDEX32X32, F_INDEX64_48, F_INDEX184x112
+
       } },
    };
    return categoryContent;

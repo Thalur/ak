@@ -68,6 +68,8 @@ public:
 
    TResourceFiles GetResourceFiles(TRequiredResources aCategories);
 
+   std::vector<std::pair<TSize, std::string>> GetFileList() const;
+
    // Convenience method
    bool IsResourceSubset(TRequiredResources aSubset, TRequiredResources aSuperset);
 

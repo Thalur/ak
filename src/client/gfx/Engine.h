@@ -53,11 +53,9 @@ private:
    CResourceManager iResourceManager;
    CCabManager iCabinetManager;
 
+   // Window state
    int32_t iWidth = 0;
    int32_t iHeight = 0;
-   int32_t iCurrentTexture = -1;
-   bool iBlending = false;
-
    int32_t fps = 0;
    int32_t frame = 0;
    int64_t frameStartUs = 0;
@@ -65,7 +63,8 @@ private:
    int64_t nextTick = 0;
 
    // This needs to go away:
-   TCabinetPtr iCabinet;
+   int32_t iCurrentTexture = -1;
+   bool iBlending = false;
    std::vector<TTexturePtr> iTextures;
 };
 

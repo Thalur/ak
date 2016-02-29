@@ -21,11 +21,11 @@ bool CmpFileNameIndex(const CCabManager::TFileEntry& aFirst, const std::string& 
 }
 
 
-bool CCabManager::Init(std::vector<TCabinetPtr> aCabinets, const TIndexData& aIndexValues, TSize aMaxIndex)
+bool CCabManager::Init(std::vector<TCabinetPtr> aCabinets, const TIndexData& aIndexValues)
 {
    LOG_METHOD();
    iCabinets.swap(aCabinets);
-   TSize size = iCabinets.size();
+   const TSize size = iCabinets.size();
    if (size == 0) {
       return false;
    }
@@ -34,13 +34,15 @@ bool CCabManager::Init(std::vector<TCabinetPtr> aCabinets, const TIndexData& aIn
    }
 
    // Create the file prefix index
+   LOG_DEBUG("Creating file prefix index");
    for (uint8_t i = static_cast<uint8_t>(size); i > 0; i--) {
       MergeIntoFileList(i-1, iCabinets[i-1]->GetFilePrefixList());
    }
 
    // Create the quick access index
-   iResourceIndex.resize(aMaxIndex);
-   for (auto& resourceEntry : aIndexValues) {
+   LOG_DEBUG("Creating quick access index");
+   iResourceIndex.resize(aIndexValues.size() + 1);
+   for (const auto& resourceEntry : aIndexValues) {
       std::vector<TFileEntry>::iterator it = std::lower_bound(iFileIndex.begin(), iFileIndex.end(),
          resourceEntry.second, CmpFileNameIndex);
       if (it != iFileIndex.end()) {
