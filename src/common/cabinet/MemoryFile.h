@@ -7,8 +7,10 @@
 #include "common/cabinet/File.h"
 #include <sstream>
 
-#pragma warning (push)
-#pragma warning (disable: 4250) // MSVC bug: diamond inheritance with virtual methods generates warning
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4250) // MSVC bug: diamond inheritance with virtual methods generates warning
+#endif
 
 class CMemoryFile;
 typedef std::shared_ptr<CMemoryFile> TMemoryFilePtr;
@@ -61,6 +63,8 @@ public:
    using CWriteableFile::Insert;
 };
 
-#pragma warning (pop)
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 #endif // AK_MEMORYFILE_H_INCLUDED

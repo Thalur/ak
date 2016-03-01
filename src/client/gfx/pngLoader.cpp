@@ -7,8 +7,10 @@
 #include "oglincludes.h"
 #include <cstring>
 
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 4127)
+#endif
 
 #define CHECK_GL_ERROR(msg) do { \
       GLenum myGlError_ = glGetError(); \
@@ -266,4 +268,6 @@ TTexturePtr LoadFromMemory(TFilePtr& aFile, const char* aLogdata)
 
 } // namespace Client
 
+#ifdef _MSC_VER
 #pragma warning(pop)
+#endif

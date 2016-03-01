@@ -238,7 +238,7 @@ bool CCabinet::DecryptData(TFileData& aData, uint64_t aKeyOffset)
 {
    TSize length = aData.size();
    CJavaRandom jr{iDecryptionKey + aKeyOffset};
-   for (int i = 0; i < length; i++) {
+   for (TSize i = 0; i < length; i++) {
       aData[i] = (char)(((uint32_t)aData[i] + 512 - jr.nextInt(256)) % 256);
    }
    return true;

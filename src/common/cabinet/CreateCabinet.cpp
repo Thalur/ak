@@ -23,7 +23,7 @@ bool CompareEntries(const CCreateCabinet::TCreatedEntry& a1, const CCreateCabine
 
 inline void AppendUnsigned(TFileData& aData, uint64_t aValue, TSize aBytes)
 {
-   for (int i = 0; i < aBytes; i++) {
+   for (TSize i = 0; i < aBytes; i++) {
       aData.emplace_back(static_cast<char>(aValue >> 8*(aBytes-i-1)));
    }
 }
