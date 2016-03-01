@@ -153,8 +153,13 @@ void CEngine::OnIdle()
 
    // Execute ticks and schedule the next tick according to the set tick rate
    do {
-      //LOG_DEBUG("Tick");
-      const int32_t tickRate = 60;//GetTickRate();
+      const TGameStatePtr state = iAppPtr->GameState();
+      if (state) {
+         if (state->OnTick()) {
+            // ... (reset tick rate)
+         }
+      }
+      const int32_t tickRate = 60;
       const int64_t tickIntervalUs = (1000000 + tickRate/2) / tickRate;
       nextTick += tickIntervalUs;
    } while (CClock::GetCurrentTicksUs()+100 >= nextTick);
@@ -188,6 +193,11 @@ void CEngine::OnDrawFrame()
    DrawTexture(*iTextures[0], 20, 20);
    DrawTexture(*iTextures[1], 450, 400, 64, 64);
    DrawTexturePart(*iTextures[5], 500, 10, 200, 200, 50, 50, 100, 100);
+
+   const TGameStatePtr state = iAppPtr->GameState();
+   if (state) {
+      state->OnDraw(fps);
+   }
 
    if (frame == 3) { // Record drawing duration once per second
       drawTimeUs = CClock::GetCurrentTicksUs() - timeUs;
@@ -228,14 +238,20 @@ void CEngine::OnDestroy()
 bool CEngine::OnBackKey()
 {
    LOG_METHOD();
-   // ...
-   return true; // further process the key event
+   const TGameStatePtr state = iAppPtr->GameState();
+   if (state) {
+      return state->OnBackKey();
+   }
+   return true; // exit the application
 }
 
 bool CEngine::OnMenuKey()
 {
    LOG_METHOD();
-   // ...
+   const TGameStatePtr state = iAppPtr->GameState();
+   if (state) {
+      state->OnMenuKey();
+   }
    return true;
 }
 

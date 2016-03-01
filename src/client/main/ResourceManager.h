@@ -1,8 +1,8 @@
 /**
  *
  */
-#ifndef AK_RESOURCES_H_INCLUDED
-#define AK_RESOURCES_H_INCLUDED
+#ifndef AK_RESOURCE_MANAGER_H_INCLUDED
+#define AK_RESOURCE_MANAGER_H_INCLUDED
 
 #include "common/types.h"
 #include <vector>
@@ -83,4 +83,4 @@ private:
 
 } // namespace Client
 
-#endif // AK_RESOURCES_H_INCLUDED
+#endif // AK_RESOURCE_MANAGER_H_INCLUDED

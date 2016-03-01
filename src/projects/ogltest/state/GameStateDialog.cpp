@@ -6,7 +6,7 @@
 
 CGameStateDialog::CGameStateDialog(IStateSwitchCallback* aStateSwitchCallback,
       TGameStatePtr aParentState, std::string aTitle, const std::string& aText, TDialogButtons aButtons)
- : IGameState(iStateSwitchCallback)
+ : IGameState(aStateSwitchCallback)
  , iParentState(std::move(aParentState))
  , iTitle(std::move(aTitle))
  , iText(std::vector<std::string>{aText})
