@@ -56,27 +56,28 @@ void OnVisibilityChanged(int aState)
 
 void OnNormalKeydown(unsigned char key, int mouseX, int mouseY)
 {
+   LOG_PARAMS("key=%d, x=%d, y=%d", key, mouseX, mouseY);
    if (key == 27) {
       if (engine->OnBackKey()) {
          ExitApplication();
       }
    } else {
-      int mod = glutGetModifiers();
+      //int mod = glutGetModifiers();
       engine->OnKeyDown(key, key, 0);
       engine->OnKeyUp(key, key, 0);
    }
 }
 
-void OnSpecialKeydown(int key, int x, int y)
+void OnSpecialKeydown(int key, int mouseX, int mouseY)
 {
-   LOG_PARAMS("key=%d, x=%d, y=%d", key, x, y);
+   LOG_PARAMS("key=%d, x=%d, y=%d", key, mouseX, mouseY);
    // ...
 }
 
 void OnMouseButton(int button, int state, int x, int y)
 {
    LOG_PARAMS("button=%d, state=%d, x=%d, y=%d", button, state, x, y);
-   bool bDown = (state == 0);
+   //bool bDown = (state == 0);
    // ...
 }
 
@@ -136,7 +137,7 @@ bool SetupOpenGL(int argc, char** argv, const std::string& aTitle)
    glutInit(&argc, argv);
    glutInitWindowSize(800, 480);
    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_ALPHA);
-   int glutWindow = glutCreateWindow(aTitle.c_str());
+   glutCreateWindow(aTitle.c_str());
    GLenum err = GLEW_OK;
 #ifndef AK_SYSTEM_OSX
    // glewInit() on OSX is neither necessary nor available

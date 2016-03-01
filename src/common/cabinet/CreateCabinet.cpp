@@ -126,7 +126,7 @@ bool CCreateCabinet::AddFile(const std::string& aFilename, const TCabinetPtr& aS
 {
    if (FindEntryByName(aFilename) == iEntries.end()) {
       LOG_DEBUG("Adding cabinet file %s", aFilename.c_str());
-      iEntries.emplace_back(aFilename, aEncrypted, aEncrypted, aSourceCabinet, aSourceIndex);
+      iEntries.emplace_back(aFilename, aEncrypted, aCompressed, aSourceCabinet, aSourceIndex);
       return true;
    }
    LOG_ERROR("Duplicate filename %s", aFilename.c_str());

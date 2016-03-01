@@ -13,6 +13,10 @@ public:
                     std::string aTitle, const std::string& aText, TDialogButtons aButtons);
    virtual ~CGameStateDialog() {}
 
+   // Disable default copy constructor / assignment operator
+   CGameStateDialog(const CGameStateDialog&) = delete;
+   CGameStateDialog& operator=(const CGameStateDialog&) = delete;
+
    // IGameState implementation
    virtual void OnActivate(EDialogButton aDialogResult);
    virtual void OnDraw(int32_t aFps);

@@ -76,7 +76,7 @@ public:
    virtual void OnTouch(const TTouchEvent& aEvent) = 0;
 
    // ToDo
-   virtual void OnKeyDown(int32_t aKeyCode) {
+   virtual void OnKeyDown(int32_t /*aKeyCode*/) {
       // do nothing
    }
 

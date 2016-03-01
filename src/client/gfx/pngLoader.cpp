@@ -7,6 +7,8 @@
 #include "oglincludes.h"
 #include <cstring>
 
+#pragma warning(push)
+#pragma warning(disable: 4127)
 
 #define CHECK_GL_ERROR(msg) do { \
       GLenum myGlError_ = glGetError(); \
@@ -236,7 +238,7 @@ TTexturePtr LoadPNG(TFilePtr& aFile, const char* aLogdata, void* aPngPtr)
    delete[] rowPtrs;
 
    // And send it over to OpenGL
-   TTexturePtr texture { CreateTexture(data, w, h, GetTextureType(color_type)) };
+   TTexturePtr texture { CreateTexture(data, static_cast<uint16_t>(w), static_cast<uint16_t>(h), GetTextureType(color_type)) };
    //LOG_DEBUG("Data: %d %d %d %d %d %d %d %d", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
    delete[] data;
    LOG_DEBUG("PNG file loaded: %s (%ux%u, bpp %d, type %d)", aLogdata, w, h, bitdepth, GetTextureType(color_type));
@@ -263,3 +265,5 @@ TTexturePtr LoadFromMemory(TFilePtr& aFile, const char* aLogdata)
 }
 
 } // namespace Client
+
+#pragma warning(pop)

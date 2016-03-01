@@ -39,6 +39,8 @@ struct CMethodLogger
    ~CMethodLogger() {
       LogAppend(ELogLevel::EDEBUG, iFile, iFunction, "<< EXIT", iLine);
    }
+   CMethodLogger(const CMethodLogger&) = delete;
+   CMethodLogger& operator=(const CMethodLogger&) = delete;
 };
 
 }
