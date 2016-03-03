@@ -6,6 +6,8 @@ include_directories ("../../../lib/glew-1.12.0/include")
 SET (CLIENT_GFX_FILES
     Engine.cpp
     Engine.h
+    GraphicsComponent.cpp
+    GraphicsComponent.h
     IEngine.h
     oglincludes.h
     pngLoader.cpp

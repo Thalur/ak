@@ -4,66 +4,12 @@
 #include "Engine.h"
 #include "common/log/log.h"
 #include "common/util/clock.h"
-#include "pngLoader.h"
 #include "oglincludes.h"
 #include <chrono>
 #include <thread>
 
 namespace Client
 {
-
-namespace {
-
-#ifdef AK_SYSTEM_ANDROID
-void Crop(int32_t aLeft, int32_t aTop, int32_t aRight, int32_t aBottom)
-{
-   // Set the cropping rectangle to only draw part of the source bitmap
-   int32_t crop[4];
-   crop[0] = aLeft;
-   crop[1] = aTop;
-   crop[2] = aRight - aLeft;
-   crop[3] = aBottom - aTop;
-   glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_CROP_RECT_OES, crop);
-   if (glGetError() != 0) LOG_ERROR("Error!");
-}
-void NativeBlitAndroid(int32_t x, int32_t y, int32_t aWidth, int32_t aHeight,
-    int32_t cropLeft, int32_t cropTop, int32_t cropRight, int32_t cropBottom, int32_t orgWidth, int32_t orgHeight)
-{
-   bool bCrop = (cropLeft != 0) || (cropTop != 0) || (cropRight != orgWidth) || (cropBottom != orgHeight);
-   if (bCrop) {
-      Crop(cropLeft, cropTop, cropRight, cropBottom);
-   }
-   glDrawTexiOES(x, y, 0, aWidth, aHeight);
-   if (glGetError() != 0) LOG_ERROR("Error!");
-   if (bCrop) {
-      Crop(0, 0, orgWidth, orgHeight);
-   }
-}
-void NativeBlitAndroid(int32_t x, int32_t y, int32_t aWidth, int32_t aHeight)
-{
-   glDrawTexiOES(x, y, 0, aWidth, aHeight);
-   if (glGetError() != 0) LOG_ERROR("Error!");
-}
-#else
-void NativeBlitPosix(float x, float y, float aWidth, float aHeight,
-    float cropLeft, float cropTop, float cropRight, float cropBottom)
-{
-   float right = x + aWidth;
-   float bottom = y + aHeight;
-   glBegin(GL_QUADS);
-   glTexCoord2f(cropLeft, cropBottom);
-   glVertex2f(x, y);
-   glTexCoord2f(cropRight, cropBottom);
-   glVertex2f(right, y);
-   glTexCoord2f(cropRight, cropTop);
-   glVertex2f(right, bottom);
-   glTexCoord2f(cropLeft, cropTop);
-   glVertex2f(x, bottom);
-   glEnd();
-}
-#endif
-
-} // anonymous namespace
 
 TEnginePtr IEngine::CreateEngine(TNativePtr aNativePtr, TAppPtr aAppPtr)
 {
@@ -99,33 +45,12 @@ void CEngine::OnInitWindow(int32_t aWidth, int32_t aHeight)
    iWidth = aWidth;
    iHeight = aHeight;
 
-   // Initialize OpenGL drawing parameters
-   glEnable(GL_TEXTURE_2D);              
-   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);         
-   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-   glViewport(0, 0, iWidth, iHeight);
-   glMatrixMode(GL_MODELVIEW);
-   glMatrixMode(GL_PROJECTION);
-   glLoadIdentity();
-#ifdef AK_SYSTEM_ANDROID
-   glOrthof(0, iWidth, iHeight, 0, 1, -1);
-#else // For some reason, glOrthof() crashes on Windows
-   glOrtho(0, iWidth, iHeight, 0, 1, -1);
-#endif
-   glMatrixMode(GL_MODELVIEW);
+   // Initialize the graphics engine
+   iGraphicsComponent = make_unique<CGraphicsComponent>(iWidth, iHeight);
+   iGraphicsComponent->InitOpenGL();
 
    // Load graphics for splash screen
-   LOG_DEBUG("Loading image files...");
-   for (const TResourceFile& filename : iResourceManager.GetResourceFiles(TRequiredResources(1))) {
-      if (std::get<1>(filename) == EFileType::GFX) {
-         TFilePtr file = iCabinetManager.GetFile(std::get<0>(filename));
-         TTexturePtr texture = LoadFromMemory(file, std::get<2>(filename).c_str());
-         iTextures.push_back(std::move(texture));
-      } else {
-         LOG_ERROR("File type %d not supported yet.", std::get<1>(filename));
-      }
-   }
+   LoadData(TRequiredResources(1));
 }
 
 void CEngine::OnStart()
@@ -183,16 +108,14 @@ void CEngine::OnDrawFrame()
    }
    frame++;
 
-   glClearColor(0.5, 0.5, 0.5, 1);
-   glClear(GL_COLOR_BUFFER_BIT);
-   iCurrentTexture = -1;
+   iGraphicsComponent->StartFrame();
 
-   DrawTexture(*iTextures[3], 0, 0, 64, 64);
-   DrawTexture(*iTextures[4], 140, 100, 128, 96);
-   DrawTexture(*iTextures[5], 432, 256, 368, 224);
-   DrawTexture(*iTextures[0], 20, 20);
-   DrawTexture(*iTextures[1], 450, 400, 64, 64);
-   DrawTexturePart(*iTextures[5], 500, 10, 200, 200, 50, 50, 100, 100);
+   iGraphicsComponent->Draw(3, 0, 0, 64, 64);
+   iGraphicsComponent->Draw(4, 140, 100, 128, 96);
+   iGraphicsComponent->Draw(5, 432, 256, 368, 224);
+   iGraphicsComponent->Draw(1, 20, 20);
+   iGraphicsComponent->Draw(0, 450, 400, 64, 64);
+   iGraphicsComponent->Draw(5, 500, 10, 200, 200, 50, 50, 100, 100);
 
    const TGameStatePtr state = iAppPtr->GameState();
    if (state) {
@@ -276,52 +199,23 @@ bool CEngine::OnTouchEvent(const TTouchEvent& aEvent)
    return true;
 }
 
-void CEngine::DrawTexture(const CTexture& aTexture, int32_t x, int32_t y)
+/**
+ * Load all data required for the selected categories.
+ * The order we load the data in is important because loading
+ * fonts can add more images to the image list.
+ */
+void CEngine::LoadData(TRequiredResources aRequiredResources)
 {
-   DrawTexture(aTexture, x, y, aTexture.Width(), aTexture.Height());
-}
-
-void CEngine::DrawTexture(const CTexture& aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight)
-{
-   BindTexture(aTexture);
-#ifdef AK_SYSTEM_ANDROID
-   NativeBlitAndroid(x, iHeight-y-aHeight, aWidth, aHeight);
-#else
-   NativeBlitPosix(static_cast<float>(x), static_cast<float>(y), static_cast<float>(aWidth), static_cast<float>(aHeight),
-      0, 0, aTexture.CropX(), aTexture.CropY());
-#endif
-}
-
-void CEngine::DrawTexturePart(const CTexture& aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight,
-                              int32_t aTexLeft, int32_t aTexTop, int32_t aTexRight, int32_t aTexBottom)
-{
-   BindTexture(aTexture);
-   float texHeight = static_cast<float>(aTexture.TexHeight());
-#ifdef AK_SYSTEM_ANDROID
-   NativeBlitAndroid(x, iHeight-y-aHeight, aWidth, aHeight, aTexLeft, texHeight - aTexBottom,
-                     aTexRight, texHeight - aTexTop, aTexture.Width(), aTexture.Height());
-#else
-   float texWidth = static_cast<float>(aTexture.TexWidth());
-   NativeBlitPosix(static_cast<float>(x), static_cast<float>(y), static_cast<float>(aWidth), static_cast<float>(aHeight),
-      static_cast<float>(aTexLeft) / texWidth, (texHeight - static_cast<float>(aTexBottom)) / texHeight,
-      static_cast<float>(aTexRight) / texWidth, (texHeight - static_cast<float>(aTexTop)) / texHeight);
-#endif
-}
-
-void CEngine::BindTexture(const CTexture& aTexture)
-{
-   if (iCurrentTexture != aTexture.ID()) {
-      iCurrentTexture = aTexture.ID();
-      glBindTexture(GL_TEXTURE_2D, iCurrentTexture);
-      if (iBlending != aTexture.HasTransparency()) {
-         iBlending = !iBlending;
-         if (iBlending) {
-            glEnable(GL_BLEND);
-         } else {
-            glDisable(GL_BLEND);
-         }
-      }
-   }
+   LOG_INFO("Loading resources for categories %s", aRequiredResources.to_string().c_str());
+   // 1. Load fonts
+   // ...
+   // 2. Load images
+   const TFileList files = iResourceManager.GetFileList(TRequiredResources(1), EFileType::GFX);
+   iGraphicsComponent->LoadGraphics(iCabinetManager, files);
+   // 3. Load SFX
+   // ...
+   // 4. Load text files
+   // ...
 }
 
 } // namespace Client

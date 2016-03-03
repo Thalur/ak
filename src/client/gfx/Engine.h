@@ -7,6 +7,7 @@
 #include "IEngine.h"
 #include "common/cabinet/CabManager.h"
 #include "Texture.h"
+#include "GraphicsComponent.h"
 
 namespace Client
 {
@@ -41,17 +42,14 @@ public:
    virtual bool OnTouchEvent(const TTouchEvent& aEvent);
 
 private:
-   void DrawTexture(const CTexture& aTexture, int32_t x, int32_t y);
-   void DrawTexture(const CTexture& aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight);
-   void DrawTexturePart(const CTexture& aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight,
-                        int32_t aTexLeft, int32_t aTexTop, int32_t aTexRight, int32_t aTexBottom);
-   void BindTexture(const CTexture& aTexture);
+   void LoadData(TRequiredResources aRequiredResources);
 
    // Game engines
    TNativePtr iNativePtr;
    TAppPtr iAppPtr;
    CResourceManager iResourceManager;
    CCabManager iCabinetManager;
+   std::unique_ptr<CGraphicsComponent> iGraphicsComponent;
 
    // Window state
    int32_t iWidth = 0;

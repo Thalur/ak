@@ -76,4 +76,18 @@ std::vector<std::pair<TSize, std::string>> CResourceManager::GetFileList() const
    return result;
 }
 
+TFileList CResourceManager::GetFileList(const TRequiredResources aCategories, const EFileType aFileType)
+{
+   LOG_PARAMS("categories %s, type %d", aCategories.to_string().c_str(), aFileType);
+   const std::list<TResourceFileId> ids = GetListForResource(aCategories);
+   TFileList result;
+   for (const TResourceFileId id : ids) {
+      const TResourceFile& file = iFiles[id];
+      if (std::get<1>(file) == aFileType) {
+         result.emplace_back(std::get<0>(file), std::get<2>(file));
+      }
+   }
+   return result;
+}
+
 } // namespace Client

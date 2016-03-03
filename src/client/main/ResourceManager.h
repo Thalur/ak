@@ -48,6 +48,12 @@ using TRequiredResources = std::bitset<32>;
  */
 using TCategoryContent = std::map<TResourceCategory, std::vector<TResourceFileId>>;
 
+/**
+ * A file list is the list of files of a specific file type
+ * that are required for a specific category combination.
+ */
+using TFileList = std::vector<std::pair<TResourceFileId, std::string>>;
+
 
 class CResourceManager
 {
@@ -69,6 +75,7 @@ public:
    TResourceFiles GetResourceFiles(TRequiredResources aCategories);
 
    std::vector<std::pair<TSize, std::string>> GetFileList() const;
+   TFileList GetFileList(TRequiredResources aCategories, EFileType aFileType);
 
    // Convenience method
    bool IsResourceSubset(TRequiredResources aSubset, TRequiredResources aSuperset);
