@@ -23,6 +23,8 @@ CGraphicsComponent::~CGraphicsComponent()
 
 void CGraphicsComponent::InitOpenGL()
 {
+   LOG_METHOD();
+
    // Initialize OpenGL drawing parameters
    glEnable(GL_TEXTURE_2D);
    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -60,11 +62,7 @@ void CGraphicsComponent::LoadGraphics(CCabManager &aCabinets, const TFileList &a
 void CGraphicsComponent::Crop(int32_t aLeft, int32_t aTop, int32_t aRight, int32_t aBottom)
 {
    // Set the cropping rectangle to only draw part of the source bitmap
-   const int32_t crop[4];
-   crop[0] = aLeft;
-   crop[1] = aTop;
-   crop[2] = aRight - aLeft;
-   crop[3] = aBottom - aTop;
+   const int32_t crop[4] { aLeft, aTop, aRight - aLeft, aBottom - aTop };
    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_CROP_RECT_OES, crop);
    if (glGetError() != 0) LOG_ERROR("Error!");
 }

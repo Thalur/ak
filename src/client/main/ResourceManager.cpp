@@ -13,7 +13,7 @@ std::list<TResourceFileId> CResourceManager::GetListForResource(const TRequiredR
    for (TResourceCategory cat = 0; cat < aCategories.size(); cat++) {
       if (aCategories[cat]) {
          if (!iCategoryCached[cat]) {
-            // ... (add referenced files from animation or font files)
+            // ... (add referenced files from animation or font files?)
          }
          const std::vector<TResourceFileId>& files = iCategories[cat];
          result.insert(result.begin(), files.begin(), files.end());
