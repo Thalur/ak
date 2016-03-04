@@ -6,8 +6,7 @@
 
 #include "IEngine.h"
 #include "common/cabinet/CabManager.h"
-#include "Texture.h"
-#include "GraphicsComponent.h"
+#include "client/gfx/GraphicsComponent.h"
 
 namespace Client
 {

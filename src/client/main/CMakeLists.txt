@@ -4,6 +4,9 @@ include_directories ("../../../lib/freeglut/include")
 include_directories ("../../../lib/glew-1.12.0/include")
 
 SET (CLIENT_MAIN_FILES
+    Engine.cpp
+    Engine.h
+    IEngine.h
     IAppInterface.h
     IGameState.h
     INativeInterface.h
