@@ -15,11 +15,9 @@ enum class ETouchAction {
    DOWN, POINTER_DOWN, MOVE, UP, POINTER_UP, CANCEL
 };
 
-enum class EDialogButton {
+enum class EDialogResult {
    NONE, OK, YES, NO, CANCEL
 };
-
-using TDialogButtons = std::vector<EDialogButton>;
 
 /**
  * Touch event structure with codes from android/input.h
@@ -39,21 +37,13 @@ typedef std::shared_ptr<IGameState> TGameStatePtr;
 class IGameState
 {
 public:
-   // Callback interface to let the game control know when to switch game states
-   class IStateSwitchCallback
-   {
-   public:
-      virtual ~IStateSwitchCallback() {}
-      virtual void SwitchGameState(const TGameStatePtr& aNewState) = 0;
-   };
-
    virtual ~IGameState() {}
 
    // If the game state needs to do some time-consuming work, this is the place
    virtual void OnLoadData() {}
 
    // The game state is set to active (i.e. foreground).
-   virtual void OnActivate(EDialogButton aDialogResult) = 0;
+   virtual void OnActivate(EDialogResult aDialogResult) = 0;
 
    // Draw the current frame
    virtual void OnDraw(int32_t aFps) = 0;
@@ -103,9 +93,6 @@ public:
    virtual int32_t GetDesiredFrameRate() const = 0;
 
 protected:
-   explicit IGameState(IStateSwitchCallback* aStateSwitchCallback) : iStateSwitchCallback(aStateSwitchCallback)
-   {}
-
    // Execute a tick while another window has focus (usually do nothing)
    virtual void OnBackgroundTick() {}
 
@@ -124,8 +111,6 @@ protected:
       }
       return *this;
    }
-
-   IStateSwitchCallback* iStateSwitchCallback;
 };
 
 #endif // AK_IGAMESTATE_H_INCLUDED

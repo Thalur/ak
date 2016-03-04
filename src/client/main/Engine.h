@@ -19,6 +19,7 @@ public:
     , iAppPtr(aAppPtr)
     , iResourceManager(aAppPtr->GetResourceFiles(), aAppPtr->GetCategoryContent())
     , iCabinetManager()
+    , iLastState(nullptr)
    {}
    virtual ~CEngine() {}
 
@@ -50,6 +51,8 @@ private:
    CCabManager iCabinetManager;
    std::unique_ptr<CGraphicsComponent> iGraphicsComponent;
 
+   IGameState* iLastState; // to compare with current state, not used for accessing
+
    // Window state
    int32_t iWidth = 0;
    int32_t iHeight = 0;
@@ -58,11 +61,6 @@ private:
    int64_t frameStartUs = 0;
    int64_t drawTimeUs = 0;
    int64_t nextTick = 0;
-
-   // This needs to go away:
-   int32_t iCurrentTexture = -1;
-   bool iBlending = false;
-   std::vector<TTexturePtr> iTextures;
 };
 
 } // namespace Client

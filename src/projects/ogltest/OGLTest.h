@@ -4,11 +4,12 @@
 #ifndef AK_OGLTEST_H_INCLUDED
 #define AK_OGLTEST_H_INCLUDED
 
+#include "GameControl.h"
 #include "client/main/IAppInterface.h"
 #include "client/main/IGameState.h"
 
 
-class COGLTest : public Client::IAppInterface, public IGameState::IStateSwitchCallback
+class COGLTest : public Client::IAppInterface, public IGameControl
 {
 public:
    COGLTest();
@@ -22,7 +23,7 @@ public:
    virtual Client::TCategoryContent GetCategoryContent();
    virtual TGameStatePtr GameState();
 
-   // IStateSwitchCallback implementation
+   // IGameControl implementation
    virtual void SwitchGameState(const TGameStatePtr& aNewState);
 
 private:

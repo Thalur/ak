@@ -91,6 +91,19 @@ void CEngine::OnIdle()
 
 void CEngine::OnDrawFrame()
 {
+   if (!iAppPtr->GameState()) {
+      LOG_ERROR("Draw() called without active game state");
+   }
+   IGameState& gameState = *iAppPtr->GameState();
+   if (iLastState != &gameState) {
+      // Check if we need to load new data
+      // ...
+
+      // no loading necessary - move to new state
+      iLastState = &gameState;
+      gameState.OnActivate(EDialogResult::NONE);
+   }
+
    const int64_t timeUs = CClock::GetCurrentTicksUs();
    const int64_t frametimeUs = timeUs - frameStartUs;
    //LOG_DEBUG("time: %" PRId64 " start: %" PRId64 " frametime: %" PRId64, timeUs, frameStartUs, frametimeUs);
@@ -116,10 +129,7 @@ void CEngine::OnDrawFrame()
    iGraphicsComponent->Draw(0, 450, 400, 64, 64);
    iGraphicsComponent->Draw(5, 500, 10, 200, 200, 50, 50, 100, 100);
 
-   const TGameStatePtr state = iAppPtr->GameState();
-   if (state) {
-      state->OnDraw(fps);
-   }
+   gameState.OnDraw(fps);
 
    if (frame == 3) { // Record drawing duration once per second
       drawTimeUs = CClock::GetCurrentTicksUs() - timeUs;

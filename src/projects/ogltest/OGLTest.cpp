@@ -15,15 +15,15 @@ Client::TAppPtr CreateApplication()
 
 COGLTest::COGLTest()
 {
-   iGameState = std::make_shared<CGameStateDialog>(this, TGameStatePtr(),
+   iGameState = std::make_shared<CGameStateDialog>(*this, TGameStatePtr(),
       "Title",
       "Message",
-      TDialogButtons { EDialogButton::OK });
+      TDialogButtons { EDialogResult::OK });
 }
 
 TGameStatePtr COGLTest::GameState()
 {
-   return TGameStatePtr();
+   return iGameState;
 }
 
 void COGLTest::SwitchGameState(const TGameStatePtr& aNewState)

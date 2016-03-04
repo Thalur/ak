@@ -4,9 +4,9 @@
 #include "GameStateDialog.h"
 #include "projects/ogltest/resourcelist.h"
 
-CGameStateDialog::CGameStateDialog(IStateSwitchCallback* aStateSwitchCallback,
+CGameStateDialog::CGameStateDialog(IGameControl &aGameControl,
       TGameStatePtr aParentState, std::string aTitle, const std::string& aText, TDialogButtons aButtons)
- : IGameState(aStateSwitchCallback)
+ : iGame(aGameControl)
  , iParentState(std::move(aParentState))
  , iTitle(std::move(aTitle))
  , iText(std::vector<std::string>{aText})
@@ -17,7 +17,7 @@ CGameStateDialog::CGameStateDialog(IStateSwitchCallback* aStateSwitchCallback,
 }
 
 
-void CGameStateDialog::OnActivate(EDialogButton aDialogResult)
+void CGameStateDialog::OnActivate(EDialogResult aDialogResult)
 {
 
 }
