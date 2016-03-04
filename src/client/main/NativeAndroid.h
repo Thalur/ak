@@ -4,7 +4,7 @@
 #ifndef AK_NATIVE_ANDROID_H_INCLUDED
 #define AK_NATIVE_ANDROID_H_INCLUDED
 
-#include "client/gfx/IEngine.h"
+#include "IEngine.h"
 #include "IAppInterface.h"
 #include <android/native_activity.h>
 #include <EGL/egl.h>
