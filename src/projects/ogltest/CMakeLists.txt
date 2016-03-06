@@ -48,12 +48,12 @@ ELSE()
   # Add the core resource file into the executable
   IF ("${AK_TARGET}" STREQUAL "LINUX")
     add_custom_command(OUTPUT oglres.o
-        COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR}/data && ld -r --format=binary -o ${CMAKE_CURRENT_BINARY_DIR}/oglres.o test.ak
+        COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR}/data && ld -r --format=binary -o ${CMAKE_CURRENT_BINARY_DIR}/oglres.o startup.ak
         COMMAND objcopy --rename-section .data=.rodata,alloc,load,readonly,data,contents ${CMAKE_CURRENT_BINARY_DIR}/oglres.o ${CMAKE_CURRENT_BINARY_DIR}/oglres.o)
   ELSE () # OSX
     add_custom_command(OUTPUT oglres.o
         COMMAND rm stub.c && touch stub.c && gcc -o stub.o -c stub.c
-        COMMAND ld -r -o oglres.o -sectcreate binary core_resources ${CMAKE_CURRENT_SOURCE_DIR}/data/test.ak stub.o)
+        COMMAND ld -r -o oglres.o -sectcreate binary core_resources ${CMAKE_CURRENT_SOURCE_DIR}/data/startup.ak stub.o)
   ENDIF ()
   add_library(oglres STATIC oglres.o)
   SET_SOURCE_FILES_PROPERTIES(oglres.o PROPERTIES EXTERNAL_OBJECT true GENERATED true)

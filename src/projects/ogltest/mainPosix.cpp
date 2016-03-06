@@ -25,12 +25,12 @@ const std::string internal_cabinet_name { "startup.ak" };
 extern const int internal_cabinet_resource_id;
 const int internal_cabinet_resource_id = 9999;
 #elif defined(AK_SYSTEM_LINUX)
-extern char _binary_test_ak_start;
-extern char _binary_test_ak_end;
+extern char _binary_startup_ak_start;
+extern char _binary_startup_ak_end;
 extern const char* internal_cabinet_start_ptr;
 extern const char* internal_cabinet_start_ptr;
-const char* internal_cabinet_start_ptr = &_binary_test_ak_start;
-const char* internal_cabinet_end_ptr = &_binary_test_ak_end;
+const char* internal_cabinet_start_ptr = &_binary_startup_ak_start;
+const char* internal_cabinet_end_ptr = &_binary_startup_ak_end;
 #else // OSX
 extern const char* internal_cabinet_section_name;
 const char* internal_cabinet_section_name = "core_resources";

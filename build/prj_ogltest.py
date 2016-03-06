@@ -74,10 +74,14 @@ class project_ogltest:
     build.copy_files("projects/ogltest/" + self.mode + "/*.pdb", binDir)
     shutil.copy2("../../../../lib/freeglut/bin/x64/freeglut.dll", binDir)
     shutil.copy2("../../../../lib/glew-1.12.0/bin/Release/x64/glew32.dll", binDir)
+    build.copy_files("*.ak", binDir)
+    os.remove(os.path.join(binDir, "startup.ak"))
     return True
 
   def post_build_actions_linux(self, binDir):
     shutil.copy2("projects/ogltest/OGLtest", binDir)
+    build.copy_files("*.ak", binDir)
+    os.remove(os.path.join(binDir, "startup.ak"))
     return True
 
   def post_build_actions_osx(self, binDir):

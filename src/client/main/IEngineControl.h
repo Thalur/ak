@@ -12,6 +12,7 @@ namespace Client
 class IEngineControl
 {
 public:
+   virtual ~IEngineControl() {}
 
    /// General information
 
