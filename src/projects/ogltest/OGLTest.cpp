@@ -6,7 +6,6 @@
 #include "state/GameStateDialog.h"
 #include "common/log/log.h"
 
-const std::string COGLTest::iAppName = "OGLTest by AK";
 
 Client::TAppPtr CreateApplication()
 {
@@ -14,6 +13,8 @@ Client::TAppPtr CreateApplication()
 }
 
 COGLTest::COGLTest()
+ : iAppName("OGLTest - Platform-independent C++")
+ , iCopyright("Copyright (C) 2016 by Andre Koschmieder")
 {
    iGameState = std::make_shared<CGameStateDialog>(*this, TGameStatePtr(),
       "Title",
@@ -45,9 +46,8 @@ void COGLTest::ShowLoadScreen(double aProgress)
       Engine()->Draw(F_STARTUP_PROGRESS_FULL, x, y+100, static_cast<int32_t>(300 * aProgress), 30);
    }
    DrawSoundUI();
-   /*Font f = gfx.getFont(Gfx.FONT_3D_SMALL_WHITE);
-   f.draw(Global.fullTitle,10,Global.screenY,Font.BOTTOM,2,0);
-   f.draw(Global.copyright,Global.screenX-10,Global.screenY,Font.BOTTOM|Font.RIGHT,2,0);*/
+   Engine()->Text(F_FONT_DUNE3DSMALL, iAppName, 10, Engine()->Height(), TFontStyle(EHorizontal::LEFT, EVertical::BOTTOM));
+   Engine()->Text(F_FONT_DUNE3DSMALL, iCopyright, Engine()->Width() - 10, Engine()->Height(), TFontStyle(EHorizontal::RIGHT, EVertical::BOTTOM));
 
    /*Engine()->Draw(F_INDEX32X32, 0, 0, 64, 64);
    Engine()->Draw(F_INDEX64_48, 140, 100, 128, 96);

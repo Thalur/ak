@@ -1,3 +1,4 @@
+AKFONTDESC1
 % AK Font Description File for font "Dune 3D Small"
 %
 % Absolute coordinates and letter size for each character
@@ -52,14 +53,14 @@ font05 % YELLOW
 7
 6
 
-57 % ( (NYI)
-24
-7
+30 % (
+0
+4
 6
 
-57 % ) (NYI)
-24
-7
+34 % )
+0
+4
 6
 
 57 % * (NYI)
@@ -67,9 +68,9 @@ font05 % YELLOW
 7
 6
 
-57 % + (NYI)
-24
-7
+25 % +
+0
+5
 6
 
 57 % , (NYI)
@@ -77,9 +78,9 @@ font05 % YELLOW
 7
 6
 
-57 % - (NYI)
-24
-7
+20 % -
+0
+5
 6
 
 14 % .

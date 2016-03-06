@@ -23,16 +23,19 @@ ELogLevel consoleLogLevel = ELogLevel::EDEBUG;
 boost::optional<std::ofstream> logFile;
 std::string appName;
 
-const std::string logDebug("DEBUG");
-const std::string logInfo("INFO ");
-const std::string logWarn("WARN ");
-const std::string logError("ERROR");
-const std::string logInvalid("<INVALID>");
+const std::string logVerbose { "VERB " };
+const std::string logDebug { "DEBUG" };
+const std::string logInfo { "INFO " };
+const std::string logWarn { "WARN " };
+const std::string logError { "ERROR" };
+const std::string logInvalid { "<INVALID>" };
 
 inline const std::string& GetLevelString(ELogLevel aLogLevel)
 {
    switch (aLogLevel)
    {
+   case ELogLevel::EVERBOSE:
+      return logVerbose;
    case ELogLevel::EDEBUG:
       return logDebug;
    case ELogLevel::EINFO:

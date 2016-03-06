@@ -5,6 +5,7 @@
 #define AK_IENGINECONTROL_H_INCLUDED
 
 #include "ResourceManager.h"
+#include "client/gfx/Font.h"
 
 namespace Client
 {
@@ -25,6 +26,11 @@ public:
    virtual void Draw(TResourceFileId aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight) = 0;
    virtual void Draw(TResourceFileId aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight,
                      int32_t aTexLeft, int32_t aTexTop, int32_t aTexRight, int32_t aTexBottom) = 0;
+
+   virtual void Text(TResourceFileId aFont, const std::string& aLine, int32_t x, int32_t y,
+                     TFontStyle aStyle = TFontStyle(), uint32_t aVariant = 0) = 0;
+   virtual void Text(TResourceFileId aFont, const std::string& aLine, int32_t x, int32_t y, int32_t aWidth,
+                     int32_t aHeight, TFontStyle aStyle = TFontStyle(), uint32_t aVariant = 0) = 0;
 };
 
 } // namespace Client

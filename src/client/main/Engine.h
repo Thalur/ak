@@ -59,6 +59,14 @@ public:
                      int32_t aTexLeft, int32_t aTexTop, int32_t aTexRight, int32_t aTexBottom) final {
       iGraphicsComponent->Draw(aTexture, x, y, aWidth, aHeight, aTexLeft, aTexTop, aTexRight, aTexBottom);
    }
+   virtual void Text(TResourceFileId aFont, const std::string& aLine, int32_t x, int32_t y,
+                     TFontStyle aStyle, uint32_t aVariant) final {
+      Text(aFont, aLine, x, y, 0, 0, TFontStyle(aStyle.iHorizontal, aStyle.iVertical, ELines::NOCLIP), aVariant);
+   }
+   virtual void Text(TResourceFileId aFont, const std::string& aLine, int32_t x, int32_t y, int32_t aWidth,
+                     int32_t aHeight, TFontStyle aStyle, uint32_t aVariant) final {
+      iGraphicsComponent->DrawText(aFont, aLine, x, y, aWidth, aHeight, aStyle, aVariant);
+   }
 private:
    void LoadData(TRequiredResources aRequiredResources);
 

@@ -1,3 +1,4 @@
+AKFONTDESC1
 % AK Font Description File for font "Dune Caps Small"
 %
 % Absolute coordinates and letter size for each character

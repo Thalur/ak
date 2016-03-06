@@ -46,12 +46,31 @@ void CGraphicsComponent::LoadGraphics(CCabManager &aCabinets, const TFileList &a
 {
    LOG_METHOD();
    for (const auto& file : aFiles) {
-      if (iTextures.find(file.first) == iTextures.end()) { // texture not yet loaded
+      if (iTextures.find(file.first) == iTextures.end()) { // Texture not yet loaded
          TFilePtr memFile = aCabinets.GetFile(file.first);
+         if (!memFile) { // Try loading by filename if by index did not work
+            memFile = aCabinets.GetFile(file.second);
+         }
          if (memFile) {
             TTexturePtr texture = LoadFromMemory(memFile, file.second.c_str());
             if (texture) {
                iTextures[file.first] = std::move(texture);
+            }
+         }
+      }
+   }
+}
+
+void CGraphicsComponent::LoadFonts(CCabManager &aCabinets, const TFileList &aFiles, CResourceManager& aResourceManager)
+{
+   LOG_METHOD();
+   for (const auto& file : aFiles) {
+      if (iFonts.find(file.first) == iFonts.end()) { // Font not yet loaded
+         TMemoryFilePtr memFile = aCabinets.GetFile(file.first);
+         if (memFile) {
+            TFontPtr font = CFont::FromFile(*memFile, aResourceManager, this);
+            if (font) {
+               iFonts[file.first] = std::move(font);
             }
          }
       }

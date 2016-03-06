@@ -33,7 +33,8 @@ public:
    void SetEngineControl(Client::IEngineControl* aEngineControl) { iEngineControl = aEngineControl; }
 
 private:
-   static const std::string iAppName;
+   const std::string iAppName;
+   const std::string iCopyright;
 
    TGameStatePtr iGameState;
    TGameStatePtr iNextGameState;

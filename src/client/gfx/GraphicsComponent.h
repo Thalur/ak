@@ -4,9 +4,11 @@
 #ifndef AK_GRAPHICSCOMPONENT_H_INCLUDED
 #define AK_GRAPHICSCOMPONENT_H_INCLUDED
 
+#include "Font.h"
 #include "Texture.h"
 #include "oglincludes.h"
 #include "client/main/ResourceManager.h"
+#include "common/log/log.h"
 
 
 class CCabManager;
@@ -22,6 +24,7 @@ public:
 
    void InitOpenGL();
    void LoadGraphics(CCabManager& aCabinets, const TFileList& aFiles);
+   void LoadFonts(CCabManager& aCabinets, const TFileList& aFiles, CResourceManager &aResourceManager);
 
    // Most drawing methods are inline for performance reasons
    void StartFrame()
@@ -53,6 +56,16 @@ public:
       const CTexture* texture = GetTexture(aTexture);
       if (texture != nullptr) {
          DrawTexture(*texture, x, y, aWidth, aHeight, aTexLeft, aTexTop, aTexRight, aTexBottom);
+      }
+   }
+
+   void DrawText(TResourceFileId aFont, const std::string& aLine, int32_t x, int32_t y, int32_t aWidth,
+                 int32_t aHeight, TFontStyle aStyle, uint32_t aVariant) {
+      auto it = iFonts.find(aFont);
+      if (it != iFonts.end()) {
+         it->second->Draw(aLine, x, y, aWidth, aHeight, aStyle, aVariant);
+      } else {
+         LOG_ERROR("Invalid font %d", aFont);
       }
    }
 
@@ -127,6 +140,7 @@ private:
    // Resources state
    TRequiredResources iLoadedResources;
    std::map<TResourceFileId, TTexturePtr> iTextures;
+   std::map<TResourceFileId, TFontPtr> iFonts;
 };
 
 } // namespace Client

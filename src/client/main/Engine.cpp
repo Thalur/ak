@@ -70,7 +70,7 @@ void CEngine::OnIdle()
    const int64_t timeUs = CClock::GetCurrentTicksUs();
    if (timeUs+1000 < nextTick) {
       const int32_t sleepTime = static_cast<int32_t>((nextTick-timeUs)/1000);
-      LOG_DEBUG("Spleeping for %d ms (diff: %" PRId64 ")", sleepTime, (nextTick-timeUs));
+      LOG_VERBOSE("Spleeping for %d ms (diff: %" PRId64 ")", sleepTime, (nextTick-timeUs));
       std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
    } else if (nextTick+500000 < timeUs) {
       LOG_DEBUG("Resetting tick timer (difference was %" PRId64 " ms)", (timeUs-nextTick+500)/1000);
@@ -215,7 +215,7 @@ void CEngine::LoadData(TRequiredResources aRequiredResources)
    LOG_INFO("Loading resources for categories %s", aRequiredResources.to_string().c_str());
    // 1. Load fonts
    const TFileList fontFiles = iResourceManager.GetFileList(TRequiredResources(1), EFileType::FONT);
-   // ...
+   iGraphicsComponent->LoadFonts(iCabinetManager, fontFiles, iResourceManager);
    // 2. Load images
    const TFileList gfxFiles = iResourceManager.GetFileList(TRequiredResources(1), EFileType::GFX);
    iGraphicsComponent->LoadGraphics(iCabinetManager, gfxFiles);

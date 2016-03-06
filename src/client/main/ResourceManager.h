@@ -71,16 +71,35 @@ public:
       return aCategoryContent.rbegin()->first + 1;
    }
 
-   TResourceFiles GetResourceFiles(TRequiredResources aCategories);
-
+   /**
+    * Returns the list of files (resource index and file name)
+    * for all known resource files. This is used to build the cabinet file index.
+    */
    std::vector<std::pair<TSize, std::string>> GetFileList() const;
+
+   /**
+    * Returns the list of files (resource index and file name)
+    * for all resources of the specified type for the specified categorie combination.
+    */
    TFileList GetFileList(TRequiredResources aCategories, EFileType aFileType);
+
+   /**
+    * Retrieve the resource identifier for the given resource name,
+    * or, if it does not exist yet, add it to the known resources.
+    */
+   TResourceFileId GetResourceId(const std::string &aResource);
 
    // Convenience method
    bool IsResourceSubset(TRequiredResources aSubset, TRequiredResources aSuperset);
 
 private:
    std::list<TResourceFileId> GetListForResource(TRequiredResources aCategories);
+   std::pair<bool, TSize> FindResourceId(const std::string& aResource);
+
+   /**
+    * Add referenced files from animation or font files to the category.
+    */
+   void CacheCategory(TResourceCategory aCategory);
 
    TResourceFiles iFiles;
    TCategoryContent iCategories;

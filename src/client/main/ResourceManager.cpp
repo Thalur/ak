@@ -13,15 +13,45 @@ std::list<TResourceFileId> CResourceManager::GetListForResource(const TRequiredR
    for (TResourceCategory cat = 0; cat < aCategories.size(); cat++) {
       if (aCategories[cat]) {
          if (!iCategoryCached[cat]) {
-            // ... (add referenced files from animation or font files?)
+            CacheCategory(cat);
          }
          const std::vector<TResourceFileId>& files = iCategories[cat];
+         LOG_DEBUG("Found %d files in category %u", files.size(), cat);
          result.insert(result.begin(), files.begin(), files.end());
       }
    }
    result.sort();
    result.unique();
    return result;
+}
+
+std::pair<bool, TSize> CResourceManager::FindResourceId(const std::string &aResource)
+{
+   LOG_METHOD();
+   for (auto file : iFiles) {
+      if (std::get<2>(file) == aResource) {
+         return std::make_pair(true, std::get<0>(file));
+      }
+   }
+   return std::make_pair(false, 0);
+}
+
+void CResourceManager::CacheCategory(const TResourceCategory aCategory)
+{
+   LOG_PARAMS("%u", aCategory);
+   std::vector<TResourceFileId> addedResources;
+   for (const TResourceFileId file : iCategories[aCategory]) {
+      const EFileType type = std::get<1>(iFiles[file]);
+      if (type == EFileType::FONT) {
+         // Font image files are added when the fonts are loaded
+      } else if (type == EFileType::GFX) {
+         // ... (Check if gfx is an animation file, if yes add files that are not referenced
+      }
+   }
+   iCategories[aCategory].insert(iCategories[aCategory].end(),
+                                 std::make_move_iterator(addedResources.begin()),
+                                 std::make_move_iterator(addedResources.end()));
+   iCategoryCached[aCategory] = true;
 }
 
 bool CResourceManager::IsResourceSubset(const TRequiredResources aSubset, const TRequiredResources aSuperset)
@@ -55,7 +85,7 @@ bool CResourceManager::IsResourceSubset(const TRequiredResources aSubset, const 
    //return subset.empty();
 }
 
-TResourceFiles CResourceManager::GetResourceFiles(const TRequiredResources aCategories)
+/*TResourceFiles CResourceManager::GetResourceFiles(const TRequiredResources aCategories)
 {
    LOG_PARAMS("%u", aCategories.to_ulong());
    const std::list<TResourceFileId> files = GetListForResource(aCategories);
@@ -64,13 +94,14 @@ TResourceFiles CResourceManager::GetResourceFiles(const TRequiredResources aCate
       result.push_back(iFiles[fileId]);
    }
    return result;
-}
+}*/
 
 std::vector<std::pair<TSize, std::string>> CResourceManager::GetFileList() const
 {
    LOG_METHOD();
    std::vector<std::pair<TSize, std::string>> result;
    for (const TResourceFile& file : iFiles) {
+      LOG_VERBOSE("List entry: %d, %s", (int)std::get<0>(file), std::get<2>(file).c_str());
       result.emplace_back(std::get<0>(file), std::get<2>(file));
    }
    return result;
@@ -84,10 +115,25 @@ TFileList CResourceManager::GetFileList(const TRequiredResources aCategories, co
    for (const TResourceFileId id : ids) {
       const TResourceFile& file = iFiles[id];
       if (std::get<1>(file) == aFileType) {
+         LOG_VERBOSE("List entry: %d, %s", (int)std::get<0>(file), std::get<2>(file).c_str());
          result.emplace_back(std::get<0>(file), std::get<2>(file));
       }
    }
    return result;
+}
+
+TResourceFileId CResourceManager::GetResourceId(const std::string& aResource)
+{
+   LOG_METHOD();
+   std::pair<bool, TSize> found = FindResourceId(aResource);
+   if (found.first) {
+      return static_cast<TResourceFileId>(found.second);
+   }
+   TResourceFileId id = static_cast<TResourceFileId>(iFiles.size());
+   LOG_DEBUG("Adding %s as %u", aResource.c_str(), id);
+   iFiles.emplace_back(id, EFileType::GFX, aResource);
+   iCategories[0].push_back(id);
+   return id;
 }
 
 } // namespace Client

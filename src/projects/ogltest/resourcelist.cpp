@@ -42,10 +42,10 @@ Client::TResourceFiles COGLTest::GetResourceFiles()
    const Client::TResourceFiles resourceFiles = {
       // Startup files
       std::make_tuple(F_FONT_DUNE3DLARGE,       Type::FONT, "fontdesc00"),
-      std::make_tuple(F_FONT_DUNE3DSMALL,       Type::FONT, "fontdest01"),
+      std::make_tuple(F_FONT_DUNE3DSMALL,       Type::FONT, "fontdesc01"),
       std::make_tuple(F_FONT_DUNESMALLCAPS,     Type::FONT, "fontdesc02"),
       std::make_tuple(F_FONT_DUNEBLACK,         Type::FONT, "fontdesc03"),
-      std::make_tuple(F_FONT_DUNEHOUSE,         Type::FONT, "fontdest04"),
+      std::make_tuple(F_FONT_DUNEHOUSE,         Type::FONT, "fontdesc04"),
       std::make_tuple(F_STARTUP_LOADTEXT,       Type::GFX,  "startup00"),
       std::make_tuple(F_STARTUP_PROGRESS_EMPTY, Type::GFX,  "startup01"),
       std::make_tuple(F_STARTUP_PROGRESS_FULL,  Type::GFX,  "startup02"),

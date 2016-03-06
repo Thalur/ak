@@ -27,6 +27,8 @@ bool CCabManager::Init(std::vector<TCabinetPtr> aCabinets, const TIndexData& aIn
 {
    LOG_METHOD();
    iCabinets.swap(aCabinets);
+   iResourceIndex.clear();
+   iFileIndex.clear();
    const TSize size = iCabinets.size();
    if (size == 0) {
       return false;
@@ -47,7 +49,8 @@ bool CCabManager::Init(std::vector<TCabinetPtr> aCabinets, const TIndexData& aIn
    for (const auto& resourceEntry : aIndexValues) {
       std::vector<TFileEntry>::iterator it = std::lower_bound(iFileIndex.begin(), iFileIndex.end(),
          resourceEntry.second, CmpFileNameIndex);
-      if (it != iFileIndex.end()) {
+      if ((it != iFileIndex.end()) && (std::get<0>(*it) == resourceEntry.second)) {
+         LOG_VERBOSE("Adding resource index to %d: %d, %s", resourceEntry.first, (int)std::get<2>(*it), resourceEntry.second.c_str());
          iResourceIndex[resourceEntry.first] = TIndexEntry(std::get<1>(*it), std::get<2>(*it));
       } else LOG_ERROR("File not found in cabinet index: %s", resourceEntry.second.c_str());
    }
@@ -67,6 +70,7 @@ void CCabManager::MergeIntoFileList(uint8_t aCabinetIndex, const std::vector<TEn
             bIndexEnd = true;
          }
       } else if (cmp > 0) { // Insert the data string before the current position
+         LOG_VERBOSE("Adding at %d: %d, %s", (itIndex - iFileIndex.begin()), itData->second, itData->first.c_str());
          itIndex = iFileIndex.emplace(itIndex, itData->first, aCabinetIndex, itData->second) + 1;
          if (!bIndexEnd && itIndex == iFileIndex.end()) {
             bIndexEnd = true;

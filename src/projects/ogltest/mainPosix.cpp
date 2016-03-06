@@ -13,7 +13,7 @@ extern Client::TAppPtr CreateApplication();
 int main(int argc, char** argv)
 {
    Client::TAppPtr app = CreateApplication();
-   NLogging::InitLogFile(app->AppName(), "log.txt", ELogLevel::EDEBUG, ELogLevel::EINFO);
+   NLogging::InitLogFile(app->AppName(), "log.txt", ELogLevel::EVERBOSE, ELogLevel::EINFO);
    Client::Run(app, argc, argv);
    NLogging::FinishLogger();
 }
