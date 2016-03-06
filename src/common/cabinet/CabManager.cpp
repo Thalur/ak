@@ -8,6 +8,8 @@
 
 namespace {
 
+const uint8_t KINVALID = std::numeric_limits<uint8_t>::max();
+
 bool CmpCabinetsByPatch(const TCabinetPtr& aFirst, const TCabinetPtr& aSecond)
 {
    return aFirst->GetPatchCycle() < aSecond->GetPatchCycle();
@@ -18,7 +20,7 @@ bool CmpFileNameIndex(const CCabManager::TFileEntry& aFirst, const std::string& 
    return std::get<0>(aFirst) < aSecond;
 }
 
-}
+} // anonymous namespace
 
 
 bool CCabManager::Init(std::vector<TCabinetPtr> aCabinets, const TIndexData& aIndexValues)
@@ -41,7 +43,7 @@ bool CCabManager::Init(std::vector<TCabinetPtr> aCabinets, const TIndexData& aIn
 
    // Create the quick access index
    LOG_DEBUG("Creating quick access index");
-   iResourceIndex.resize(aIndexValues.size() + 1);
+   iResourceIndex.resize(aIndexValues.size() + 1, TIndexEntry(KINVALID, 0));
    for (const auto& resourceEntry : aIndexValues) {
       std::vector<TFileEntry>::iterator it = std::lower_bound(iFileIndex.begin(), iFileIndex.end(),
          resourceEntry.second, CmpFileNameIndex);
@@ -81,12 +83,14 @@ TMemoryFilePtr CCabManager::GetFile(TSize aIndex) const
 {
    if (aIndex < iResourceIndex.size()) {
       const TIndexEntry& entry = iResourceIndex[aIndex];
-      LOG_DEBUG("GetFile: %" PRIuS " (%u, %" PRIuS ")", aIndex, entry.first, entry.second);
-      TCabinetPtr cab = iCabinets[entry.first];
-      if (cab) {
-         return cab->ReadFileByIndex(entry.second);
-      } else {
-         LOG_ERROR("Invalid cabinet handle");
+      if (entry.first != KINVALID) {
+         LOG_DEBUG("GetFile: %" PRIuS " (%u, %" PRIuS ")", aIndex, entry.first, entry.second);
+         TCabinetPtr cab = iCabinets[entry.first];
+         if (cab) {
+            return cab->ReadFileByIndex(entry.second);
+         } else {
+            LOG_ERROR("Invalid cabinet handle");
+         }
       }
    }
    LOG_ERROR("Invalid index %" PRIuS, aIndex);
