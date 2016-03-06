@@ -6,6 +6,8 @@
 #include "client/main/ResourceManager.h"
 #include "common/cabinet/MemoryFile.h"
 #include "common/log/log.h"
+#include <limits>
+#include <cstdlib>
 
 namespace Client
 {
@@ -58,8 +60,8 @@ std::vector<std::string> CFont::GetFontVariants(CMemoryFile &aFile)
 {
    LOG_METHOD();
    std::vector<std::string> result;
-   const std::string headeLine = aFile.GetNextConfigLine();
-   if (headeLine == "AKFONTDESC1") {
+   const std::string headerLine = aFile.GetNextConfigLine();
+   if (headerLine == "AKFONTDESC1") {
       const std::string numberLine = aFile.GetNextConfigLine();
       if (!numberLine.empty()) {
          const int32_t num = std::atoi(numberLine.c_str());
@@ -78,7 +80,7 @@ std::vector<std::string> CFont::GetFontVariants(CMemoryFile &aFile)
          LOG_ERROR("Invalid font specification file");
       }
    } else {
-      LOG_ERROR("Invalid font identifier: %s", headeLine.c_str());
+      LOG_ERROR("Invalid font identifier: %s", headerLine.c_str());
    }
    return result;
 }
