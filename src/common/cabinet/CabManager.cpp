@@ -95,14 +95,14 @@ TMemoryFilePtr CCabManager::GetFile(TSize aIndex) const
 
 TMemoryFilePtr CCabManager::GetFile(const std::string& aFilePrefix) const
 {
-   LOG_DEBUG("GetFile: %s", aFilePrefix.c_str());
+   LOG_PARAMS(aFilePrefix.c_str());
    const std::vector<TFileEntry>::const_iterator it = std::lower_bound(iFileIndex.begin(), iFileIndex.end(),
          aFilePrefix, CmpFileNameIndex);
    if (it != iFileIndex.end()) {
       LOG_DEBUG("Found file %s: %u, %u", aFilePrefix.c_str(), std::get<1>(*it), std::get<2>(*it));
       return iCabinets[std::get<1>(*it)]->ReadFileByIndex(std::get<2>(*it));
    }
-   LOG_ERROR("Invalid prefix %s", aFilePrefix.c_str());
+   LOG_ERROR("File not found");
    return TMemoryFilePtr();
 }
 

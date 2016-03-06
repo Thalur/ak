@@ -20,7 +20,7 @@ int main(int argc, char** argv)
 
 // Propagate access to the internal resources to the client implementation
 extern const std::string internal_cabinet_name;
-const std::string internal_cabinet_name { "test.ak" };
+const std::string internal_cabinet_name { "startup.ak" };
 #ifdef AK_SYSTEM_WINDOWS
 extern const int internal_cabinet_resource_id;
 const int internal_cabinet_resource_id = 9999;

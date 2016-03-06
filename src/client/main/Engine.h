@@ -43,6 +43,12 @@ public:
    virtual bool OnTouchEvent(const TTouchEvent& aEvent) final;
 
    // IEngineControl implementation (see there for documentation)
+   virtual int32_t Width() final {
+      return iWidth;
+   }
+   virtual int32_t Height() final {
+      return iHeight;
+   }
    virtual void Draw(TResourceFileId aTexture, int32_t x, int32_t y) final {
       iGraphicsComponent->Draw(aTexture, x, y);
    }

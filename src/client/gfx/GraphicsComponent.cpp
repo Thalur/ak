@@ -47,7 +47,7 @@ void CGraphicsComponent::LoadGraphics(CCabManager &aCabinets, const TFileList &a
    LOG_METHOD();
    for (const auto& file : aFiles) {
       if (iTextures.find(file.first) == iTextures.end()) { // texture not yet loaded
-         TFilePtr memFile = aCabinets.GetFile(file.second);
+         TFilePtr memFile = aCabinets.GetFile(file.first);
          if (memFile) {
             TTexturePtr texture = LoadFromMemory(memFile, file.second.c_str());
             if (texture) {

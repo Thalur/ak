@@ -21,6 +21,7 @@ public:
    virtual ~IGameControl() {}
 
    virtual void SwitchGameState(const TGameStatePtr& aNewState) = 0;
+   virtual void DrawSoundUI() = 0;
 
    Client::IEngineControl* Engine() { return iEngineControl; }
 

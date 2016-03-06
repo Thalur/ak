@@ -13,6 +13,11 @@ class IEngineControl
 {
 public:
 
+   /// General information
+
+   virtual int32_t Width() = 0;
+   virtual int32_t Height() = 0;
+
    /// Graphics control
 
    virtual void Draw(TResourceFileId aTexture, int32_t x, int32_t y) = 0;
@@ -23,4 +28,4 @@ public:
 
 } // namespace Client
 
-#endif AK_IENGINECONTROL_H_INCLUDED
+#endif // AK_IENGINECONTROL_H_INCLUDED

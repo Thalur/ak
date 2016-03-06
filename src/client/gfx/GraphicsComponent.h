@@ -26,7 +26,7 @@ public:
    // Most drawing methods are inline for performance reasons
    void StartFrame()
    {
-      glClearColor(0.5, 0.5, 0.5, 1);
+      glClearColor(0.0, 0.0, 0.0, 1);
       glClear(GL_COLOR_BUFFER_BIT);
       iCurrentTexture = -1;
    }

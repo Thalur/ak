@@ -1,4 +1,4 @@
 
 GLUT_ICON ICON "data/app.ico"
 
-9999 RCDATA "..\\..\\..\\gen\\cmake\\ogltest\\win\\test.ak"
+9999 RCDATA "..\\..\\..\\gen\\cmake\\ogltest\\win\\startup.ak"

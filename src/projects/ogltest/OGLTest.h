@@ -28,6 +28,7 @@ public:
 
    // IGameControl implementation
    virtual void SwitchGameState(const TGameStatePtr& aNewState) final;
+   virtual void DrawSoundUI() final;
 
    void SetEngineControl(Client::IEngineControl* aEngineControl) { iEngineControl = aEngineControl; }
 
