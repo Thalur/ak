@@ -15,9 +15,17 @@ COGLTest::TNames COGLTest::InternalCabinets()
 
 /**
  * A list of all cabinets required by the program. Order is important.
+ */
+COGLTest::TNames COGLTest::RequiredCabinets()
+{
+   return TNames();
+}
+
+/**
+ * A list of additional cabinets used by the program. Order is important.
  * Can include wildcards to account for future patch files.
  */
-COGLTest::TNames COGLTest::ResourceCabinets()
+COGLTest::TNames COGLTest::OptionalCabinets()
 {
    return TNames();
 }

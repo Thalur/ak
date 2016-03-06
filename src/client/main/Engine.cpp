@@ -12,7 +12,9 @@ namespace Client
 
 TEnginePtr IEngine::CreateEngine(TNativePtr aNativePtr, TAppPtr aAppPtr)
 {
-   return std::make_shared<CEngine>(aNativePtr, aAppPtr);
+   const TEnginePtr engine = std::make_shared<CEngine>(aNativePtr, aAppPtr);
+   aAppPtr->SetEngineControl(dynamic_cast<CEngine*>(&(*engine)));
+   return engine;
 }
 
 bool CEngine::OnCreate(const void* aSavedState)
@@ -122,12 +124,7 @@ void CEngine::OnDrawFrame()
 
    iGraphicsComponent->StartFrame();
 
-   iGraphicsComponent->Draw(3, 0, 0, 64, 64);
-   iGraphicsComponent->Draw(4, 140, 100, 128, 96);
-   iGraphicsComponent->Draw(5, 432, 256, 368, 224);
-   iGraphicsComponent->Draw(1, 20, 20);
-   iGraphicsComponent->Draw(0, 450, 400, 64, 64);
-   iGraphicsComponent->Draw(5, 500, 10, 200, 200, 50, 50, 100, 100);
+   iAppPtr->ShowLoadScreen(0.5);
 
    gameState.OnDraw(fps);
 
@@ -217,13 +214,16 @@ void CEngine::LoadData(TRequiredResources aRequiredResources)
 {
    LOG_INFO("Loading resources for categories %s", aRequiredResources.to_string().c_str());
    // 1. Load fonts
+   const TFileList fontFiles = iResourceManager.GetFileList(TRequiredResources(1), EFileType::FONT);
    // ...
    // 2. Load images
-   const TFileList files = iResourceManager.GetFileList(TRequiredResources(1), EFileType::GFX);
-   iGraphicsComponent->LoadGraphics(iCabinetManager, files);
+   const TFileList gfxFiles = iResourceManager.GetFileList(TRequiredResources(1), EFileType::GFX);
+   iGraphicsComponent->LoadGraphics(iCabinetManager, gfxFiles);
    // 3. Load SFX
+   const TFileList sfxFiles = iResourceManager.GetFileList(TRequiredResources(1), EFileType::SFX);
    // ...
    // 4. Load text files
+   const TFileList textFiles = iResourceManager.GetFileList(TRequiredResources(1), EFileType::TEXT);
    // ...
 }
 

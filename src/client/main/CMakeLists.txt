@@ -7,6 +7,7 @@ SET (CLIENT_MAIN_FILES
     Engine.cpp
     Engine.h
     IEngine.h
+    IEngineControl.h
     IAppInterface.h
     IGameState.h
     INativeInterface.h

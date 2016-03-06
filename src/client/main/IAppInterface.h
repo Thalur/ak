@@ -4,6 +4,7 @@
 #ifndef AK_IAPPINTERFACE_H_INCLUDED
 #define AK_IAPPINTERFACE_H_INCLUDED
 
+#include "IEngineControl.h"
 #include "IGameState.h"
 #include "common/cabinet/File.h"
 #include <vector>
@@ -33,14 +34,19 @@ public:
    // Get the application name to be displayed as the window title
    virtual std::string AppName() = 0;
 
+   // Set the callback for the game engine
+   virtual void SetEngineControl(IEngineControl* aEngineControl) = 0;
 
    /// Files and data
 
    // Get a list of internal cabinet files to be loaded immediately on startup
    virtual TNames InternalCabinets() = 0;
 
-   // Get a list of resource files, including wirldcard names for patches
-   virtual TNames ResourceCabinets() = 0;
+   // Get a list of cabinet files that are required to run the application
+   virtual TNames RequiredCabinets() = 0;
+
+   // Get a list of additional cabinet files, including wirldcard names for patches
+   virtual TNames OptionalCabinets() = 0;
 
    // Get a list and properties of all files that can be referenced in the code
    virtual TResourceFiles GetResourceFiles() = 0;
@@ -54,6 +60,9 @@ public:
    // Get the current game state
    virtual TGameStatePtr GameState() = 0;
 
+   virtual void OnRequiredFilesMissing() = 0;
+
+   virtual void ShowLoadScreen(double aProgress) = 0;
 };
 
 } // namespace Client

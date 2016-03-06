@@ -7,7 +7,7 @@ include_directories ("../../../lib/glew-1.12.0/include")
 add_subdirectory (state)
 
 SET (OGLTEST_FILES
-    GameControl.h
+    IGameControl.h
     OGLTest.cpp
     OGLTest.h
     resourcelist.cpp

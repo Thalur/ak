@@ -4,7 +4,7 @@
 #ifndef AK_GAME_STATE_DIALOG_H_INCLUDED
 #define AK_GAME_STATE_DIALOG_H_INCLUDED
 
-#include "GameControl.h"
+#include "IGameControl.h"
 #include "client/main/IGameState.h"
 
 using TDialogButtons = std::vector<EDialogResult>;
@@ -32,7 +32,7 @@ public:
    virtual void OnMenuKey();
    virtual int32_t GetDesiredFrameRate() const;
 
-private:
+protected:
    IGameControl& iGame;
    const TGameStatePtr iParentState;
    const std::string iTitle;

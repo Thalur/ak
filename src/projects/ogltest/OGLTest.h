@@ -4,7 +4,7 @@
 #ifndef AK_OGLTEST_H_INCLUDED
 #define AK_OGLTEST_H_INCLUDED
 
-#include "GameControl.h"
+#include "IGameControl.h"
 #include "client/main/IAppInterface.h"
 #include "client/main/IGameState.h"
 
@@ -16,15 +16,20 @@ public:
    virtual ~COGLTest() {}
 
    // IAppInterface implementation
-   virtual std::string AppName() { return iAppName; }
-   virtual TNames InternalCabinets();
-   virtual TNames ResourceCabinets();
-   virtual Client::TResourceFiles GetResourceFiles();
-   virtual Client::TCategoryContent GetCategoryContent();
-   virtual TGameStatePtr GameState();
+   virtual std::string AppName() final { return iAppName; }
+   virtual TNames InternalCabinets() final;
+   virtual TNames RequiredCabinets() final;
+   virtual TNames OptionalCabinets() final;
+   virtual Client::TResourceFiles GetResourceFiles() final;
+   virtual Client::TCategoryContent GetCategoryContent() final;
+   virtual TGameStatePtr GameState() final;
+   virtual void OnRequiredFilesMissing() final;
+   virtual void ShowLoadScreen(double aProgress) final;
 
    // IGameControl implementation
-   virtual void SwitchGameState(const TGameStatePtr& aNewState);
+   virtual void SwitchGameState(const TGameStatePtr& aNewState) final;
+
+   void SetEngineControl(Client::IEngineControl* aEngineControl) { iEngineControl = aEngineControl; }
 
 private:
    static const std::string iAppName;

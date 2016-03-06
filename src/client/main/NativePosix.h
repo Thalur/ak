@@ -17,8 +17,8 @@ public:
    virtual ~CNativePosix() {}
 
    // INativeInterface implementation
-   virtual TFilePtr GetInternalFile(const std::string& aFilename);
-   virtual TFilePtr GetResourceFile(const std::string& aFilename);
+   virtual TFilePtr GetInternalFile(const std::string& aFilename) final;
+   virtual TFilePtr GetResourceFile(const std::string& aFilename) final;
 
 private:
    std::string iAppPath;

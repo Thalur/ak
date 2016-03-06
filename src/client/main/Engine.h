@@ -5,13 +5,14 @@
 #define AK_ENGINE_H_INCLUDED
 
 #include "IEngine.h"
+#include "IEngineControl.h"
 #include "common/cabinet/CabManager.h"
 #include "client/gfx/GraphicsComponent.h"
 
 namespace Client
 {
 
-class CEngine : public IEngine
+class CEngine : public IEngine, public IEngineControl
 {
 public:
    CEngine(TNativePtr aNativePtr, TAppPtr aAppPtr)
@@ -24,23 +25,34 @@ public:
    virtual ~CEngine() {}
 
    // IEngine implementation (see there for documentation)
-   virtual bool OnCreate(const void* aSavedState);
-   virtual void OnInitWindow(int32_t aWidth, int32_t aHeight);
-   virtual void OnStart();
-   virtual void OnResume();
-   virtual void OnIdle();
-   virtual void OnDrawFrame();
-   virtual void* OnSaveState();
-   virtual void OnPause();
-   virtual void OnStop();
-   virtual void OnDestroyWindow();
-   virtual void OnDestroy();
-   virtual bool OnBackKey();
-   virtual bool OnMenuKey();
-   virtual bool OnKeyDown(int32_t aKeyCode, int32_t aScanCode, int32_t aFlags);
-   virtual bool OnKeyUp(int32_t aKeyCode, int32_t aScanCode, int32_t aFlags);
-   virtual bool OnTouchEvent(const TTouchEvent& aEvent);
+   virtual bool OnCreate(const void* aSavedState) final;
+   virtual void OnInitWindow(int32_t aWidth, int32_t aHeight) final;
+   virtual void OnStart() final;
+   virtual void OnResume() final;
+   virtual void OnIdle() final;
+   virtual void OnDrawFrame() final;
+   virtual void* OnSaveState() final;
+   virtual void OnPause() final;
+   virtual void OnStop() final;
+   virtual void OnDestroyWindow() final;
+   virtual void OnDestroy() final;
+   virtual bool OnBackKey() final;
+   virtual bool OnMenuKey() final;
+   virtual bool OnKeyDown(int32_t aKeyCode, int32_t aScanCode, int32_t aFlags) final;
+   virtual bool OnKeyUp(int32_t aKeyCode, int32_t aScanCode, int32_t aFlags) final;
+   virtual bool OnTouchEvent(const TTouchEvent& aEvent) final;
 
+   // IEngineControl implementation (see there for documentation)
+   virtual void Draw(TResourceFileId aTexture, int32_t x, int32_t y) final {
+      iGraphicsComponent->Draw(aTexture, x, y);
+   }
+   virtual void Draw(TResourceFileId aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight) final {
+      iGraphicsComponent->Draw(aTexture, x, y, aWidth, aHeight);
+   }
+   virtual void Draw(TResourceFileId aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight,
+                     int32_t aTexLeft, int32_t aTexTop, int32_t aTexRight, int32_t aTexBottom) final {
+      iGraphicsComponent->Draw(aTexture, x, y, aWidth, aHeight, aTexLeft, aTexTop, aTexRight, aTexBottom);
+   }
 private:
    void LoadData(TRequiredResources aRequiredResources);
 
