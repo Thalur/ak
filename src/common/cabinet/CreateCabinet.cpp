@@ -18,7 +18,7 @@ static const uint8_t kCompressed = 2;
 
 bool CompareEntries(const CCreateCabinet::TCreatedEntry& a1, const CCreateCabinet::TCreatedEntry& a2)
 {
-   return a1.iFilename <= a2.iFilename;
+   return a1.iFilename < a2.iFilename;
 }
 
 inline void AppendUnsigned(TFileData& aData, uint64_t aValue, TSize aBytes)
@@ -169,7 +169,7 @@ bool CCreateCabinet::WriteToDisk()
       LOG_ERROR("Unsupported cabinet version %u", iCabinetVersion);
       return false;
    }
-   std::sort(iEntries.begin(), iEntries.end(), CompareEntries);
+   std::stable_sort(iEntries.begin(), iEntries.end(), CompareEntries);
    TFileData header;
    iFile->Open();
    iFile->Clear();

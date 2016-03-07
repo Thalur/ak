@@ -85,7 +85,6 @@ TCabinetPtr CCabinet::Open(TFilePtr& aFile, int32_t aKey)
    TCabinetPtr cab = std::make_shared<CCabinet>(CCabinet(aFile, aKey));
    aFile->Open();
    if (cab->ReadHeader()) {
-      cab->PrintFileIndex();
       return cab;
    }
    aFile->Close();

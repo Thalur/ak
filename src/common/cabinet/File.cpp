@@ -41,7 +41,6 @@ std::string CFile::GetNextConfigLine(const std::string& aCommentSymbols)
    std::string line;
    while (!AtEOF()) {
       line = ReadLine();
-      LOG_VERBOSE("Input to %d: %s", (int)iPos, line.c_str());
       if (!line.empty()) { // ignore empty lines
          TSize pos = line.find_first_not_of(" \t");
          if (pos != std::string::npos) { // ignore whitespace-only lines
