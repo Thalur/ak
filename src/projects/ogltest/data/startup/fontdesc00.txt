@@ -1,7 +1,7 @@
 AKFONTDESC1
 % AK Font Description File for font "Dune 3D Large"
 %
-% Absolute coordinates and letter size for each character
+% Contains absolute coordinates and letter size for each character
 
 3 % Available variants of this font
 font00 % WHITE
