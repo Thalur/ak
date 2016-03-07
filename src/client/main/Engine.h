@@ -69,6 +69,8 @@ public:
    }
 private:
    void LoadData(TRequiredResources aRequiredResources);
+   bool InitCabinets(bool aAddInternalOnly);
+   TCabinetPtr OpenCabinet(const std::string& aFilename, bool aInternal);
 
    // Game engines
    TNativePtr iNativePtr;

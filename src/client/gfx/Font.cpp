@@ -14,6 +14,7 @@ namespace Client
 
 TFontPtr CFont::FromFile(CMemoryFile &aFile, CResourceManager &aResourceManager, CGraphicsComponent *aGraphics)
 {
+   LOG_METHOD();
    std::vector<std::string> variants = GetFontVariants(aFile);
    if (!variants.empty()) {
       std::vector<uint32_t> variantIds;
@@ -153,15 +154,15 @@ void CFont::Draw(const std::string &aLine, const int32_t x, const int32_t y, con
 void CFont::DrawLine(const char* const aChars, const TSize aStartIndex, const TSize aEndIndex,
                      const int32_t x, const int32_t y, const int32_t aVariant) const
 {
-   LOG_VERBOSE("%s (%d, %d) --> ImageId %d", aChars, aStartIndex, aEndIndex, iFontVariants[aVariant]);
+   //LOG_VERBOSE("%s (%d, %d) --> ImageId %d", aChars, aStartIndex, aEndIndex, iFontVariants[aVariant]);
    int32_t pos = x;
    for (TSize i = aStartIndex; i < aEndIndex; i++) {
       const TCharData data = GetCharData(aChars[i]);
       iGraphics->Draw(iFontVariants[aVariant], pos, y, data.iWidth*2, data.iHeight*2,
                       data.iX, data.iY, data.iX + data.iWidth, data.iY + data.iHeight);
       if (i == 0) {
-         LOG_DEBUG("Drawing char '%c' (%d) with parameters %u, %d, %d, %u, %u, %u, %u, %u, %u",
-                   aChars[i], (int)aChars[i], iFontVariants[aVariant], pos, y, data.iWidth, data.iHeight, data.iX, data.iY, data.iWidth, data.iHeight);
+         //LOG_DEBUG("Drawing char '%c' (%d) with parameters %u, %d, %d, %u, %u, %u, %u, %u, %u",
+         //          aChars[i], (int)aChars[i], iFontVariants[aVariant], pos, y, data.iWidth, data.iHeight, data.iX, data.iY, data.iWidth, data.iHeight);
       }
       pos += data.iWidth*2 - 1;
    }

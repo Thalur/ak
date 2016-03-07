@@ -22,22 +22,7 @@ bool CEngine::OnCreate(const void* aSavedState)
    LOG_PARAMS(aSavedState != nullptr ? "with saved state" : "NULL");
 
    // Open the required internal cabinets
-   const IAppInterface::TNames cabinetNames = iAppPtr->InternalCabinets();
-   std::vector<TCabinetPtr> cabinets;
-   for (const auto& fName : cabinetNames) {
-      TFilePtr file = iNativePtr->GetInternalFile(fName);
-      if (!file) {
-         return false;
-      }
-      const TCabinetPtr cabinet = CCabinet::Open(file);
-      if (!cabinet) {
-         LOG_ERROR("Could not open cabinet %s", fName.c_str());
-         return false;
-      }
-      cabinets.emplace_back(std::move(cabinet));
-   }
-   iCabinetManager.Init(cabinets, iResourceManager.GetFileList());
-   return true;
+   return InitCabinets(true);
 }
 
 void CEngine::OnInitWindow(int32_t aWidth, int32_t aHeight)
@@ -99,7 +84,12 @@ void CEngine::OnDrawFrame()
    IGameState& gameState = *iAppPtr->GameState();
    if (iLastState != &gameState) {
       // Check if we need to load new data
-      // ...
+      if (iLastState == nullptr) {
+         if (!InitCabinets(false)) {
+            iAppPtr->OnRequiredFilesMissing();
+            return;
+         }
+      }
 
       // no loading necessary - move to new state
       iLastState = &gameState;
@@ -225,6 +215,48 @@ void CEngine::LoadData(TRequiredResources aRequiredResources)
    // 4. Load text files
    const TFileList textFiles = iResourceManager.GetFileList(TRequiredResources(1), EFileType::TEXT);
    // ...
+}
+
+bool CEngine::InitCabinets(const bool aAddInternalOnly)
+{
+   LOG_METHOD();
+   std::vector<TCabinetPtr> cabinets;
+   for (const auto& fName : iAppPtr->InternalCabinets()) {
+      const TCabinetPtr cabinet = OpenCabinet(fName, true);
+      if (!cabinet) {
+         LOG_ERROR("Could not open internal cabinet %s", fName.c_str());
+         return false;
+      }
+      cabinets.emplace_back(std::move(cabinet));
+   }
+
+   if (!aAddInternalOnly) {
+      for (const auto& fName : iAppPtr->RequiredCabinets()) {
+         const TCabinetPtr cabinet = OpenCabinet(fName, false);
+         if (!cabinet) {
+            LOG_ERROR("Could not open required cabinet %s", fName.c_str());
+            return false;
+         }
+         cabinets.emplace_back(std::move(cabinet));
+      }
+      // ... (optional cabinets)
+   }
+   return iCabinetManager.Init(cabinets, aAddInternalOnly ? iResourceManager.GetStartupFileList()
+                                                          : iResourceManager.GetFileList());
+}
+
+TCabinetPtr CEngine::OpenCabinet(const std::string& aFilename, const bool aInternal)
+{
+   TFilePtr file;
+   if (aInternal) {
+      file = iNativePtr->GetInternalFile(aFilename);
+   } else {
+      file = iNativePtr->GetResourceFile(aFilename);
+   }
+   if (!file) {
+      return TCabinetPtr();
+   }
+   return CCabinet::Open(file);
 }
 
 } // namespace Client

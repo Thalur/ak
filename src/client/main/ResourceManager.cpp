@@ -107,6 +107,20 @@ std::vector<std::pair<TSize, std::string>> CResourceManager::GetFileList() const
    return result;
 }
 
+std::vector<std::pair<TSize, std::string>> CResourceManager::GetStartupFileList() const
+{
+   LOG_METHOD();
+   const TResourceCategory startupCategory = 0;
+   const auto it = iCategories.find(startupCategory);
+   std::vector<std::pair<TSize, std::string>> result;
+   for (const TResourceFileId id : it->second) {
+      const TResourceFile& file = iFiles[id];
+      LOG_VERBOSE("Startup entry: %d, %s", (int)std::get<0>(file), std::get<2>(file).c_str());
+      result.emplace_back(std::get<0>(file), std::get<2>(file));
+   }
+   return result;
+}
+
 TFileList CResourceManager::GetFileList(const TRequiredResources aCategories, const EFileType aFileType)
 {
    LOG_PARAMS("categories %s, type %d", aCategories.to_string().c_str(), aFileType);

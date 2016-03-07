@@ -76,6 +76,7 @@ public:
     * for all known resource files. This is used to build the cabinet file index.
     */
    std::vector<std::pair<TSize, std::string>> GetFileList() const;
+   std::vector<std::pair<TSize, std::string>> GetStartupFileList() const;
 
    /**
     * Returns the list of files (resource index and file name)

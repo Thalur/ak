@@ -18,7 +18,7 @@ COGLTest::TNames COGLTest::InternalCabinets()
  */
 COGLTest::TNames COGLTest::RequiredCabinets()
 {
-   const TNames names { "test.ak" };
+   const TNames names { "assets.ak" };
    return names;
 }
 
@@ -43,9 +43,6 @@ Client::TResourceFiles COGLTest::GetResourceFiles()
       // Startup files
       std::make_tuple(F_FONT_DUNE3DLARGE,       Type::FONT, "fontdesc00"),
       std::make_tuple(F_FONT_DUNE3DSMALL,       Type::FONT, "fontdesc01"),
-      std::make_tuple(F_FONT_DUNESMALLCAPS,     Type::FONT, "fontdesc02"),
-      std::make_tuple(F_FONT_DUNEBLACK,         Type::FONT, "fontdesc03"),
-      std::make_tuple(F_FONT_DUNEHOUSE,         Type::FONT, "fontdesc04"),
       std::make_tuple(F_STARTUP_LOADTEXT,       Type::GFX,  "startup00"),
       std::make_tuple(F_STARTUP_PROGRESS_EMPTY, Type::GFX,  "startup01"),
       std::make_tuple(F_STARTUP_PROGRESS_FULL,  Type::GFX,  "startup02"),
@@ -53,7 +50,19 @@ Client::TResourceFiles COGLTest::GetResourceFiles()
       std::make_tuple(F_STARTUP_SOUND,          Type::GFX,  "startup04"),
       std::make_tuple(F_STARTUP_DISABLED,       Type::GFX,  "startup05"),
       std::make_tuple(F_STARTUP_BACKGROUND,     Type::GFX,  "startup06"),
-      // Test files
+      std::make_tuple(F_DIALOG_BACK_SUNKEN,     Type::GFX,  "dialog00"),
+      std::make_tuple(F_DIALOG_BACK_OUTSTANDING,Type::GFX,  "dialog01"),
+      // Common files
+      std::make_tuple(F_FONT_DUNESMALLCAPS,     Type::FONT, "fontdesc02"),
+      std::make_tuple(F_FONT_DUNEBLACK,         Type::FONT, "fontdesc03"),
+      std::make_tuple(F_FONT_DUNEHOUSE,         Type::FONT, "fontdesc04"),
+      std::make_tuple(F_DIALOG_ARROW_UP,        Type::GFX,  "dialog02"),
+      std::make_tuple(F_DIALOG_ARROW_UP_PRESSED,Type::GFX,  "dialog03"),
+      std::make_tuple(F_DIALOG_ARROW_DOWN,      Type::GFX,  "dialog04"),
+      std::make_tuple(F_DIALOG_ARROW_DOWN_PRESSED,Type::GFX,"dialog05"),
+      std::make_tuple(F_DIALOG_SLIDER_BAR,      Type::GFX,  "dialog06"),
+      std::make_tuple(F_DIALOG_SLIDER,          Type::GFX,  "dialog07"),
+      // All other files files
       std::make_tuple(F_ALPHA320X200, Type::GFX,  "alpha320x200"),
       std::make_tuple(F_ALPHA32X32,   Type::GFX,  "alpha32x32"),
       std::make_tuple(F_ICON,         Type::GFX,  "icon"),
@@ -68,11 +77,14 @@ Client::TCategoryContent COGLTest::GetCategoryContent()
 {
    const Client::TCategoryContent categoryContent = {
       { CAT_STARTUP, { // Splash screen and loading progress
-         F_FONT_DUNE3DLARGE, F_FONT_DUNE3DSMALL, F_FONT_DUNESMALLCAPS, F_FONT_DUNEBLACK, F_FONT_DUNEHOUSE,
+         F_FONT_DUNE3DLARGE, F_FONT_DUNE3DSMALL, F_DIALOG_BACK_SUNKEN, F_DIALOG_BACK_OUTSTANDING,
          F_STARTUP_LOADTEXT, F_STARTUP_PROGRESS_EMPTY, F_STARTUP_PROGRESS_FULL,
          F_STARTUP_MUSIC, F_STARTUP_SOUND, F_STARTUP_DISABLED, F_STARTUP_BACKGROUND,
       } },
       { CAT_COMMON, { // For all categories
+         F_FONT_DUNESMALLCAPS, F_FONT_DUNEBLACK, F_FONT_DUNEHOUSE,
+         F_DIALOG_ARROW_UP, F_DIALOG_ARROW_UP_PRESSED, F_DIALOG_ARROW_DOWN, F_DIALOG_ARROW_DOWN_PRESSED,
+         F_DIALOG_SLIDER_BAR, F_DIALOG_SLIDER,
       } },
       { CAT_TEST, { // OGLTest just needs this one main data category
          F_ALPHA32X32, F_ALPHA320X200, F_ICON, F_INDEX32X32, F_INDEX64_48, F_INDEX184x112
