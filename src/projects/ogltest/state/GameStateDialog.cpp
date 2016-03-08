@@ -24,7 +24,8 @@ void CGameStateDialog::OnActivate(EDialogResult aDialogResult)
 
 void CGameStateDialog::OnDraw(int32_t aFps)
 {
-
+   std::string msg = "GameStateDialog";
+   iGame.Engine()->Text(F_FONT_DUNE3DLARGE, msg, iGame.Engine()->Width()/2, iGame.Engine()->Height()/2, TFontStyle(EHorizontal::CENTER, EVertical::CENTER));
 }
 
 bool CGameStateDialog::OnTick()

@@ -21,6 +21,7 @@ public:
     , iResourceManager(aAppPtr->GetResourceFiles(), aAppPtr->GetCategoryContent())
     , iCabinetManager()
     , iLastState(nullptr)
+    , iLoadState(ELoadState::INIT)
    {}
    virtual ~CEngine() {}
 
@@ -72,6 +73,10 @@ private:
    bool InitCabinets(bool aAddInternalOnly);
    TCabinetPtr OpenCabinet(const std::string& aFilename, bool aInternal);
 
+   enum class ELoadState {
+      DONE, INIT, LOAD
+   };
+
    // Game engines
    TNativePtr iNativePtr;
    TAppPtr iAppPtr;
@@ -80,6 +85,7 @@ private:
    std::unique_ptr<CGraphicsComponent> iGraphicsComponent;
 
    IGameState* iLastState; // to compare with current state, not used for accessing
+   ELoadState iLoadState;
 
    // Window state
    int32_t iWidth = 0;

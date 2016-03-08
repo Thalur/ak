@@ -80,20 +80,43 @@ void CEngine::OnDrawFrame()
 {
    if (!iAppPtr->GameState()) {
       LOG_ERROR("Draw() called without active game state");
+      return;
    }
    IGameState& gameState = *iAppPtr->GameState();
-   if (iLastState != &gameState) {
-      // Check if we need to load new data
-      if (iLastState == nullptr) {
-         if (!InitCabinets(false)) {
-            iAppPtr->OnRequiredFilesMissing();
-            return;
-         }
-      }
 
-      // no loading necessary - move to new state
+   // On the first frame, create the cabinet index
+   if (iLastState == nullptr) {
+      iGraphicsComponent->StartFrame();
+      iAppPtr->ShowLoadScreen(0);
+      iLoadState = ELoadState::INIT;
       iLastState = &gameState;
+      return;
+   }
+   if (iLoadState == ELoadState::INIT) {
+      if (!InitCabinets(false)) {
+         iAppPtr->OnRequiredFilesMissing();
+      }
+      iGraphicsComponent->StartFrame();
+      iAppPtr->ShowLoadScreen(0);
+      iLoadState = ELoadState::LOAD;
+      return;
+   }
+
+   // When a new game state gets activated, check if we need to load new resources
+   if (iLastState != &gameState) {
+      // ...
+      iLastState = &gameState;
+      iLoadState = ELoadState::LOAD;
+   }
+
+   // We need to load some data
+   if (iLoadState == ELoadState::LOAD) {
+      LoadData(gameState.GetRequiredResources());
+      iLoadState = ELoadState::DONE;
+      iGraphicsComponent->StartFrame();
+      iAppPtr->ShowLoadScreen(1);
       gameState.OnActivate(EDialogResult::NONE);
+      return;
    }
 
    const int64_t timeUs = CClock::GetCurrentTicksUs();
@@ -113,8 +136,6 @@ void CEngine::OnDrawFrame()
    frame++;
 
    iGraphicsComponent->StartFrame();
-
-   iAppPtr->ShowLoadScreen(0.5);
 
    gameState.OnDraw(fps);
 
