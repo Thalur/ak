@@ -46,7 +46,7 @@ public:
    virtual void OnActivate(EDialogResult aDialogResult) = 0;
 
    // Draw the current frame
-   virtual void OnDraw(int32_t aFps) = 0;
+   virtual void OnDraw() = 0;
 
    // Execute a tick event (usually right before drawing)
    // Returns true, if the tick counter should be reset (e.g. after loading data)

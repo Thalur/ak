@@ -64,11 +64,8 @@ void CEngine::OnIdle()
 
    // Execute ticks and schedule the next tick according to the set tick rate
    do {
-      const TGameStatePtr state = iAppPtr->GameState();
-      if (state) {
-         if (state->OnTick()) {
-            // ... (reset tick rate)
-         }
+      if (iAppPtr->Tick()) {
+         // ... (reset tick rate)
       }
       const int32_t tickRate = 60;
       const int64_t tickIntervalUs = (1000000 + tickRate/2) / tickRate;
@@ -86,8 +83,7 @@ void CEngine::OnDrawFrame()
 
    // On the first frame, create the cabinet index
    if (iLastState == nullptr) {
-      iGraphicsComponent->StartFrame();
-      iAppPtr->ShowLoadScreen(0);
+      ShowLoadScreen(0);
       iLoadState = ELoadState::INIT;
       iLastState = &gameState;
       return;
@@ -95,10 +91,11 @@ void CEngine::OnDrawFrame()
    if (iLoadState == ELoadState::INIT) {
       if (!InitCabinets(false)) {
          iAppPtr->OnRequiredFilesMissing();
+         iLoadState = ELoadState::DONE;
+      } else {
+         ShowLoadScreen(0);
+         iLoadState = ELoadState::LOAD;
       }
-      iGraphicsComponent->StartFrame();
-      iAppPtr->ShowLoadScreen(0);
-      iLoadState = ELoadState::LOAD;
       return;
    }
 
@@ -113,8 +110,7 @@ void CEngine::OnDrawFrame()
    if (iLoadState == ELoadState::LOAD) {
       LoadData(gameState.GetRequiredResources());
       iLoadState = ELoadState::DONE;
-      iGraphicsComponent->StartFrame();
-      iAppPtr->ShowLoadScreen(1);
+      ShowLoadScreen(1);
       gameState.OnActivate(EDialogResult::NONE);
       return;
    }
@@ -137,7 +133,7 @@ void CEngine::OnDrawFrame()
 
    iGraphicsComponent->StartFrame();
 
-   gameState.OnDraw(fps);
+   iAppPtr->Draw(fps);
 
    if (frame == 3) { // Record drawing duration once per second
       drawTimeUs = CClock::GetCurrentTicksUs() - timeUs;
@@ -225,16 +221,16 @@ void CEngine::LoadData(TRequiredResources aRequiredResources)
 {
    LOG_INFO("Loading resources for categories %s", aRequiredResources.to_string().c_str());
    // 1. Load fonts
-   const TFileList fontFiles = iResourceManager.GetFileList(TRequiredResources(1), EFileType::FONT);
+   const TFileList fontFiles = iResourceManager.GetFileList(aRequiredResources, EFileType::FONT);
    iGraphicsComponent->LoadFonts(iCabinetManager, fontFiles, iResourceManager);
    // 2. Load images
-   const TFileList gfxFiles = iResourceManager.GetFileList(TRequiredResources(1), EFileType::GFX);
+   const TFileList gfxFiles = iResourceManager.GetFileList(aRequiredResources, EFileType::GFX);
    iGraphicsComponent->LoadGraphics(iCabinetManager, gfxFiles);
    // 3. Load SFX
-   const TFileList sfxFiles = iResourceManager.GetFileList(TRequiredResources(1), EFileType::SFX);
+   const TFileList sfxFiles = iResourceManager.GetFileList(aRequiredResources, EFileType::SFX);
    // ...
    // 4. Load text files
-   const TFileList textFiles = iResourceManager.GetFileList(TRequiredResources(1), EFileType::TEXT);
+   const TFileList textFiles = iResourceManager.GetFileList(aRequiredResources, EFileType::TEXT);
    // ...
 }
 

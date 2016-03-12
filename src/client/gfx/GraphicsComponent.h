@@ -27,14 +27,14 @@ public:
    void LoadFonts(CCabManager& aCabinets, const TFileList& aFiles, CResourceManager &aResourceManager);
 
    // Most drawing methods are inline for performance reasons
-   void StartFrame()
+   void StartFrame() const
    {
-      glClearColor(0.0, 0.0, 0.0, 1);
+      glClearColor(0.2f, 0.2f, 0.2f, 1);
       glClear(GL_COLOR_BUFFER_BIT);
       iCurrentTexture = -1;
    }
 
-   void Draw(TResourceFileId aTexture, int32_t x, int32_t y)
+   void Draw(TResourceFileId aTexture, int32_t x, int32_t y) const
    {
       const CTexture* texture = GetTexture(aTexture);
       if (texture != nullptr) {
@@ -42,7 +42,7 @@ public:
       }
    }
 
-   void Draw(TResourceFileId aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight)
+   void Draw(TResourceFileId aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight) const
    {
       const CTexture* texture = GetTexture(aTexture);
       if (texture != nullptr) {
@@ -51,7 +51,7 @@ public:
    }
 
    void Draw(TResourceFileId aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight,
-             int32_t aTexLeft, int32_t aTexTop, int32_t aTexRight, int32_t aTexBottom)
+             int32_t aTexLeft, int32_t aTexTop, int32_t aTexRight, int32_t aTexBottom) const
    {
       const CTexture* texture = GetTexture(aTexture);
       if (texture != nullptr) {
@@ -60,7 +60,8 @@ public:
    }
 
    void DrawText(TResourceFileId aFont, const std::string& aLine, int32_t x, int32_t y, int32_t aWidth,
-                 int32_t aHeight, TFontStyle aStyle, uint32_t aVariant) {
+                 int32_t aHeight, TFontStyle aStyle, uint32_t aVariant) const
+   {
       auto it = iFonts.find(aFont);
       if (it != iFonts.end()) {
          it->second->Draw(aLine, x, y, aWidth, aHeight, aStyle, aVariant);
@@ -70,7 +71,7 @@ public:
    }
 
 private:
-   void DrawTexture(const CTexture& aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight)
+   void DrawTexture(const CTexture& aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight) const
    {
       BindTexture(aTexture);
 #ifdef AK_SYSTEM_ANDROID
@@ -81,7 +82,7 @@ private:
 #endif
    }
    void DrawTexture(const CTexture& aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight,
-                    int32_t aTexLeft, int32_t aTexTop, int32_t aTexRight, int32_t aTexBottom)
+                    int32_t aTexLeft, int32_t aTexTop, int32_t aTexRight, int32_t aTexBottom) const
    {
       BindTexture(aTexture);
 #ifdef AK_SYSTEM_ANDROID
@@ -96,7 +97,7 @@ private:
 #endif
    }
 
-   const CTexture* GetTexture(const TResourceFileId aTexture)
+   const CTexture* GetTexture(const TResourceFileId aTexture) const
    {
       auto texture = iTextures.find(aTexture);
       if (texture != iTextures.end()) {
@@ -104,7 +105,7 @@ private:
       }
       return nullptr;
    }
-   void BindTexture(const CTexture& aTexture)
+   void BindTexture(const CTexture& aTexture) const
    {
       if (iCurrentTexture != aTexture.ID()) {
          iCurrentTexture = aTexture.ID();
@@ -127,15 +128,15 @@ private:
       int32_t cropTop, int32_t cropRight, int32_t cropBottom, int32_t orgWidth, int32_t orgHeight);
    static void NativeBlitAndroid(int32_t x, int32_t y, int32_t aWidth, int32_t aHeight);
 #else
-   void NativeBlitPosix(float x, float y, float aWidth, float aHeight,
-                        float cropLeft, float cropTop, float cropRight, float cropBottom);
+   static void NativeBlitPosix(float x, float y, float aWidth, float aHeight,
+                               float cropLeft, float cropTop, float cropRight, float cropBottom);
 #endif
 
    // Drawing state
    int32_t iWidth;
    int32_t iHeight;
-   int32_t iCurrentTexture;
-   bool iBlending;
+   mutable int32_t iCurrentTexture;
+   mutable bool iBlending;
 
    // Resources state
    TRequiredResources iLoadedResources;

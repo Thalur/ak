@@ -23,7 +23,7 @@ public:
 
    // IGameState implementation
    virtual void OnActivate(EDialogResult aDialogResult);
-   virtual void OnDraw(int32_t aFps);
+   virtual void OnDraw();
    virtual bool OnTick();
    virtual Client::TRequiredResources GetRequiredResources() const { return iRequiredResources; }
    virtual void OnTouch(const TTouchEvent& aEvent);

@@ -72,6 +72,10 @@ private:
    void LoadData(TRequiredResources aRequiredResources);
    bool InitCabinets(bool aAddInternalOnly);
    TCabinetPtr OpenCabinet(const std::string& aFilename, bool aInternal);
+   void ShowLoadScreen(double aProgress) {
+      iGraphicsComponent->StartFrame();
+      iAppPtr->ShowLoadScreen(aProgress);
+   }
 
    enum class ELoadState {
       DONE, INIT, LOAD

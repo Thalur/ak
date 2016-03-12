@@ -5,6 +5,7 @@
 #define AK_FONT_H_INCLUDED
 
 #include "common/types.h"
+#include "common/log/log.h"
 #include <string>
 #include <memory>
 #include <vector>
@@ -53,11 +54,15 @@ public:
    static std::vector<std::string> GetFontVariants(CMemoryFile& aFile);
 
    void Draw(const std::string& aLine, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight,
-             TFontStyle aStyle, uint32_t aVariant) const;
+             TFontStyle aStyle, uint32_t aVariant) const {
+      DrawScaled(aLine, x, y, aWidth, aHeight, aStyle, 1, aVariant);
+   }
+   void DrawScaled(const std::string& aLine, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight,
+                   TFontStyle aStyle, int32_t aScale, uint32_t aVariant) const;
 
-   int32_t GetCharWidth(int32_t aChar) const
+   int32_t GetCharWidth(uint32_t aChar) const
    {
-      return GetCharData(aChar).iWidth;
+      return GetCharData(aChar).iWidth * iDefaultScaling;
    }
 private:
    struct TCharData {
@@ -67,24 +72,47 @@ private:
       uint16_t iHeight;
    };
    using TCharMap = std::map<uint32_t, TCharData>;
+   using TSymbols = std::vector<uint32_t>; // For UTF-8 support
 
-   CFont(CGraphicsComponent* aGraphicsComponent, std::vector<uint32_t>&& aFontVariants, TCharMap&& aChars)
+   CFont(CGraphicsComponent* aGraphicsComponent, std::vector<uint32_t>&& aFontVariants, TCharMap&& aChars,
+         uint32_t aDefaultChar, int16_t aDefaultScaling, int16_t aHorizontalDistance, int16_t aVerticalDistance)
     : iGraphics(aGraphicsComponent), iFontVariants(std::move(aFontVariants)), iChars(std::move(aChars))
+    , iDefaultChar(aDefaultChar), iDefaultScaling(aDefaultScaling)
+    , iHorizontalDistance(aHorizontalDistance), iVerticalDistance(aVerticalDistance)
    {}
 
-   void DrawLine(const char* aChars, TSize aStartIndex, TSize aEndIndex, int32_t x, int32_t y, int32_t aVariant) const;
+   CFont(const CFont&) = delete;
+   CFont& operator=(const CFont&) = delete;
+
+   static TCharData ReadCharData(CMemoryFile& aFile);
+   static TSymbols ParseUTF8String(const char* aChars, TSize length);
+
+   void DrawMultiline(const TSymbols aChars, TSize aLength, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight,
+                      TFontStyle aStyle, int32_t aVariant, int32_t aScale) const;
+
+   void DrawLine(const TSymbols aChars, TSize aStartIndex, TSize aEndIndex, int32_t x, int32_t y,
+                 int32_t aVariant, int32_t aScale) const;
 
    const TCharData& GetCharData(uint32_t aChar) const {
-      auto it = iChars.find(aChar);
+      const auto it = iChars.find(aChar);
       if (it != iChars.end()) {
          return it->second;
+      }
+      LOG_WARN("Char not found in font table: %u", aChar);
+      const auto def = iChars.find(iDefaultChar);
+      if (def != iChars.end()) {
+         return def->second;
       }
       return iChars.rbegin()->second;
    }
 
-   CGraphicsComponent* iGraphics;
-   std::vector<uint32_t> iFontVariants;
-   TCharMap iChars;
+   const CGraphicsComponent* iGraphics;
+   const std::vector<uint32_t> iFontVariants;
+   const TCharMap iChars;
+   const uint32_t iDefaultChar;
+   const int16_t iDefaultScaling;
+   const int16_t iHorizontalDistance;
+   const int16_t iVerticalDistance;
 };
 
 } // namespace Client

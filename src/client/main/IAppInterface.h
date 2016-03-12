@@ -63,6 +63,10 @@ public:
    virtual void OnRequiredFilesMissing() = 0;
 
    virtual void ShowLoadScreen(double aProgress) = 0;
+
+   virtual void Draw(int32_t aFps) = 0;
+
+   virtual bool Tick() = 0;
 };
 
 } // namespace Client

@@ -9,7 +9,12 @@ font07 % BLACK
 % Font Details
 32 % First character: SPACE
 96 % Number of characters: ASCII through 127
+127 % Default symbol for characters not in this font
 0 % Special characters outside this area
+
+2 % Default scaling
+1 % Horizontal distance between characters at default scaling level
+0 % Vertical distance between lines at default scaling level
 
 %----- Line 1
 

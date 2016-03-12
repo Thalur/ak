@@ -14,6 +14,8 @@ class COGLTest : public Client::IAppInterface, public IGameControl
 public:
    COGLTest();
    virtual ~COGLTest() {}
+   COGLTest(const COGLTest&) = delete;
+   COGLTest& operator=(const COGLTest&) = delete;
 
    // IAppInterface implementation
    virtual std::string AppName() final { return iAppName; }
@@ -22,9 +24,11 @@ public:
    virtual TNames OptionalCabinets() final;
    virtual Client::TResourceFiles GetResourceFiles() final;
    virtual Client::TCategoryContent GetCategoryContent() final;
-   virtual TGameStatePtr GameState() final;
+   virtual TGameStatePtr GameState() final { return iGameState; }
    virtual void OnRequiredFilesMissing() final;
    virtual void ShowLoadScreen(double aProgress) final;
+   virtual void Draw(int32_t aFps) final;
+   virtual bool Tick() final;
 
    // IGameControl implementation
    virtual void SwitchGameState(const TGameStatePtr& aNewState) final;
