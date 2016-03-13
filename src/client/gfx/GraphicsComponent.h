@@ -60,11 +60,11 @@ public:
    }
 
    void DrawText(TResourceFileId aFont, const std::string& aLine, int32_t x, int32_t y, int32_t aWidth,
-                 int32_t aHeight, TFontStyle aStyle, uint32_t aVariant) const
+                 int32_t aHeight, TFontStyle aStyle, int32_t aScale, uint32_t aVariant) const
    {
       auto it = iFonts.find(aFont);
       if (it != iFonts.end()) {
-         it->second->Draw(aLine, x, y, aWidth, aHeight, aStyle, aVariant);
+         it->second->DrawScaled(aLine, x, y, aWidth, aHeight, aStyle, aScale, aVariant);
       } else {
          LOG_ERROR("Invalid font %d", aFont);
       }

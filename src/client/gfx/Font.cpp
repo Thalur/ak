@@ -37,7 +37,7 @@ TFontPtr CFont::FromFile(CMemoryFile &aFile, CResourceManager &aResourceManager,
          const int32_t defaultSymbol = std::atoi(defaultSymbolLine.c_str());
          ASSERT(defaultSymbol >= 0);
          const int32_t numExtra = std::atoi(numExtraLine.c_str());
-         ASSERT(numExtra == 0);
+         ASSERT(numExtra >= 0);
          const int32_t defaultScaling = std::atoi(defaultScalingLine.c_str());
          ASSERT(defaultScaling > 0 && defaultScaling <= 100);
          const int32_t horizontalSpace = std::atoi(horizontalSpaceLine.c_str());
@@ -198,13 +198,13 @@ inline int32_t GetXPos(const EHorizontal aHorizontal, const int32_t x, const int
 
 void CFont::DrawScaled(const std::string &aLine, const int32_t x, const int32_t y,
                        const int32_t aWidth, const int32_t aHeight, const TFontStyle aStyle,
-                       int32_t aScale, const uint32_t aVariant) const
+                       const int32_t aScale, const uint32_t aVariant) const
 {
    const TSymbols chars = ParseUTF8String(aLine.c_str(), aLine.length());
    const TSize len = chars.size();
    if (len == 0) return;
    ASSERT(aVariant < iFontVariants.size());
-   aScale *= iDefaultScaling;
+   const int32_t scale = aScale * iDefaultScaling;
 
    if (aStyle.iLines == ELines::MULTILINE) {
       DrawMultiline(chars, len, x, y, aWidth, aHeight, aStyle, aVariant, aScale);
@@ -213,13 +213,13 @@ void CFont::DrawScaled(const std::string &aLine, const int32_t x, const int32_t 
       int32_t overallHeight = 0;
       for (TSize i = 0; i < len; i++) {
          const TCharData& data = GetCharData(chars[i]);
-         overallLength += data.iWidth * aScale + iHorizontalDistance;
-         if (data.iHeight * aScale + iVerticalDistance > overallHeight) {
-            overallHeight = data.iHeight * aScale + iVerticalDistance;
+         overallLength += data.iWidth * scale + iHorizontalDistance * aScale;
+         if (data.iHeight * scale + iVerticalDistance * aScale > overallHeight) {
+            overallHeight = data.iHeight * scale + iVerticalDistance * aScale;
          }
       }
-      overallLength -= iHorizontalDistance;
-      overallHeight -= iVerticalDistance;
+      overallLength -= iHorizontalDistance * aScale;
+      overallHeight -= iVerticalDistance * aScale;
 
       switch (aStyle.iLines) {
       case ELines::NOCLIP:
@@ -231,11 +231,11 @@ void CFont::DrawScaled(const std::string &aLine, const int32_t x, const int32_t 
          TSize startIndex = 0, endIndex = len;
          while ((overallLength > aWidth) && (startIndex < endIndex)) {
             if (aStyle.iHorizontal != EHorizontal::RIGHT) {
-               overallLength -= GetCharData(chars[--endIndex]).iWidth * aScale + iHorizontalDistance;
+               overallLength -= GetCharData(chars[--endIndex]).iWidth * scale + iHorizontalDistance * aScale;
             }
             if (aStyle.iHorizontal == EHorizontal::LEFT || ((aStyle.iHorizontal == EHorizontal::CENTER)
                 && (startIndex < endIndex) && (overallLength > aWidth))) {
-               overallLength -= GetCharData(chars[startIndex++]).iWidth * aScale + iHorizontalDistance;
+               overallLength -= GetCharData(chars[startIndex++]).iWidth * scale + iHorizontalDistance * aScale;
             }
          }
          if (startIndex < endIndex) {
@@ -247,11 +247,11 @@ void CFont::DrawScaled(const std::string &aLine, const int32_t x, const int32_t 
       case ELines::ELLIPSIS:
          TSize endIndex = len;
          int32_t numEll = 0;
-         const int32_t ellLength = GetCharData('.').iWidth * aScale + iHorizontalDistance;
+         const int32_t ellLength = GetCharData('.').iWidth * scale + iHorizontalDistance * aScale;
          if (overallLength > aWidth) {
             numEll = 3;
             while (overallLength + numEll * ellLength > aWidth && endIndex > 0) {
-               overallLength -= GetCharData(chars[--endIndex]).iWidth * aScale + iHorizontalDistance;
+               overallLength -= GetCharData(chars[--endIndex]).iWidth * scale + iHorizontalDistance * aScale;
             }
             if ((endIndex == 0) && (numEll * ellLength - 1 > aWidth)) {
                overallLength = 0;
@@ -264,7 +264,8 @@ void CFont::DrawScaled(const std::string &aLine, const int32_t x, const int32_t 
             DrawLine(chars, 0, endIndex, xPos, yPos, aVariant, aScale);
          }
          if (numEll > 0) {
-            DrawLine(ParseUTF8String("...", numEll), 0, numEll, xPos + overallLength + iHorizontalDistance, yPos, aVariant, aScale);
+            DrawLine(ParseUTF8String("...", numEll), 0, numEll,
+                     xPos + overallLength + iHorizontalDistance * aScale, yPos, aVariant, aScale);
          }
          break;
       }
@@ -276,14 +277,15 @@ void CFont::DrawMultiline(const TSymbols aChars, const TSize aLength, const int3
                           const int32_t aVariant, const int32_t aScale) const
 {
    //LOG_PARAMS("'%s' (%d) x:%d y:%d w:%d h:%d scale: %d", aChars, (int)aLength, x, y, aWidth, aHeight, aScale);
+   const int32_t scale = iDefaultScaling * aScale;
    TSize lineStart = 0, pos = 0, lastWhitespace = 0;
    int32_t overallHeight = 0, lineHeight = 0, lineWidth = 0, widthToLastWhitespace = 0;
    int32_t nextCharWidth = 0, nextCharHeight = 0;
    std::vector<std::tuple<TSize, TSize, int32_t, int32_t>> lines; // <start index, end index, width, height>
    while (pos <= aLength) {
       if (pos < aLength) { // Get dimensions for the next character
-         nextCharWidth = GetCharData(aChars[pos]).iWidth * aScale + iHorizontalDistance;
-         nextCharHeight = GetCharData(aChars[pos]).iHeight * aScale + iVerticalDistance;
+         nextCharWidth = GetCharData(aChars[pos]).iWidth * scale + iHorizontalDistance * aScale;
+         nextCharHeight = GetCharData(aChars[pos]).iHeight * scale + iVerticalDistance * aScale;
       }
       if ((pos == aLength) || (aChars[pos] == ' ')) { // can break here
          lastWhitespace = pos;
@@ -331,12 +333,13 @@ void CFont::DrawMultiline(const TSymbols aChars, const TSize aLength, const int3
 void CFont::DrawLine(const TSymbols aChars, const TSize aStartIndex, const TSize aEndIndex,
                      const int32_t x, const int32_t y, const int32_t aVariant, const int32_t aScale) const
 {
+   const int32_t scale = iDefaultScaling * aScale;
    int32_t pos = x;
    for (TSize i = aStartIndex; i < aEndIndex; i++) {
       const TCharData data = GetCharData(aChars[i]);
-      iGraphics->Draw(iFontVariants[aVariant], pos, y, data.iWidth * aScale, data.iHeight * aScale,
+      iGraphics->Draw(iFontVariants[aVariant], pos, y, data.iWidth * scale, data.iHeight * scale,
                       data.iX, data.iY, data.iX + data.iWidth, data.iY + data.iHeight);
-      pos += data.iWidth * aScale + iHorizontalDistance;
+      pos += data.iWidth * scale + iHorizontalDistance * aScale;
    }
 }
 

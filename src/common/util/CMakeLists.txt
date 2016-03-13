@@ -4,7 +4,10 @@ SET (COMMON_UTIL_FILES
     clock.cpp
     clock.h
     typeconversions.cpp
-    typeconversions.h)
+    typeconversions.h
+    UTF8String.cpp
+    UTF8String.h
+)
 
 IF ("${AK_TARGET}" STREQUAL "WIN64")
 SET (COMMON_UTIL_FILES ${COMMON_UTIL_FILES}
