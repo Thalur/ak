@@ -18,3 +18,8 @@ SET (COMMON_UTIL_FILES ${COMMON_UTIL_FILES}
 ENDIF ()
 
 add_library(Common.Util ${COMMON_UTIL_FILES})
+
+
+add_executable(Common.Util.Test
+    TestUTF8String.cpp)
+target_link_libraries(Common.Util.Test Common.Log Common.Util)
