@@ -3,13 +3,14 @@
  */
 #include "client/main/ResourceManager.h"
 #include "common/log/log.h"
+#include <algorithm>
 
 namespace Client {
 
-std::list<TResourceFileId> CResourceManager::GetListForResource(const TRequiredResources aCategories)
+std::vector<TResourceFileId> CResourceManager::GetListForResource(const TRequiredResources aCategories)
 {
    LOG_METHOD();
-   std::list<TResourceFileId> result;
+   std::vector<TResourceFileId> result;
    for (TResourceCategory cat = 0; cat < aCategories.size(); cat++) {
       if (aCategories[cat]) {
          if (!iCategoryCached[cat]) {
@@ -17,11 +18,11 @@ std::list<TResourceFileId> CResourceManager::GetListForResource(const TRequiredR
          }
          const std::vector<TResourceFileId>& files = iCategories[cat];
          LOG_DEBUG("Found %d files in category %u", files.size(), cat);
-         result.insert(result.begin(), files.begin(), files.end());
+         result.insert(result.end(), files.begin(), files.end());
       }
    }
-   result.sort();
-   result.unique();
+   std::sort(result.begin(), result.end());
+   std::unique(result.begin(), result.end());
    return result;
 }
 
@@ -56,11 +57,11 @@ void CResourceManager::CacheCategory(const TResourceCategory aCategory)
 
 bool CResourceManager::IsResourceSubset(const TRequiredResources aSubset, const TRequiredResources aSuperset)
 {
-   const std::list<TResourceFileId> subset = GetListForResource(aSubset);
+   const std::vector<TResourceFileId> subset = GetListForResource(aSubset);
    if (subset.empty()) {
       return true;
    }
-   const std::list<TResourceFileId> superset = GetListForResource(aSuperset);
+   const std::vector<TResourceFileId> superset = GetListForResource(aSuperset);
    auto subEnd = subset.end();
    auto superEnd = superset.end();
    for (auto subIt = subset.begin(), superIt = superset.begin(); superIt != superEnd ; ) {
@@ -124,7 +125,7 @@ std::vector<std::pair<TSize, std::string>> CResourceManager::GetStartupFileList(
 TFileList CResourceManager::GetFileList(const TRequiredResources aCategories, const EFileType aFileType)
 {
    LOG_PARAMS("categories %s, type %d", aCategories.to_string().c_str(), aFileType);
-   const std::list<TResourceFileId> ids = GetListForResource(aCategories);
+   const std::vector<TResourceFileId> ids = GetListForResource(aCategories);
    TFileList result;
    for (const TResourceFileId id : ids) {
       const TResourceFile& file = iFiles[id];

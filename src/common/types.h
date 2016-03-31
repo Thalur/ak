@@ -9,6 +9,11 @@
 #include <cstddef>
 #include <memory> // std::unique_ptr
 
+// Globally define that all strings will be in UTF-8 format
+#include "common/util/UTF8String.h"
+using TString = utf8::CStringContainer;
+using TStringIt = utf8::CIterator;
+
 #if defined(AK_SYSTEM_WINDOWS)
 #define AK_PLATFORM_NAME "Windows"
 #define constexpr

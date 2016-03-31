@@ -4,8 +4,8 @@
 #ifndef AK_UTF8STRING_H_INCLUDED
 #define AK_UTF8STRING_H_INCLUDED
 
-#include <common/types.h>
 #include <string>
+#include <cstdint>
 
 
 namespace utf8
@@ -18,36 +18,73 @@ namespace utf8
 class CIterator
  //: public std::iterator<std::random_access_iterator_tag, uint32_t>
 {
+   using TSize = std::size_t;
 public:
    CIterator()
-      : iString(nullptr), iLength(0), iStart(0), iPos(iStart) {}
-   CIterator(const std::string& aSrc)
-      : iString(aSrc.c_str()), iLength(aSrc.length()), iStart(GetStartPos()), iPos(iStart) {}
-   CIterator(const char* aSrc)
-      : iString(aSrc), iLength(std::strlen(aSrc)), iStart(GetStartPos()), iPos(iStart) {}
-   CIterator(const char* aSrc, TSize aLength)
-      : iString(aSrc), iLength(aLength), iStart(GetStartPos()), iPos(iStart) {}
-   CIterator(const CIterator& aSrc)
-      : iString(aSrc.iString), iLength(aSrc.iLength), iStart(aSrc.iStart), iPos(aSrc.iPos) {}
-   CIterator(CIterator&& aSrc)
-      : iString(aSrc.iString), iLength(aSrc.iLength), iStart(aSrc.iStart), iPos(aSrc.iPos) {}
+      : iString(nullptr), iByteEnd(0) {}
+   CIterator(const std::string& aString)
+      : iString(aString.c_str()), iByteEnd(aString.length()), iByteStart(GetStartPos()), iBytePos(iByteStart) {}
+   CIterator(const std::string& aString, TSize aStart, TSize aEnd)
+      : iString(aString.c_str()), iByteEnd(aEnd), iByteStart(aStart), iBytePos(iByteStart) {}
+   CIterator(const char* aString)
+      : iString(aString), iByteEnd(std::strlen(aString)), iByteStart(GetStartPos()), iBytePos(iByteStart) {}
+   CIterator(const char* aString, TSize aLength)
+      : iString(aString), iByteEnd(aLength), iByteStart(GetStartPos()), iBytePos(iByteStart) {}
+   CIterator(const char* aString, TSize aStart, TSize aEnd)
+      : iString(aString), iByteEnd(aEnd), iByteStart(aStart), iBytePos(aStart) {}
+   CIterator(const CIterator& aSrc) // copy constructor
+      : iString(aSrc.iString), iByteEnd(aSrc.iByteEnd), iByteStart(aSrc.iByteStart)
+      , iBytePos(aSrc.iBytePos), iCharPos(aSrc.iCharPos), iCharLength(aSrc.iCharLength) {}
+   CIterator(CIterator&& aSrc) // move constructor
+      : iString(aSrc.iString), iByteEnd(aSrc.iByteEnd), iByteStart(aSrc.iByteStart)
+      , iBytePos(aSrc.iBytePos), iCharPos(aSrc.iCharPos), iCharLength(aSrc.iCharLength) {}
 
-   CIterator& operator=(const CIterator aSrc) {
+   CIterator& operator=(const CIterator& aSrc) { // copy assignment
       iString = aSrc.iString;
-      iLength = aSrc.iLength;
-      iStart = aSrc.iStart;
-      iPos = aSrc.iPos;
+      iByteEnd = aSrc.iByteEnd;
+      iByteStart = aSrc.iByteStart;
+      iBytePos = aSrc.iBytePos;
+      iCharPos = aSrc.iCharPos;
+      iCharLength = aSrc.iCharLength;
       return *this;
    }
 
-   operator bool() const { return iPos >= iStart && iPos < iLength; } // is iterator in a valid position
+   operator bool() const { // is iterator in a valid position
+      return iBytePos >= iByteStart && iBytePos < iByteEnd;
+   }
+   bool rvalid() const { // backwards iterator position valid
+      return iBytePos > iByteStart && iBytePos <= iByteEnd;
+   }
    uint32_t operator*() const; // "dereference": get character at current position
-   int32_t length() const { return end() - begin(); }
-   void reset() { iPos = iStart; }
+   TSize length() const { // determine the number of characters in O(n)
+      if (iCharLength != std::string::npos) {
+         return iCharLength;
+      } else {
+         return CalculateCharLength();
+      }
+   }
+   TSize pos() const { // get current character offset
+      if (iCharPos != std::string::npos) {
+         return iCharPos;
+      } else {
+         iCharPos = GetCharDistance(iString, iByteEnd, iByteStart, iBytePos);
+         return iCharPos;
+      }
+   }
+   TSize bytePos() const { return iBytePos; } // get current position in bytes
+
+   CIterator& reset() { // reset iterator position
+      iBytePos = iByteStart;
+      iCharPos = 0;
+      return *this;
+   }
 
    CIterator& operator++() { // preincrement
-      while (iPos < iLength) {
-         if ((iString[++iPos] & 0xC0) != 0x80) break;
+      while (iBytePos < iByteEnd) {
+         if ((iString[++iBytePos] & 0xC0) != 0x80) {
+            iCharPos++;
+            break;
+         }
       }
       return *this;
    }
@@ -57,8 +94,13 @@ public:
       return tmp;
    }
    CIterator& operator--() { // predecrement
-      while (iPos > iStart) {
-         if ((iString[--iPos] & 0xC0) != 0x80) break;
+      while (iBytePos > iByteStart) {
+         if ((iString[--iBytePos] & 0xC0) != 0x80) {
+            if (iCharPos != std::string::npos) {
+               iCharPos--;
+            }
+            break;
+         }
       }
       return *this;
    }
@@ -92,13 +134,13 @@ public:
       return (*(*this + aOffset));
    }
    bool operator==(const CIterator& aRight) const { // test for iterator equality
-      return (this->iPos == aRight.iPos);
+      return (this->iBytePos == aRight.iBytePos);
    }
    bool operator!=(const CIterator& aRight) const { // test for iterator inequality
       return (!(*this == aRight));
    }
    bool operator<(const CIterator& aRight) const { // test if this < aRight
-      return (this->iPos < aRight.iPos);
+      return (this->iBytePos < aRight.iBytePos);
    }
    bool operator>(const CIterator& aRight) const { // test if this > aRight
       return (aRight < *this);
@@ -110,29 +152,76 @@ public:
       return (!(*this < aRight));
    }
 
-   CIterator begin() const {
-      CIterator tmp { *this };
-      tmp.iPos = tmp.iStart;
-      return tmp;
-   }
-   CIterator end() const {
-      CIterator tmp { *this };
-      tmp.iPos = tmp.iLength;
-      return tmp;
-   }
-
 private:
    TSize GetStartPos() const { // Skip UTF-8 BOM if present at the beginning of the string
-      if ((iLength >= 3) && (iString[0] == 0xEF) && (iString[1] == 0xBB) && (iString[2] == 0xBF)) {
+      if ((iByteEnd >= 3) && (iString[0] == 0xEF) && (iString[1] == 0xBB) && (iString[2] == 0xBF)) {
          return 3;
       }
       return 0;
    }
+   TSize CalculateCharLength() const {
+      iCharLength = GetCharDistance(iString, iByteEnd, iByteStart, iByteEnd);
+      return iCharLength;
+   }
+   static TSize GetCharDistance(const char* aString, TSize aEnd, TSize aPos1, TSize aPos2);
 
    const char* iString;
-   TSize iLength;
+   TSize iByteEnd;
+   TSize iByteStart = 0;
+   TSize iBytePos = 0;
+   mutable TSize iCharPos = 0; // can use lazy initialization for end iterators
+   mutable TSize iCharLength = std::string::npos; // lazily initialized
+
+   friend class CStringContainer;
+};
+
+
+class CStringContainer
+{
+   using TSize = std::size_t;
+public:
+   CStringContainer(const std::string& aString)
+      : iString(aString.c_str()), iStart(0), iEnd(aString.length()) {}
+   CStringContainer(const std::string& aString, TSize aLength)
+      : iString(aString.c_str()), iStart(0), iEnd(aLength) {}
+   CStringContainer(const std::string& aString, TSize aStart, TSize aEnd)
+      : iString(aString.c_str()), iStart(aStart), iEnd(aEnd) {}
+   CStringContainer(const char* aString)
+      : iString(aString), iStart(0), iEnd(std::strlen(aString)) {}
+   CStringContainer(const char* aString, TSize aLength)
+      : iString(aString), iStart(0), iEnd(aLength) {}
+   CStringContainer(const char* aString, TSize aStart, TSize aEnd)
+      : iString(aString), iStart(aStart), iEnd(aEnd) {}
+   CStringContainer(const CStringContainer& aString, TSize aStart, TSize aEnd)
+      : iString(aString.iString), iStart(aString.iStart + aStart), iEnd(aEnd) {}
+   CStringContainer(const CStringContainer& aSrc) // copy constructor
+      : iString(aSrc.iString), iStart(aSrc.iStart), iEnd(aSrc.iEnd) {}
+   CStringContainer(CStringContainer&& aSrc) // move constructor
+      : iString(aSrc.iString), iStart(aSrc.iStart), iEnd(aSrc.iEnd) {}
+
+   CStringContainer& operator=(const CStringContainer& aSrc) { // copy assignment
+      iString = aSrc.iString;
+      iStart = aSrc.iStart;
+      iEnd = aSrc.iEnd;
+      return *this;
+   }
+
+   CIterator begin() const {
+      return CIterator { iString, iStart, iEnd };
+   }
+   CIterator end() const {
+      CIterator tmp { iString, iStart, iEnd };
+      tmp.iBytePos = iEnd;
+      tmp.iCharPos = std::string::npos; // for lazy initialization
+      return tmp;
+   }
+   const char* c_str() const { return iString; }
+   TSize size() const { return iEnd - iStart; }
+
+private:
+   const char* iString;
    TSize iStart;
-   TSize iPos;
+   TSize iEnd;
 };
 
 } // namespace utf8

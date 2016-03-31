@@ -1,5 +1,13 @@
 /**
+ * Resource management definitions and types.
  *
+ * Loading resources happens at 5 different stages in the application lifecycle:
+ * 1. Files for the initial splash screen (usually only images, from internal).
+ * 2. Files necessary to show the extended splash screen, e.g. loading animations,
+ *    and files used in error situations like missing required assets (from internal).
+ * 3. Data used for the initial / current game state, loaded while load screen shows.
+ * 4. Data for other game states, can be loaded in the background.
+ * 5. Lazily loaded data, only loaded when the resource is actually used.
  */
 #ifndef AK_RESOURCE_MANAGER_H_INCLUDED
 #define AK_RESOURCE_MANAGER_H_INCLUDED
@@ -9,7 +17,7 @@
 #include <string>
 #include <map>
 #include <bitset>
-#include <list>
+
 
 namespace Client
 {
@@ -94,7 +102,7 @@ public:
    bool IsResourceSubset(TRequiredResources aSubset, TRequiredResources aSuperset);
 
 private:
-   std::list<TResourceFileId> GetListForResource(TRequiredResources aCategories);
+   std::vector<TResourceFileId> GetListForResource(TRequiredResources aCategories);
    std::pair<bool, TSize> FindResourceId(const std::string& aResource);
 
    /**

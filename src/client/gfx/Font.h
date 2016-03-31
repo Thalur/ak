@@ -6,7 +6,6 @@
 
 #include "common/types.h"
 #include "common/log/log.h"
-#include <string>
 #include <memory>
 #include <vector>
 #include <map>
@@ -72,7 +71,7 @@ private:
       uint16_t iHeight;
    };
    using TCharMap = std::map<uint32_t, TCharData>;
-   using TSymbols = std::vector<uint32_t>; // For UTF-8 support
+   //using TSymbols = std::vector<uint32_t>; // For UTF-8 support
 
    CFont(CGraphicsComponent* aGraphicsComponent, std::vector<uint32_t>&& aFontVariants, TCharMap&& aChars,
          uint32_t aDefaultChar, int16_t aDefaultScaling, int16_t aHorizontalDistance, int16_t aVerticalDistance)
@@ -85,13 +84,12 @@ private:
    CFont& operator=(const CFont&) = delete;
 
    static TCharData ReadCharData(CMemoryFile& aFile);
-   static TSymbols ParseUTF8String(const char* aChars, TSize length);
+   //static TSymbols ParseUTF8String(const char* aChars, TSize length);
 
-   void DrawMultiline(const TSymbols aChars, TSize aLength, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight,
+   void DrawMultiline(TString aText, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight,
                       TFontStyle aStyle, int32_t aVariant, int32_t aScale) const;
 
-   void DrawLine(const TSymbols aChars, TSize aStartIndex, TSize aEndIndex, int32_t x, int32_t y,
-                 int32_t aVariant, int32_t aScale) const;
+   void DrawLine(TString aText, int32_t x, int32_t y, int32_t aVariant, int32_t aScale) const;
 
    const TCharData& GetCharData(uint32_t aChar) const {
       const auto it = iChars.find(aChar);

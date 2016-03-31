@@ -3,6 +3,7 @@
  */
 #include "UTF8String.h"
 
+using TString = utf8::CStringContainer;
 using TStringIt = utf8::CIterator;
 
 void main()
@@ -15,7 +16,7 @@ void main()
    }
    printf(" (Length: %d)\n",it.length());
    it.reset();
-   for (auto c : TStringIt("Hallo André (not è or ê)")) {
+   for (auto c : TString("Hallo André (not è or ê)")) {
       printf("%u ", c);
    }
    printf("\n");
