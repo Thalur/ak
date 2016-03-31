@@ -8,6 +8,7 @@
 #include "common/log/log.h"
 #include <tuple>
 #include <limits>
+#include <cstdlib>
 
 
 namespace Client
@@ -56,7 +57,7 @@ TFontPtr CFont::FromFile(CMemoryFile &aFile, CResourceManager &aResourceManager,
             ASSERT(chars.find(charId) == chars.end());
             chars[charId] = ReadCharData(aFile);
          }
-         ASSERT(numChars + numExtra == chars.size());
+         ASSERT(numChars + numExtra == static_cast<int32_t>(chars.size()));
          return TFontPtr(new CFont(aGraphics, std::move(variantIds), std::move(chars),
                                    defaultSymbol, static_cast<int16_t>(defaultScaling),
                                    static_cast<int16_t>(horizontalSpace),
@@ -182,6 +183,9 @@ void CFont::DrawScaled(const std::string &aLine, const int32_t x, const int32_t 
       overallHeight -= iVerticalDistance * aScale;
 
       switch (aStyle.iLines) {
+      case ELines::MULTILINE:
+         FAIL();
+         break;
       case ELines::NOCLIP: // Just draw the whole string without any checks
          DrawLine(text, GetXPos(aStyle.iHorizontal, x, aWidth, overallLength),
                   GetYPos(aStyle.iVertical, y, aHeight, overallHeight), aVariant, aScale);

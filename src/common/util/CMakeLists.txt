@@ -20,6 +20,9 @@ ENDIF ()
 add_library(Common.Util ${COMMON_UTIL_FILES})
 
 
+IF ("${AK_TARGET}" STREQUAL "WIN64" OR "${AK_TARGET}" STREQUAL "LINUX" OR "${AK_TARGET}" STREQUAL "OSX")
 add_executable(Common.Util.Test
     TestUTF8String.cpp)
-target_link_libraries(Common.Util.Test Common.Log Common.Util)
+target_link_libraries(Common.Util.Test Common.Util Common.Log)
+ENDIF ()
+

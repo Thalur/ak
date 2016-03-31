@@ -5,6 +5,7 @@
 #define AK_UTF8STRING_H_INCLUDED
 
 #include <string>
+#include <cstring>
 #include <cstdint>
 
 
@@ -154,7 +155,8 @@ public:
 
 private:
    TSize GetStartPos() const { // Skip UTF-8 BOM if present at the beginning of the string
-      if ((iByteEnd >= 3) && (iString[0] == 0xEF) && (iString[1] == 0xBB) && (iString[2] == 0xBF)) {
+      if ((iByteEnd >= 3) && (static_cast<uint8_t>(iString[0]) == 0xEF) && 
+          (static_cast<uint8_t>(iString[1]) == 0xBB) && (static_cast<uint8_t>(iString[2]) == 0xBF)) {
          return 3;
       }
       return 0;

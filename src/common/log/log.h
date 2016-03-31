@@ -55,12 +55,14 @@ struct CMethodLogger
 #define LOG_METHOD()
 #define LOG_PARAMS(s, ...)
 #define ASSERT(x)
+#define FAIL()
 #else
 #define LOG_DEBUG(s, ...) NLogging::LogAppend(ELogLevel::EDEBUG, (__FILE__), (__FUNCTION__), s, (__LINE__), ##__VA_ARGS__)
 #define LOG_VERBOSE(s, ...) NLogging::LogAppend(ELogLevel::EVERBOSE, (__FILE__), (__FUNCTION__), s, (__LINE__), ##__VA_ARGS__)
 #define LOG_METHOD() NLogging::CMethodLogger _method_logger_((__FILE__), (__FUNCTION__), (__LINE__))
 #define LOG_PARAMS(s, ...) NLogging::CMethodLogger _method_logger_((__FILE__), (__FUNCTION__), s, (__LINE__), ##__VA_ARGS__)
 #define ASSERT(x) { if (!(x)) LOG_ERROR("ASSERTION FAILURE: %s", #x); }
+#define FAIL() { LOG_ERROR("ASSERTION FAILURE"); }
 #endif
 
 

@@ -46,7 +46,7 @@ std::string GetString(const TFileData& aData, TSize aPosition, TSize aMaxSize, T
 {
    if (2 <= aMaxSize) {
       uint16_t size = GetUnsigned<uint16_t>(aData, aPosition, 2);
-      if (size+2 <= aMaxSize) {
+      if (static_cast<TSize>(size)+2 <= aMaxSize) {
          aResultPosition = aPosition + 2 + size;
          if (size > 0) {
             return std::string(&aData[aPosition+2], size);
