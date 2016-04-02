@@ -67,6 +67,7 @@ class project_ogltest:
           if call(cmd, shell=True) != 0:
             return False
     build.copy_files("../../../../src/projects/ogltest/data/*.ak", binDir)
+    print "Copying ../../../../src/projects/ogltest/data/*.ak to " + binDir
     return True
 
   def post_build_actions_win(self, binDir):
@@ -81,6 +82,7 @@ class project_ogltest:
   def post_build_actions_linux(self, binDir):
     shutil.copy2("projects/ogltest/OGLtest", binDir)
     build.copy_files("*.ak", binDir)
+    print "Copied .ak files from . to " + binDir
     os.remove(os.path.join(binDir, "startup.ak"))
     return True
 

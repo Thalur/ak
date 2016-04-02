@@ -151,4 +151,15 @@ TResourceFileId CResourceManager::GetResourceId(const std::string& aResource)
    return id;
 }
 
+const std::string* CResourceManager::GetResourceFileName(const TResourceFileId aId)
+{
+   LOG_METHOD();
+   for (auto file : iFiles) {
+      if (std::get<0>(file) == aId) {
+         return &std::get<2>(file);
+      }
+   }
+   return nullptr;
+}
+
 } // namespace Client

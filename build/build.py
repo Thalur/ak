@@ -83,10 +83,12 @@ class cd:
 
   def __enter__(self):
     self.savedPath = os.getcwd()
+    print "Changing directory to " + self.newPath
     os.chdir(self.newPath)
 
   def __exit__(self, etype, value, traceback):
     os.chdir(self.savedPath)
+    print "Resetting directory to " + self.savedPath
 
 #####
 # Build configuration implementations (per target system)

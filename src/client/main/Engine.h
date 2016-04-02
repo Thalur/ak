@@ -60,6 +60,9 @@ public:
                      int32_t aTexLeft, int32_t aTexTop, int32_t aTexRight, int32_t aTexBottom) final {
       iGraphicsComponent->Draw(aTexture, x, y, aWidth, aHeight, aTexLeft, aTexTop, aTexRight, aTexBottom);
    }
+   virtual void DrawScaled(TResourceFileId aTexture, int32_t x, int32_t y, int32_t aScale) final {
+      iGraphicsComponent->DrawScaled(aTexture, x, y, aScale);
+   }
    virtual void Text(TResourceFileId aFont, const std::string& aLine, int32_t x, int32_t y,
                      TFontStyle aStyle, int32_t aScale, uint32_t aVariant) final {
       Text(aFont, aLine, x, y, 0, 0, TFontStyle(aStyle.iHorizontal, aStyle.iVertical, ELines::NOCLIP), aScale, aVariant);

@@ -104,7 +104,7 @@ private:
       return iChars.rbegin()->second;
    }
 
-   const CGraphicsComponent* iGraphics;
+   mutable CGraphicsComponent* iGraphics;
    const std::vector<uint32_t> iFontVariants;
    const TCharMap iChars;
    const uint32_t iDefaultChar;

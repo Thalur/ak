@@ -97,7 +97,7 @@ TMemoryFilePtr CCabManager::GetFile(TSize aIndex) const
          }
       }
    }
-   LOG_ERROR("Invalid index %" PRIuS, aIndex);
+   LOG_DEBUG("Invalid index %" PRIuS, aIndex);
    return TMemoryFilePtr();
 }
 
@@ -106,11 +106,11 @@ TMemoryFilePtr CCabManager::GetFile(const std::string& aFilePrefix) const
    LOG_PARAMS(aFilePrefix.c_str());
    const std::vector<TFileEntry>::const_iterator it = std::lower_bound(iFileIndex.begin(), iFileIndex.end(),
          aFilePrefix, CmpFileNameIndex);
-   if (it != iFileIndex.end()) {
+   if ((it != iFileIndex.end()) && (std::get<0>(*it) == aFilePrefix)) {
       LOG_DEBUG("Found file %s: %u, %u", aFilePrefix.c_str(), std::get<1>(*it), std::get<2>(*it));
       return iCabinets[std::get<1>(*it)]->ReadFileByIndex(std::get<2>(*it));
    }
-   LOG_ERROR("File not found");
+   LOG_ERROR("File not found: %s", aFilePrefix.c_str());
    return TMemoryFilePtr();
 }
 

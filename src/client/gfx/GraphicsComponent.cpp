@@ -10,8 +10,8 @@
 namespace Client
 {
 
-CGraphicsComponent::CGraphicsComponent(int32_t aWidth, int32_t aHeight)
- : iWidth(aWidth), iHeight(aHeight), iCurrentTexture(-1), iBlending(false)
+CGraphicsComponent::CGraphicsComponent(CCabManager& aCabinets, int32_t aWidth, int32_t aHeight)
+ : iCabinets(aCabinets), iWidth(aWidth), iHeight(aHeight), iCurrentTexture(-1), iBlending(false)
 {
    LOG_METHOD();
 }
@@ -42,31 +42,46 @@ void CGraphicsComponent::InitOpenGL()
    glMatrixMode(GL_MODELVIEW);
 }
 
-void CGraphicsComponent::LoadGraphics(CCabManager &aCabinets, const TFileList &aFiles)
+void CGraphicsComponent::LoadGraphics(const TFileList &aFiles)
 {
    LOG_METHOD();
    for (const auto& file : aFiles) {
       if (iTextures.find(file.first) == iTextures.end()) { // Texture not yet loaded
-         TFilePtr memFile = aCabinets.GetFile(file.first);
-         if (!memFile) { // Try loading by filename if by index did not work
-            memFile = aCabinets.GetFile(file.second);
-         }
-         if (memFile) {
-            TTexturePtr texture = LoadFromMemory(memFile, file.second.c_str());
-            if (texture) {
-               iTextures[file.first] = std::move(texture);
-            }
-         }
+         LoadTexture(file.first, file.second);
       }
    }
 }
 
-void CGraphicsComponent::LoadFonts(CCabManager &aCabinets, const TFileList &aFiles, CResourceManager& aResourceManager)
+const CTexture* CGraphicsComponent::LoadTexture(const TResourceFileId aId, const std::string& aFilename)
+{
+   TFilePtr memFile = iCabinets.GetFile(aId);
+   if (!memFile) { // Try loading by filename if by index did not work
+      memFile = iCabinets.GetFile(aFilename);
+   }
+   if (memFile) {
+      TTexturePtr texture = LoadFromMemory(memFile, aFilename.c_str());
+      if (texture) {
+         iTextures[aId] = std::move(texture);
+         return &*iTextures[aId];
+      }
+   }
+   iTextures[aId] = TTexturePtr(); // Store the failure to load
+   return nullptr;
+}
+
+const CTexture* CGraphicsComponent::LoadLazy(TResourceFileId aId)
+{
+   LOG_PARAMS("Id: %u", aId);
+   std::string filename { "" };
+   return LoadTexture(aId, filename);
+}
+
+void CGraphicsComponent::LoadFonts(const TFileList &aFiles, CResourceManager& aResourceManager)
 {
    LOG_METHOD();
    for (const auto& file : aFiles) {
       if (iFonts.find(file.first) == iFonts.end()) { // Font not yet loaded
-         TMemoryFilePtr memFile = aCabinets.GetFile(file.first);
+         TMemoryFilePtr memFile = iCabinets.GetFile(file.first);
          if (memFile) {
             TFontPtr font = CFont::FromFile(*memFile, aResourceManager, this);
             if (font) {
@@ -76,6 +91,7 @@ void CGraphicsComponent::LoadFonts(CCabManager &aCabinets, const TFileList &aFil
       }
    }
 }
+
 
 #ifdef AK_SYSTEM_ANDROID
 void CGraphicsComponent::Crop(int32_t aLeft, int32_t aTop, int32_t aRight, int32_t aBottom)

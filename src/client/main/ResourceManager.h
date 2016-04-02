@@ -98,6 +98,8 @@ public:
     */
    TResourceFileId GetResourceId(const std::string &aResource);
 
+   const std::string* GetResourceFileName(TResourceFileId aId);
+
    // Convenience method
    bool IsResourceSubset(TRequiredResources aSubset, TRequiredResources aSuperset);
 

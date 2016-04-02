@@ -19,12 +19,12 @@ namespace Client
 class CGraphicsComponent
 {
 public:
-   CGraphicsComponent(int32_t aWidth, int32_t aHeight);
+   CGraphicsComponent(CCabManager& aCabinets, int32_t aWidth, int32_t aHeight);
    ~CGraphicsComponent();
 
    void InitOpenGL();
-   void LoadGraphics(CCabManager& aCabinets, const TFileList& aFiles);
-   void LoadFonts(CCabManager& aCabinets, const TFileList& aFiles, CResourceManager &aResourceManager);
+   void LoadGraphics(const TFileList& aFiles);
+   void LoadFonts(const TFileList& aFiles, CResourceManager &aResourceManager);
 
    // Most drawing methods are inline for performance reasons
    void StartFrame() const
@@ -34,7 +34,7 @@ public:
       iCurrentTexture = -1;
    }
 
-   void Draw(TResourceFileId aTexture, int32_t x, int32_t y) const
+   void Draw(TResourceFileId aTexture, int32_t x, int32_t y)
    {
       const CTexture* texture = GetTexture(aTexture);
       if (texture != nullptr) {
@@ -42,7 +42,7 @@ public:
       }
    }
 
-   void Draw(TResourceFileId aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight) const
+   void Draw(TResourceFileId aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight)
    {
       const CTexture* texture = GetTexture(aTexture);
       if (texture != nullptr) {
@@ -51,7 +51,7 @@ public:
    }
 
    void Draw(TResourceFileId aTexture, int32_t x, int32_t y, int32_t aWidth, int32_t aHeight,
-             int32_t aTexLeft, int32_t aTexTop, int32_t aTexRight, int32_t aTexBottom) const
+             int32_t aTexLeft, int32_t aTexTop, int32_t aTexRight, int32_t aTexBottom)
    {
       const CTexture* texture = GetTexture(aTexture);
       if (texture != nullptr) {
@@ -59,8 +59,16 @@ public:
       }
    }
 
+   void DrawScaled(TResourceFileId aTexture, int32_t x, int32_t y, int32_t aScale)
+   {
+      const CTexture* texture = GetTexture(aTexture);
+      if (texture != nullptr) {
+         DrawTexture(*texture, x, y, texture->Width() * aScale, texture->Height() * aScale);
+      }
+   }
+
    void DrawText(TResourceFileId aFont, const std::string& aLine, int32_t x, int32_t y, int32_t aWidth,
-                 int32_t aHeight, TFontStyle aStyle, int32_t aScale, uint32_t aVariant) const
+                 int32_t aHeight, TFontStyle aStyle, int32_t aScale, uint32_t aVariant)
    {
       auto it = iFonts.find(aFont);
       if (it != iFonts.end()) {
@@ -97,13 +105,17 @@ private:
 #endif
    }
 
-   const CTexture* GetTexture(const TResourceFileId aTexture) const
+   const CTexture* GetTexture(const TResourceFileId aTexture)
    {
       auto texture = iTextures.find(aTexture);
-      if (texture != iTextures.end()) {
-         return &(*texture->second);
+      if (texture != iTextures.end()) { // We already tried to load the texture
+         if (texture->second) { // Texture was successfully loaded
+            return &(*texture->second);
+         } else {
+            return nullptr;
+         }
       }
-      return nullptr;
+      return LoadLazy(aTexture);
    }
    void BindTexture(const CTexture& aTexture) const
    {
@@ -121,6 +133,9 @@ private:
       }
    }
 
+   const CTexture* LoadTexture(TResourceFileId aId, const std::string& aFilename);
+   const CTexture* LoadLazy(TResourceFileId aId);
+
    // Platform-dependent blit methods
 #ifdef AK_SYSTEM_ANDROID
    static void Crop(int32_t aLeft, int32_t aTop, int32_t aRight, int32_t aBottom);
@@ -131,6 +146,9 @@ private:
    static void NativeBlitPosix(float x, float y, float aWidth, float aHeight,
                                float cropLeft, float cropTop, float cropRight, float cropBottom);
 #endif
+
+   // References to other components
+   CCabManager& iCabinets;
 
    // Drawing state
    int32_t iWidth;

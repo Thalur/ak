@@ -32,7 +32,7 @@ void CEngine::OnInitWindow(int32_t aWidth, int32_t aHeight)
    iHeight = aHeight;
 
    // Initialize the graphics engine
-   iGraphicsComponent = make_unique<CGraphicsComponent>(iWidth, iHeight);
+   iGraphicsComponent = make_unique<CGraphicsComponent>(iCabinetManager, iWidth, iHeight);
    iGraphicsComponent->InitOpenGL();
 
    // Load graphics for splash screen
@@ -222,10 +222,10 @@ void CEngine::LoadData(TRequiredResources aRequiredResources)
    LOG_INFO("Loading resources for categories %s", aRequiredResources.to_string().c_str());
    // 1. Load fonts
    const TFileList fontFiles = iResourceManager.GetFileList(aRequiredResources, EFileType::FONT);
-   iGraphicsComponent->LoadFonts(iCabinetManager, fontFiles, iResourceManager);
+   iGraphicsComponent->LoadFonts(fontFiles, iResourceManager);
    // 2. Load images
    const TFileList gfxFiles = iResourceManager.GetFileList(aRequiredResources, EFileType::GFX);
-   iGraphicsComponent->LoadGraphics(iCabinetManager, gfxFiles);
+   iGraphicsComponent->LoadGraphics(gfxFiles);
    // 3. Load SFX
    const TFileList sfxFiles = iResourceManager.GetFileList(aRequiredResources, EFileType::SFX);
    // ...

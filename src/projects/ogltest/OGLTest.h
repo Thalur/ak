@@ -42,6 +42,8 @@ private:
 
    TGameStatePtr iGameState;
    TGameStatePtr iNextGameState;
+
+   uint32_t iOrcOffset = 0;
 };
 
 #endif // AK_OGLTEST_H_INCLUDED

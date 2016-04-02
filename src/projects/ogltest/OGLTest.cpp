@@ -62,6 +62,8 @@ void COGLTest::Draw(int32_t aFps)
       sLastFps = aFps;
    }
    Engine()->Text(F_FONT_DUNE3DLARGE, sFps, 0, 0, Engine()->Width(), Engine()->Height() - 10, TFontStyle(EHorizontal::CENTER, EVertical::BOTTOM));
+   Engine()->DrawScaled(F_ORC_00 + iOrcOffset/6, 0, 0, 2);
+   iOrcOffset = (iOrcOffset + 1) % (72*6);
 }
 
 bool COGLTest::Tick()
